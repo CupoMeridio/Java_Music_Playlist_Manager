@@ -1,0 +1,123 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://www.w3.org/maven-v4_0_0.xsd">
+
+    <!-- Versione del modello POM -->
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Informazioni del progetto -->
+    <groupId>it.unisa</groupId>
+    <artifactId>Java_Music_Playlist_Manager</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <!-- Proprietà globali -->
+    <properties>
+
+        <!-- Encoding del progetto -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Versione Java utilizzata -->
+        <maven.compiler.release>21.0.9</maven.compiler.release>
+
+    </properties>
+
+    <!-- Librerie utilizzate dal progetto -->
+    <dependencies>
+
+        <!-- Componenti grafici JavaFX -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>21.0.9</version>
+        </dependency>
+
+        <!-- Supporto ai file FXML -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>21.0.9</version>
+        </dependency>
+        
+    </dependencies>
+
+    <!-- Configurazione build Maven -->
+    <build>
+        <plugins>
+            <!-- Plugin per compilare il progetto -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <!-- Compila usando Java 21 -->
+                    <release>21</release>                
+                </configuration>
+            </plugin>
+
+            <!-- Plugin per eseguire applicazioni JavaFX -->
+            <plugin>
+
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <!-- Classe principale dell'app -->
+                    <mainClass>
+                        it.unisa.java_music_playlist_manager/it.unisa.java_music_playlist_manager.App
+                    </mainClass>
+                    <options>
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
+
+                </configuration>
+                <executions>
+                    
+                    <!-- Esecuzione standard -->
+                    <execution>
+                        <id>default-cli</id>
+                    </execution>
+
+                    <!-- Configurazione debug -->
+                    <execution>
+                        <id>debug</id>
+                        <configuration>
+                            <options>
+                                <option>
+                                    -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:8000
+                                </option>
+                            </options>
+                        </configuration>
+                    </execution>
+
+                    <!-- Debug tramite IDE -->
+                    <execution>
+                        <id>ide-debug</id>
+                        <configuration>
+                            <options>
+                                <option>
+                                    -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
+                                </option>
+                            </options>
+                        </configuration>
+                    </execution>
+
+                    <!-- Configurazione profiling -->
+                    <execution>
+                        <id>ide-profile</id>
+                        <configuration>
+                            <options>
+                                <option>${profiler.jvmargs.arg1}</option>
+                                <option>${profiler.jvmargs.arg2}</option>
+                                <option>${profiler.jvmargs.arg3}</option>
+                                <option>${profiler.jvmargs.arg4}</option>
+                                <option>${profiler.jvmargs.arg5}</option>
+                            </options>
+                        </configuration>                     
+                    </execution>
+                    
+                </executions>
+            </plugin>
+            
+        </plugins>
+    </build>
+</project>
