@@ -12,7 +12,7 @@
 <?import javafx.scene.control.ComboBox?>
 
 <!--
-    View secondaria per l'inserimento di un nuovo brano.
+    View secondaria per l'inserimento o la modifica di un brano.
 
     Non viene dichiarato fx:controller, perché il progetto utilizza
     un solo controller centrale: PrimaryViewController.
@@ -36,7 +36,8 @@
     <children>
 
         <!-- Titolo del form -->
-        <Label text="Aggiungi nuovo brano"
+        <Label fx:id="formTitleLabel"
+               text="Aggiungi nuovo brano"
                style="-fx-font-size: 20px; -fx-font-weight: bold;" />
 
         <!--
@@ -127,7 +128,7 @@
         <HBox spacing="10.0" alignment="CENTER_LEFT">
             <children>
                 <!--
-                    Pulsanti del form: Salva aggiunge il brano alla Library,
+                    Pulsanti del form: Salva aggiunge il brano alla Library o lo modifica,
                     Annulla chiude la finestra. L'aggiornamento della tabella
                     principale sarà integrato nella fase di collegamento con la View.
                 -->

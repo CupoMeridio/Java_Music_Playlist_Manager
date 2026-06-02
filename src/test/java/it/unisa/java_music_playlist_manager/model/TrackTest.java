@@ -106,4 +106,80 @@ public class TrackTest {
         
         assertEquals("La durata deve essere maggiore di zero secondi.", exception.getMessage());
     }
+    
+        // TEST PATTERN OBSERVER
+
+    @Test
+    public void testObserverNotificationOnEdit() {
+        // observer finto per test
+        class TestObserver implements Observer {
+            boolean isUpdated = false;
+            
+            @Override
+            public void update() {
+                isUpdated = true;
+            }
+        }
+        
+        TestObserver observer = new TestObserver();
+        track.attach(observer);
+        
+        // modifico titolo: deve esser notificato l'observer
+        track.setTitle("Nuovo Titolo Modificato");
+        assertTrue(observer.isUpdated, "L'observer deve essere notificato dopo la modifica effettiva del titolo");
+        
+        // resetto flag
+        observer.isUpdated = false;
+        track.setYear(2025);
+        assertTrue(observer.isUpdated, "L'observer deve essere notificato dopo la modifica effettiva dell'anno");
+    }
+
+    @Test
+    public void testObserverNotNotifiedWhenValueIsSame() {
+        class TestObserver implements Observer {
+            boolean isUpdated = false;
+            
+            @Override
+            public void update() {
+                isUpdated = true;
+            }
+        }
+        
+        TestObserver observer = new TestObserver();
+        track.attach(observer);
+        
+        // stesso identico titolo con cui la traccia è stata inizializzata nel setUp() ("Epitaph")
+        track.setTitle("Epitaph");
+        
+        // observer NON dovrebbe essere notificato perché il valore non è realmente cambiato
+        assertFalse(observer.isUpdated, "L'observer non deve essere notificato se il nuovo valore è uguale al precedente");
+        
+        // verifico anche con gli spazi vuoti, dato che il setter applica il trim()
+        track.setTitle("   Epitaph   ");
+        assertFalse(observer.isUpdated, "L'observer non deve essere notificato nemmeno se si inseriscono spazi ignorati dal trim");
+    }
+
+    @Test
+    public void testObserverDetach() {
+        class TestObserver implements Observer {
+            boolean isUpdated = false;
+            
+            @Override
+            public void update() {
+                isUpdated = true;
+            }
+        }
+        
+        TestObserver observer = new TestObserver();
+        track.attach(observer);
+        
+        // scollego
+        track.detach(observer);
+        
+        track.setAuthor("Nuovo Autore");
+        
+        // verifico che non viene notificato essendo scollegato
+        assertFalse(observer.isUpdated, "L'observer non deve essere notificato se è stato scollegato (detach)");
+    }
+
 }

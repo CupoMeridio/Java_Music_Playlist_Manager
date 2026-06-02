@@ -19,6 +19,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import it.unisa.java_music_playlist_manager.model.Observer;
 
 /**
   * Controller per la gestione della vista principale (primaryView.fxml).
@@ -28,7 +34,25 @@ import javafx.stage.Stage;
   * Attualmente i metodi di gestione eventi implementano stampe a console come placeholder
   * in attesa dell'integrazione delle classi di logica e dei modelli dati del programma.
   */
-public class PrimaryViewController {
+public class PrimaryViewController implements Observer {
+
+    private Track currentEditingTrack = null;
+
+    @Override
+    public void update() {
+        if (songTableView != null) {
+            refreshTableData();
+            songTableView.refresh();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void refreshTableData() {
+        if ("Musica".equals(viewTitleLabel.getText()) || "Coda di riproduzione".equals(viewTitleLabel.getText())) {
+            ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
+            ((TableView<Track>) songTableView).setItems(trackList);
+        }
+    }
 
     // CONTROLLI BARRA LATERALE
     @FXML
@@ -117,6 +141,9 @@ public class PrimaryViewController {
     @FXML
     private ComboBox<String> addTrackGenreComboBox;
 
+    @FXML
+    private Label formTitleLabel;
+
     // METODO DI INIZIALIZZAZIONE
     @FXML
     public void initialize() {
@@ -146,7 +173,26 @@ public class PrimaryViewController {
         // Configurazione iniziale delle colonne (Vista Brani)
         showSongsColumns();
         
+        ContextMenu contextMenu = new ContextMenu();
+        MenuItem editItem = new MenuItem("Modifica brano");
+        editItem.setOnAction(e -> handleEditTrack());
+        contextMenu.getItems().add(editItem);
+        songTableView.setContextMenu(contextMenu);
+        
+        contextMenu.setOnShowing(e -> {
+            editItem.setDisable(songTableView.getSelectionModel().getSelectedItem() == null);
+        });
+        
         System.out.println("Interfaccia grafica inizializzata correttamente.");
+    }
+    
+    @FXML
+    private void handleEditTrack() {
+        Object selected = songTableView.getSelectionModel().getSelectedItem();
+        if (selected instanceof Track) {
+            currentEditingTrack = (Track) selected;
+            openAddTrackView();
+        }
     }
 
     // GESTORI EVENTI BARRA LATERALE
@@ -185,28 +231,36 @@ public class PrimaryViewController {
     /**
      * Configura le colonne della tabella per la visualizzazione dei brani.
      */
+    @SuppressWarnings("unchecked")
     private void showSongsColumns() {
          songTableView.getColumns().clear();
          
-         TableColumn titleCol = new TableColumn("Titolo");
+         TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
          titleCol.setPrefWidth(200);
+         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
          
-         TableColumn artistCol = new TableColumn("Artista");
+         TableColumn<Track, String> artistCol = new TableColumn<>("Artista");
          artistCol.setPrefWidth(150);
+         artistCol.setCellValueFactory(new PropertyValueFactory<>("author"));
          
-         TableColumn albumCol = new TableColumn("Album");
+         TableColumn<Track, String> albumCol = new TableColumn<>("Album");
          albumCol.setPrefWidth(150);
          
-         TableColumn yearCol = new TableColumn("Anno");
+         TableColumn<Track, Integer> yearCol = new TableColumn<>("Anno");
          yearCol.setPrefWidth(80);
+         yearCol.setCellValueFactory(new PropertyValueFactory<>("year"));
          
-         TableColumn genreCol = new TableColumn("Genere");
+         TableColumn<Track, String> genreCol = new TableColumn<>("Genere");
          genreCol.setPrefWidth(120);
+         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
          
-         TableColumn durationCol = new TableColumn("Durata");
+         TableColumn<Track, Integer> durationCol = new TableColumn<>("Durata");
          durationCol.setPrefWidth(80);
+         durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
          
-         songTableView.getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
+         ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
+         
+         refreshTableData();
      }
  
      /**
@@ -229,12 +283,21 @@ public class PrimaryViewController {
 
     private void openAddTrackView() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/addTrackView.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/views/addTrackView.fxml"));
 
             // Usa lo stesso controller già esistente
             loader.setController(this);
 
             Parent root = loader.load();
+            
+            if (formTitleLabel != null) {
+                if (currentEditingTrack != null) {
+                    formTitleLabel.setText("Modifica brano");
+                } else {
+                    formTitleLabel.setText("Aggiungi nuovo brano");
+                }
+            }
+            
             // Popoliamo la ComboBox del form "Aggiungi brano".
             // Questa operazione va fatta dopo loader.load(), perché solo dopo il caricamento
             // dell'FXML il campo addTrackGenreComboBox viene collegato al nodo grafico.
@@ -248,6 +311,20 @@ public class PrimaryViewController {
                         "Rap",
                         "Elettronica"
                 );
+            }
+            
+            if (currentEditingTrack != null) {
+                addTrackTitleField.setText(currentEditingTrack.getTitle());
+                addTrackAuthorField.setText(currentEditingTrack.getAuthor());
+                addTrackDurationField.setText(String.valueOf(currentEditingTrack.getDuration()));
+                addTrackYearField.setText(String.valueOf(currentEditingTrack.getYear()));
+                addTrackGenreComboBox.setValue(currentEditingTrack.getGenre());
+            } else {
+                addTrackTitleField.setText("");
+                addTrackAuthorField.setText("");
+                addTrackDurationField.setText("");
+                addTrackYearField.setText("");
+                addTrackGenreComboBox.setValue(null);
             }
 
             // Pulizia eventuale del messaggio di errore ogni volta che si apre il form
@@ -279,6 +356,7 @@ public class PrimaryViewController {
         String currentView = viewTitleLabel.getText();
         if ("Musica".equals(currentView)) {
             System.out.println("Azione: Apertura dialogo per aggiungere un nuovo brano alla libreria");
+            currentEditingTrack = null;
             openAddTrackView();
         } else if ("Playlist".equals(currentView)) {
             System.out.println("Azione: Apertura dialogo per creare una nuova playlist");
@@ -322,7 +400,7 @@ public class PrimaryViewController {
         System.out.println("Player: Muto / Attiva audio");
     }
 
-    // Metodo per salvare
+    // metodo per salvare
     @FXML
     private void handleSaveTrack() {
         try {
@@ -334,14 +412,14 @@ public class PrimaryViewController {
             String yearText = addTrackYearField.getText().trim();
 
 
-            // 1. Prima controllo se ci sono campi vuoti
+            // campi vuoti
             if (title.isEmpty() || author.isEmpty() || durationText.isEmpty()
                     || genre == null || yearText.isEmpty()) {
                 addTrackErrorLabel.setText("Compila tutti i campi obbligatori.");
                 return;
             }
 
-            // 2. Solo dopo controllo se durata e anno sono numeri
+           
             int duration;
             int year;
 
@@ -359,15 +437,25 @@ public class PrimaryViewController {
                 return;
             }
 
-            // 3. Creo il brano: qui intervengono anche le validazioni della classe Track
-            Track track = new Track(title, author, duration, genre, year);
+            // creo ed aggiorno il brano
+            if (currentEditingTrack != null) {
+                currentEditingTrack.setTitle(title);
+                currentEditingTrack.setAuthor(author);
+                currentEditingTrack.setDuration(duration);
+                currentEditingTrack.setGenre(genre);
+                currentEditingTrack.setYear(year);
+                System.out.println("Brano modificato: " + currentEditingTrack.getTitle());
+            } else {
+                Track track = new Track(title, author, duration, genre, year);
+                track.attach(this);
+                // aggiungo brano alla library
+                Library.getInstance().addTrack(track);
+                System.out.println("Brano aggiunto: " + track.getTitle());
+                System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
+                refreshTableData();
+            }
 
-            // 4. Aggiungo il brano alla Library
-            Library.getInstance().addTrack(track);
-            System.out.println("Brano aggiunto: " + track.getTitle());
-            System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
-
-            // 5. Chiudo la finestra
+            // chiudo finestra
             Stage stage = (Stage) addTrackTitleField.getScene().getWindow();
             stage.close();
 

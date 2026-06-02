@@ -12,7 +12,12 @@ import java.util.UUID;
 // temporaneamente non inserisco implement subject
 // ma con il fatto ceh si possa modificare, dovrebbe avvisare il controller
 // quando la track viene modificata
-public final class Track implements Playable  {
+import java.util.ArrayList;
+import java.util.List;
+
+public final class Track implements Playable, Subject {
+    
+    private final List<Observer> observers = new ArrayList<>();
     
     private final String id;
     private String title;
@@ -42,28 +47,40 @@ public final class Track implements Playable  {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Il titolo non può essere vuoto o nullo.");
         }
-        this.title = title.trim();
+        if (this.title == null || !this.title.equals(title.trim())) {
+            this.title = title.trim();
+            notifyObservers();
+        }
     }
 
     public void setAuthor(String author) {
         if (author == null || author.trim().isEmpty()) {
             throw new IllegalArgumentException("L'autore non può essere vuoto o nullo.");
         }
-        this.author = author.trim();
+        if (this.author == null || !this.author.equals(author.trim())) {
+            this.author = author.trim();
+            notifyObservers();
+        }
     }
 
     public void setDuration(int duration) {
         if (duration <= 0) {
             throw new IllegalArgumentException("La durata deve essere maggiore di zero secondi.");
         }
-        this.duration = duration;
+        if (this.duration != duration) {
+            this.duration = duration;
+            notifyObservers();
+        }
     }
 
     public void setGenre(String genre) {
         if (genre == null || genre.trim().isEmpty()) {
             throw new IllegalArgumentException("Il genere non può essere vuoto o nullo.");
         }
-        this.genre = genre.trim();
+        if (this.genre == null || !this.genre.equals(genre.trim())) {
+            this.genre = genre.trim();
+            notifyObservers();
+        }
     }
 
     public void setYear(int year) {
@@ -71,7 +88,29 @@ public final class Track implements Playable  {
         if (year < 0 || year > thisYear) {
             throw new IllegalArgumentException("Non puoi inserire tracce dal futuro o con anni negativi.");
         }
-        this.year = year;
+        if (this.year != year) {
+            this.year = year;
+            notifyObservers();
+        }
+    }
+    
+    @Override
+    public void attach(Observer observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void detach(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer observer : observers) {
+            observer.update();
+        }
     }
     
     /*Solo play verra effettivamente implementata in futuro in quanto Track è la foglia*/
