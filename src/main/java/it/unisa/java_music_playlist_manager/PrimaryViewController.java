@@ -148,6 +148,8 @@ public class PrimaryViewController implements Observer {
     // METODO DI INIZIALIZZAZIONE
     @FXML
     public void initialize() {
+        Library.getInstance().attach(this);
+
         if (sortComboBox != null) {
             sortComboBox.getItems().addAll("A - Z", "Z - A", "Artista", "Anno", "Durata");
         }
@@ -177,11 +179,19 @@ public class PrimaryViewController implements Observer {
         ContextMenu contextMenu = new ContextMenu();
         MenuItem editItem = new MenuItem("Modifica brano");
         editItem.setOnAction(e -> handleEditTrack());
-        contextMenu.getItems().add(editItem);
+
+        MenuItem deleteItem = new MenuItem("Elimina brano");
+        deleteItem.setOnAction(e -> handleDeleteTrack());
+
+        contextMenu.getItems().addAll(editItem, deleteItem);
         songTableView.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {
-            editItem.setDisable(songTableView.getSelectionModel().getSelectedItem() == null);
+            Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+            boolean noTrackSelected = !(selectedItem instanceof Track);
+
+            editItem.setDisable(noTrackSelected);
+            deleteItem.setDisable(noTrackSelected);
         });
 
         updatePlayerUI();
@@ -194,6 +204,21 @@ public class PrimaryViewController implements Observer {
         if (selected instanceof Track) {
             currentEditingTrack = (Track) selected;
             openAddTrackView();
+        }
+    }
+
+    @FXML
+    private void handleDeleteTrack() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (selectedItem instanceof Track) {
+            Track selectedTrack = (Track) selectedItem;
+            boolean removed = Library.getInstance().removeTrack(selectedTrack);
+            if (removed) {
+                System.out.println("Brano eliminato dalla libreria e dalle playlist: " + selectedTrack.getTitle());
+            } else {
+                System.out.println("Brano non trovato nella libreria.");
+            }
         }
     }
 
@@ -487,11 +512,12 @@ public class PrimaryViewController implements Observer {
             } else {
                 Track track = new Track(title, author, duration, genre, year);
                 track.attach(this);
-                // aggiungo brano alla library
+
+                // Aggiunta alla Library.
+                // La Library notificherà automaticamente gli Observer.
                 Library.getInstance().addTrack(track);
                 System.out.println("Brano aggiunto: " + track.getTitle());
                 System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
-                refreshTableData();
             }
 
             // chiudo finestra
