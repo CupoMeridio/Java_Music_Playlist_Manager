@@ -750,11 +750,11 @@ public class PrimaryViewController implements Observer {
         stage.close();
     }
 
-    // GESTIONE STATO
+
 
     /**
      * Sincronizza le Label della barra di riproduzione inferiore
-     * con il brano correntemente selezionato nel PlaybackManager.
+     * e lo stato del bottone Play/Pause con il brano correntemente nel PlaybackManager.
      */
     private void updatePlayerUI() {
         PlaybackManager manager = PlaybackManager.getInstance();
@@ -769,34 +769,43 @@ public class PrimaryViewController implements Observer {
                 currentTrackDetails.setText(currentTrack.getAuthor());
             }
 
-            // =================================================================
-            // AGGIUNTA: Sincronizzazione del cursore/selezione della tabella
-            // =================================================================
+            // 2. Sincronizzazione del cursore/selezione della tabella
             if (songTableView != null && !songTableView.getItems().isEmpty()) {
                 int indexAttivo = manager.getCurrentIndex();
 
-                // Controlliamo di essere nei limiti della tabella per sicurezza
                 if (indexAttivo >= 0 && indexAttivo < songTableView.getItems().size()) {
-                    // Seleziona la riga corrispondente all'indice del manager
                     songTableView.getSelectionModel().select(indexAttivo);
-
-                    // Muove visibilmente lo scroll della tabella per non perdere di vista il brano
                     songTableView.scrollTo(indexAttivo);
                 }
             }
 
         } else {
-            // Se non c'è nessun brano in riproduzione (coda vuota o finita)
+            // Se non c'è nessun brano in riproduzione
             if (currentTrackTitle != null) {
                 currentTrackTitle.setText("Nessun brano in riproduzione");
             }
             if (currentTrackDetails != null) {
                 currentTrackDetails.setText("");
             }
-
-            // Opzionale: pulisce la selezione dalla tabella se tutto è fermo
             if (songTableView != null) {
                 songTableView.getSelectionModel().clearSelection();
+            }
+        }
+
+        // GESTIONE CAMBIO DINAMICO DEL TESTO DEL BOTTONE PLAY/PAUSA
+
+        if (playPauseButton != null) {
+            // Recuperiamo il nome della classe dello stato attuale (played/paused/stopped)
+            String currentStateName = manager.getCurrentState().getClass().getSimpleName();
+
+            // Se lo stato contiene "Play" o "Playing", significa che la musica si sente.
+            // Il bottone deve quindi offrire l'azione di fermarsi -> Mostra "Pausa" o "Stop"
+            if (currentStateName.toLowerCase().contains("play")) {
+                playPauseButton.setText("||");
+            } else {
+                // Se siamo in StoppedState o PausedState, il brano è fermo.
+                // Il bottone deve offrire l'azione di ripartire -> Mostra "Play"
+                playPauseButton.setText("▶");
             }
         }
     }
