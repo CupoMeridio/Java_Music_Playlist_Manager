@@ -3,7 +3,9 @@ package it.unisa.java_music_playlist_manager;
 import java.io.IOException;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.Track;
+import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import java.util.List;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,6 +15,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -20,6 +23,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -41,6 +45,7 @@ import it.unisa.java_music_playlist_manager.model.Observer;
 public class PrimaryViewController implements Observer {
 
     private Track currentEditingTrack = null;
+    private Playlist currentOpenedPlaylist = null;
 
     @Override
     public void update() {
@@ -52,7 +57,10 @@ public class PrimaryViewController implements Observer {
 
     @SuppressWarnings("unchecked")
     private void refreshTableData() {
-        if ("Musica".equals(viewTitleLabel.getText()) || "Coda di riproduzione".equals(viewTitleLabel.getText())) {
+        if (currentOpenedPlaylist != null) {
+            ObservableList<Track> trackList = FXCollections.observableArrayList(currentOpenedPlaylist.getTracks());
+            ((TableView<Track>) songTableView).setItems(trackList);
+        } else if ("Musica".equals(viewTitleLabel.getText()) || "Coda di riproduzione".equals(viewTitleLabel.getText())) {
             ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         }
@@ -186,15 +194,45 @@ public class PrimaryViewController implements Observer {
         MenuItem deleteItem = new MenuItem("Elimina brano");
         deleteItem.setOnAction(e -> handleDeleteTrack());
 
-        contextMenu.getItems().addAll(editItem, deleteItem);
+        MenuItem addToPlaylistItem = new MenuItem("Aggiungi a playlist");
+        addToPlaylistItem.setOnAction(e -> handleAddTrackToPlaylist());
+
+        MenuItem editPlaylistItem = new MenuItem("Modifica playlist");
+        editPlaylistItem.setOnAction(e -> handleEditPlaylist());
+
+        MenuItem deletePlaylistItem = new MenuItem("Elimina playlist");
+        deletePlaylistItem.setOnAction(e -> handleDeletePlaylist());
+
+        contextMenu.getItems().addAll(editItem, deleteItem, addToPlaylistItem, editPlaylistItem, deletePlaylistItem);
         songTableView.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {
             Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
             boolean noTrackSelected = !(selectedItem instanceof Track);
+            boolean noPlaylistSelected = !(selectedItem instanceof Playlist);
 
             editItem.setDisable(noTrackSelected);
             deleteItem.setDisable(noTrackSelected);
+            addToPlaylistItem.setDisable(noTrackSelected);
+
+            editItem.setVisible(!noTrackSelected);
+            deleteItem.setVisible(!noTrackSelected);
+            addToPlaylistItem.setVisible(!noTrackSelected);
+
+            editPlaylistItem.setDisable(noPlaylistSelected);
+            deletePlaylistItem.setDisable(noPlaylistSelected);
+            editPlaylistItem.setVisible(!noPlaylistSelected);
+            deletePlaylistItem.setVisible(!noPlaylistSelected);
+        });
+
+        songTableView.setOnMouseClicked(event -> {
+            Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+            if (event.getClickCount() == 2
+                    && currentOpenedPlaylist == null
+                    && "Playlist".equals(viewTitleLabel.getText())
+                    && selectedItem instanceof Playlist playlist) {
+                openPlaylistDetail(playlist);
+            }
         });
 
         updatePlayerUI();
@@ -244,12 +282,77 @@ public class PrimaryViewController implements Observer {
         }
     }
 
+    private void handleEditPlaylist() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (!(selectedItem instanceof Playlist selectedPlaylist)) {
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog(selectedPlaylist.getTitle());
+        dialog.setTitle("Modifica playlist");
+        dialog.setHeaderText("Modifica il nome della playlist");
+        dialog.setContentText("Nome playlist:");
+        dialog.setGraphic(null);
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(name -> {
+            try {
+                selectedPlaylist.setTitle(name);
+                Library.getInstance().notifyObservers();
+                showPlaylistColumns();
+                System.out.println("Playlist modificata: " + selectedPlaylist.getTitle());
+            } catch (IllegalArgumentException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Errore");
+                alert.setHeaderText("Nome playlist non valido");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            }
+        });
+    }
+
+    private void handleDeletePlaylist() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (!(selectedItem instanceof Playlist selectedPlaylist)) {
+            return;
+        }
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Conferma eliminazione");
+        confirmAlert.setHeaderText("Eliminare la playlist selezionata?");
+        confirmAlert.setContentText(
+                "Stai per eliminare la playlist \"" + selectedPlaylist.getTitle() + "\".\n\n" +
+                        "I brani resteranno disponibili nella libreria musicale.\n\n" +
+                        "Vuoi continuare?"
+        );
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean removed = Library.getInstance().removePlaylist(selectedPlaylist);
+
+            if (removed) {
+                showPlaylistColumns();
+                System.out.println("Playlist eliminata: " + selectedPlaylist.getTitle());
+            } else {
+                System.out.println("La playlist selezionata non è stata trovata nella libreria.");
+            }
+        } else {
+            System.out.println("Eliminazione playlist annullata dall'utente.");
+        }
+    }
+
     // GESTORI EVENTI BARRA LATERALE
     @FXML
     private void handleMusicLibraryAction() {
+        currentOpenedPlaylist = null;
         viewTitleLabel.setText("Musica");
         actionButton.setText("Aggiungi brano");
         actionButton.setVisible(true);
+        actionButton.setManaged(true);
         genreFilterContainer.setVisible(true);
         genreFilterContainer.setManaged(true);
         showSongsColumns();
@@ -258,8 +361,10 @@ public class PrimaryViewController implements Observer {
 
     @FXML
     private void handlePlayQueueAction() {
+        currentOpenedPlaylist = null;
         viewTitleLabel.setText("Coda di riproduzione");
         actionButton.setVisible(false);
+        actionButton.setManaged(false);
         genreFilterContainer.setVisible(true);
         genreFilterContainer.setManaged(true);
         showSongsColumns(); // La coda mostra solitamente i brani
@@ -268,9 +373,11 @@ public class PrimaryViewController implements Observer {
 
     @FXML
     private void handlePlaylistAction() {
+        currentOpenedPlaylist = null;
         viewTitleLabel.setText("Playlist");
         actionButton.setText("Nuova playlist");
         actionButton.setVisible(true);
+        actionButton.setManaged(true);
         genreFilterContainer.setVisible(false);
         genreFilterContainer.setManaged(false);
         showPlaylistColumns();
@@ -315,20 +422,63 @@ public class PrimaryViewController implements Observer {
      /**
       * Configura le colonne della tabella per la visualizzazione delle playlist.
       */
+     @SuppressWarnings("unchecked")
      private void showPlaylistColumns() {
          songTableView.getColumns().clear();
 
-         TableColumn nameCol = new TableColumn("Nome Playlist");
+         TableColumn<Playlist, String> nameCol = new TableColumn<>("Nome Playlist");
          nameCol.setPrefWidth(300);
+         nameCol.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-         TableColumn countCol = new TableColumn("Numero Brani");
+         TableColumn<Playlist, Integer> countCol = new TableColumn<>("Numero Brani");
          countCol.setPrefWidth(150);
+         countCol.setCellValueFactory(new PropertyValueFactory<>("trackCount"));
 
-         TableColumn dateCol = new TableColumn("Data Creazione");
-         dateCol.setPrefWidth(200);
+         TableColumn<Playlist, Integer> durationCol = new TableColumn<>("Durata");
+         durationCol.setPrefWidth(150);
+         durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
 
-         songTableView.getColumns().addAll(nameCol, countCol, dateCol);
+         ((TableView<Playlist>) songTableView).getColumns().addAll(nameCol, countCol, durationCol);
+
+         ObservableList<Playlist> playlistList = FXCollections.observableArrayList(Library.getInstance().getPlaylists());
+         ((TableView<Playlist>) songTableView).setItems(playlistList);
      }
+
+    private void openPlaylistDetail(Playlist playlist) {
+        currentOpenedPlaylist = playlist;
+        viewTitleLabel.setText(playlist.getTitle());
+        actionButton.setVisible(false);
+        actionButton.setManaged(false);
+        genreFilterContainer.setVisible(true);
+        genreFilterContainer.setManaged(true);
+        showSongsColumns();
+        System.out.println("Apertura playlist: " + playlist.getTitle());
+    }
+
+    private void openCreatePlaylistDialog() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Nuova playlist");
+        dialog.setHeaderText("Crea una nuova playlist");
+        dialog.setContentText("Nome playlist:");
+        dialog.setGraphic(null);
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(name -> {
+            try {
+                Playlist playlist = new Playlist(name);
+                Library.getInstance().addPlaylist(playlist);
+                showPlaylistColumns();
+                System.out.println("Playlist creata: " + playlist.getTitle());
+            } catch (IllegalArgumentException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Errore");
+                alert.setHeaderText("Nome playlist non valido");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
+            }
+        });
+    }
 
     private void openAddTrackView() {
         try {
@@ -409,7 +559,44 @@ public class PrimaryViewController implements Observer {
             openAddTrackView();
         } else if ("Playlist".equals(currentView)) {
             System.out.println("Azione: Apertura dialogo per creare una nuova playlist");
+            openCreatePlaylistDialog();
         }
+    }
+
+    private void handleAddTrackToPlaylist() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (!(selectedItem instanceof Track selectedTrack)) {
+            return;
+        }
+
+        List<Playlist> playlists = Library.getInstance().getPlaylists();
+
+        if (playlists.isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Nessuna playlist");
+            alert.setHeaderText("Non ci sono playlist disponibili");
+            alert.setContentText("Crea prima una playlist.");
+            alert.showAndWait();
+            return;
+        }
+
+        ChoiceDialog<Playlist> dialog = new ChoiceDialog<>(playlists.get(0), playlists);
+        dialog.setTitle("Aggiungi a playlist");
+        dialog.setHeaderText("Scegli la playlist");
+        dialog.setContentText("Playlist:");
+
+        Optional<Playlist> result = dialog.showAndWait();
+
+        result.ifPresent(playlist -> {
+            playlist.add(selectedTrack);
+            Library.getInstance().notifyObservers();
+            System.out.println(
+                    "Brano \"" + selectedTrack.getTitle()
+                            + "\" aggiunto alla playlist \""
+                            + playlist.getTitle() + "\"."
+            );
+        });
     }
 
     // GESTORI EVENTI AREA CENTRALE=
@@ -445,7 +632,11 @@ public class PrimaryViewController implements Observer {
             Track selectedTrack = (Track) selectedItem;
             String currentView = viewTitleLabel.getText();
 
-            if ("Musica".equals(currentView) || "Coda di riproduzione".equals(currentView)) {
+            if (currentOpenedPlaylist != null) {
+                System.out.println("[CONTROLLER] Brano selezionato dalla playlist: " + currentOpenedPlaylist.getTitle());
+                PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, currentOpenedPlaylist.getTracks());
+
+            } else if ("Musica".equals(currentView) || "Coda di riproduzione".equals(currentView)) {
                 System.out.println("[CONTROLLER] Brano selezionato dalla Libreria.");
                 // Carica tutti i brani della libreria e imposta l'indice su quello selezionato
                 PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());

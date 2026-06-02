@@ -3,7 +3,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package it.unisa.java_music_playlist_manager.model;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +40,26 @@ public class Playlist implements Playable{
 
     public boolean contains(Playable component) {
         return tracks.contains(component);
+    }
+
+    public int getTrackCount() {
+        return getTracks().size();
+    }
+
+    public List<Track> getTracks() {
+        List<Track> result = new ArrayList<>();
+        collectTracks(this.tracks, result);
+        return result;
+    }
+
+    private void collectTracks(Set<Playable> components, List<Track> result) {
+        for (Playable component : components) {
+            if (component instanceof Track track) {
+                result.add(track);
+            } else if (component instanceof Playlist playlist) {
+                result.addAll(playlist.getTracks());
+            }
+        }
     }
     
     @Override
@@ -80,5 +102,10 @@ public class Playlist implements Playable{
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 }
