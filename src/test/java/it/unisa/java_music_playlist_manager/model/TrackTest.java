@@ -182,4 +182,28 @@ public class TrackTest {
         assertFalse(observer.isUpdated, "L'observer non deve essere notificato se è stato scollegato (detach)");
     }
 
+
+    @Test
+    public void testTrackInfoVisualization() {
+        // 1. Verifica iniziale (Dati inseriti nel setUp)
+        assertEquals("Epitaph", track.getTitle(), "Il titolo restituito non è corretto");
+        assertEquals("King Crimson", track.getAuthor(), "L'artista restituito non è corretto");
+        assertEquals(527, track.getDuration(), "La durata restituita non è corretta");
+        assertEquals("Progressive Rock", track.getGenre(), "Il genere restituito non è corretto");
+        assertEquals(1969, track.getYear(), "L'anno restituito non è corretto");
+
+        // 2. Verifica dopo la modifica (i setter devono aggiornare i metadati restituiti dai getter)
+        track.setTitle("21st Century Schizoid Man");
+        track.setAuthor("Crimson");
+        track.setDuration(443);
+        track.setGenre("Heavy Prog");
+        track.setYear(1969);
+
+        assertEquals("21st Century Schizoid Man", track.getTitle());
+        assertEquals("Crimson", track.getAuthor());
+        assertEquals(443, track.getDuration());
+        assertEquals("Heavy Prog", track.getGenre());
+        assertEquals(1969, track.getYear());
+    }
+
 }
