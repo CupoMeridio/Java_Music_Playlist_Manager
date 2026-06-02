@@ -178,4 +178,24 @@ public class LibraryTest {
                 "Gli altri brani presenti nella playlist non devono essere rimossi");
     }
 
+    // Test accesso sicuro alle playlist
+    @Test
+    public void testGetPlaylistsRitornaCopia() {
+        Playlist playlist1 = new Playlist("Rock");
+        Playlist playlist2 = new Playlist("Pop");
+
+        library.addPlaylist(playlist1);
+
+        // Ottengo la lista restituita dalla Library e provo a modificarla
+        List<Playlist> copiaPlaylists = library.getPlaylists();
+        copiaPlaylists.add(playlist2);
+
+        // Verifico che la lista interna della Library non sia stata modificata
+        assertEquals(1, library.getPlaylists().size(),
+                "Modificare la lista restituita da getPlaylists non deve alterare la Library interna");
+
+        assertFalse(library.getPlaylists().contains(playlist2),
+                "La Library originale non deve contenere la playlist aggiunta solo alla copia");
+    }
+
 }
