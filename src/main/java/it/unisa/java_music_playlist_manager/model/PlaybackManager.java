@@ -120,17 +120,38 @@ public class PlaybackManager {
     // --- INTERFACCIA PER I BOTTONI (Metodi delegati allo Stato Corrente) ---
 
     public void pressPlay() {
+        // CONTROLLO DI SICUREZZA: Impedisce l'avvio se non è caricato alcun contenuto
+        if (currentQueue == null || currentQueue.isEmpty() || getCurrentTrack() == null) {
+            System.out.println("[MANAGER - ERROR] Impossibile avviare il player: nessuna canzone caricata nella coda.");
+            return; // Blocca l'esecuzione e impedisce il cambio di stato
+        }
+
+        // Se il controllo è superato, delega allo Stato Corrente (StoppedState o PausedState)
         currentState.play(this);
     }
+
     public void pressStop() {
+        // Sicurezza: se la coda è già vuota, non c'è nulla da interrompere
+        if (currentQueue == null || currentQueue.isEmpty()) {
+            System.out.println("[MANAGER] Coda vuota, nulla da interrompere.");
+            return;
+        }
         currentState.stop(this);
     }
 
     public void pressNext() {
+        if (currentQueue == null || currentQueue.isEmpty()) {
+            System.out.println("[MANAGER] Coda vuota, impossibile andare al brano successivo.");
+            return;
+        }
         currentState.next(this);
     }
 
     public void pressPrevious() {
+        if (currentQueue == null || currentQueue.isEmpty()) {
+            System.out.println("[MANAGER] Coda vuota, impossibile andare al brano precedente.");
+            return;
+        }
         currentState.previous(this);
     }
 
