@@ -16,7 +16,7 @@ public class Playlist implements Playable{
 
     public Playlist(String title) {
         this.id = UUID.randomUUID().toString();
-        this.title = title;
+        this.setTitle(title);
         this.tracks =  new LinkedHashSet<>();
     }
 
@@ -32,7 +32,7 @@ public class Playlist implements Playable{
         for (Playable i : collezione) {
             
             duration+= i.getDuration();
-        };
+        }
         return duration;
     }
     
