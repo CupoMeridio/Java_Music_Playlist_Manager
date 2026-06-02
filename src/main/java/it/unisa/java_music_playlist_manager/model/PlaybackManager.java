@@ -99,23 +99,45 @@ public class PlaybackManager {
         return this.currentState;
     }
 
+    public List<Track> getCurrentQueue() {
+        if (this.currentQueue == null) {
+            return new ArrayList<>(); // Ritorna una lista vuota anziché null per evitare crash nella UI
+        }
+        return this.currentQueue;
+    }
+
     /**
      * Carica nel player la lista di brani corrente (Libreria o Playlist)
      * e imposta l'indice esattamente sulla canzone selezionata dall'utente.
      */
     public void selectAndLoadTrack(Track selectedTrack, List<Track> tracksContext) {
-        if (tracksContext != null && selectedTrack != null) {
+        if (tracksContext != null && !tracksContext.isEmpty() && selectedTrack != null) {
             this.currentQueue = tracksContext;
-            // Trova la posizione del brano selezionato all'interno del contesto attuale
+
+            // 1. Tentativo standard tramite uguaglianza di riferimento/ID
             this.currentIndex = tracksContext.indexOf(selectedTrack);
 
-            // Fallback di sicurezza se per qualche motivo non dovesse trovarlo
+            // 2. Fallback di sicurezza: se restituisce -1, cerchiamo per contenuto reale (Titolo e Autore)
+            if (this.currentIndex == -1) {
+                for (int i = 0; i < tracksContext.size(); i++) {
+                    Track t = tracksContext.get(i);
+                    if (t.getTitle().equalsIgnoreCase(selectedTrack.getTitle()) &&
+                            t.getAuthor().equalsIgnoreCase(selectedTrack.getAuthor())) {
+                        this.currentIndex = i;
+                        break; // Trovato!
+                    }
+                }
+            }
+
+            // 3. Fallback se non lo trova
             if (this.currentIndex == -1) {
                 this.currentIndex = 0;
             }
 
-            System.out.println("[MANAGER] Coda impostata con " + tracksContext.size() + " brani. " +
-                    "Brano attivo: " + selectedTrack.getTitle() + " (Indice: " + this.currentIndex + ")");
+            System.out.println("[MANAGER] Coda caricata con successo (" + tracksContext.size() + " brani). " +
+                    "Brano attivo: " + this.currentQueue.get(this.currentIndex).getTitle() + " [Indice: " + this.currentIndex + "]");
+        } else {
+            System.out.println("[MANAGER - ERROR] Tentato caricamento di un contesto vuoto o nullo.");
         }
     }
 
@@ -124,16 +146,21 @@ public class PlaybackManager {
     // --- INTERFACCIA PER I BOTTONI (Metodi delegati allo Stato Corrente) ---
 
     public void pressPlay() {
-        // CONTROLLO DI SICUREZZA: Impedisce l'avvio se non è caricato alcun contenuto
-        if (currentQueue == null || currentQueue.isEmpty() || getCurrentTrack() == null) {
+        // CONTROLLO DI SICUREZZA: Verifichiamo solo se la coda contiene elementi
+        if (currentQueue == null || currentQueue.isEmpty()) {
             System.out.println("[MANAGER - ERROR] Impossibile avviare il player: nessuna canzone caricata nella coda.");
-            return; // Blocca l'esecuzione e impedisce il cambio di stato
+            return;
         }
 
-        // Se il controllo è superato, delega allo Stato Corrente (StoppedState o PausedState)
+        // Se l'indice è fuori dai giochi per errore, resettalo al primo brano della coda caricata
+        if (currentIndex < 0 || currentIndex >= currentQueue.size()) {
+            System.out.println("[MANAGER - WARNING] Indice " + currentIndex + " non valido per la coda attuale. Reset a 0.");
+            currentIndex = 0;
+        }
+
+        // Se siamo qui, la coda è sicuramente valida e non vuota!
         currentState.play(this);
     }
-
     public void pressStop() {
         // Sicurezza: se la coda è già vuota, non c'è nulla da interrompere
         if (currentQueue == null || currentQueue.isEmpty()) {
