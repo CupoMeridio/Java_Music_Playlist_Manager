@@ -95,6 +95,10 @@ public class PlaybackManager {
         return this.currentIndex;
     }
 
+    public PlaybackState getCurrentState() {
+        return this.currentState;
+    }
+
     /**
      * Carica nel player la lista di brani corrente (Libreria o Playlist)
      * e imposta l'indice esattamente sulla canzone selezionata dall'utente.

@@ -88,4 +88,92 @@ public class PlaybackManagerTest {
         assertNull(manager.getCurrentTrack(),
                 "Oltre l'ultimo brano, il brano corrente deve essere null per consentire l'arresto.");
     }
+
+    @Test
+    public void testPressPlayDaStoppedPassaAPlaying() {
+        // Stato iniziale forzato a Stopped
+        manager.changeState(new StoppedState());
+
+        assertTrue(manager.getCurrentState() instanceof StoppedState,
+                "Prima del comando Play, il player deve essere in StoppedState.");
+
+        manager.pressPlay();
+
+        assertTrue(manager.getCurrentState() instanceof PlayingState,
+                "Premendo Play con una coda caricata, il player deve passare a PlayingState.");
+    }
+
+    @Test
+    public void testPressPlayDaPlayingPassaAPaused() {
+        manager.changeState(new StoppedState());
+
+        manager.pressPlay(); // Stopped -> Playing
+
+        assertTrue(manager.getCurrentState() instanceof PlayingState,
+                "Dopo il primo Play, il player deve essere in PlayingState.");
+
+        manager.pressPlay(); // Playing -> Paused
+
+        assertTrue(manager.getCurrentState() instanceof PausedState,
+                "Premendo Play mentre il player è in riproduzione, deve passare a PausedState.");
+    }
+
+    @Test
+    public void testPressPlayDaPausedPassaAPlaying() {
+        manager.changeState(new StoppedState());
+
+        manager.pressPlay(); // Stopped -> Playing
+        manager.pressPlay(); // Playing -> Paused
+
+        assertTrue(manager.getCurrentState() instanceof PausedState,
+                "Il player deve trovarsi in PausedState prima della ripresa.");
+
+        manager.pressPlay(); // Paused -> Playing
+
+        assertTrue(manager.getCurrentState() instanceof PlayingState,
+                "Premendo Play da PausedState, il player deve tornare a PlayingState.");
+    }
+
+    @Test
+    public void testPressStopDaPlayingPassaAStopped() {
+        manager.changeState(new StoppedState());
+
+        manager.pressPlay(); // Stopped -> Playing
+
+        assertTrue(manager.getCurrentState() instanceof PlayingState,
+                "Dopo Play, il player deve essere in PlayingState.");
+
+        manager.pressStop(); // Playing -> Stopped
+
+        assertTrue(manager.getCurrentState() instanceof StoppedState,
+                "Premendo Stop durante la riproduzione, il player deve passare a StoppedState.");
+
+        assertEquals(0, manager.getCurrentIndex(),
+                "Dopo Stop, l'indice della coda deve essere riportato a 0.");
+    }
+
+    @Test
+    public void testComandiRiproduzioneConCodaVuotaNonCausanoCrash() {
+        // Svuotiamo la coda per simulare assenza di file caricati
+        manager.setQueue(new ArrayList<>());
+        manager.changeState(new StoppedState());
+
+        assertDoesNotThrow(() -> manager.pressPlay(),
+                "Premere Play con coda vuota non deve causare errori.");
+
+        assertDoesNotThrow(() -> manager.pressStop(),
+                "Premere Stop con coda vuota non deve causare errori.");
+
+        assertDoesNotThrow(() -> manager.pressNext(),
+                "Premere Next con coda vuota non deve causare errori.");
+
+        assertDoesNotThrow(() -> manager.pressPrevious(),
+                "Premere Previous con coda vuota non deve causare errori.");
+
+        assertTrue(manager.getCurrentState() instanceof StoppedState,
+                "Con coda vuota, il player deve rimanere in StoppedState.");
+
+        assertNull(manager.getCurrentTrack(),
+                "Con coda vuota non deve esserci nessun brano corrente.");
+    }
 }
