@@ -13,11 +13,15 @@ public class PlaybackManager {
     private List<Track> currentQueue;
     private int currentIndex;
 
+    // Riferimento alla strategia corrente (Pattern Strategy)
+    private PlaybackStrategy currentStrategy;
+
     // Costruttore privato
     private PlaybackManager() {
         this.currentState = new StoppedState(); // Stato iniziale di default
         this.currentQueue = new ArrayList<>();
         this.currentIndex = 0;
+        this.currentStrategy = new SequentialStrategy(); // di default parte con la riproduzione sequenziale
     }
 
     // Accesso globale al Singleton
@@ -37,24 +41,42 @@ public class PlaybackManager {
         }
     }
 
+    // Metodo richiamato dal Controller per cambiare strategia a runtime
+    public void setStrategy(PlaybackStrategy newStrategy) {
+        if (newStrategy != null) {
+            this.currentStrategy = newStrategy;
+            System.out.println("[MANAGER] Nuova strategia impostata: " + newStrategy.getClass().getSimpleName());
+        }
+    }
+
     // Metodo richiamato dagli Stati concreti per cambiare lo stato dell'app
     public void changeState(PlaybackState newState) {
         this.currentState = newState;
     }
 
-    // Prossima canzone (poi metterò strategy)
+    // Prossima canzone definita dalla strategia corrente
     public void advanceQueue() {
-        this.currentIndex++;
+        if (currentQueue != null && !currentQueue.isEmpty()) {
+            // Delega il calcolo del prossimo indice alla strategia attiva
+            this.currentIndex = currentStrategy.getNextIndex(this.currentIndex, this.currentQueue.size());
+            System.out.println("[MANAGER] Avanzamento coda. Nuovo indice calcolato: " + this.currentIndex);
+        }
     }
-    // canzone precedente
+
+    // Canzone precedente
     public void regressQueue() {
-        // Se l'indice è maggiore di 0, possiamo scendere di uno
-        if (this.currentIndex > 0) {
-            this.currentIndex--;
-        } else {
-            // Altrimenti lo forziamo a rimanere a 0 (Ricomincia la canzone da capo)
-            this.currentIndex = 0;
-            System.out.println("[MANAGER] Sei già al primo brano. L'indice resta a 0.");
+        if (currentQueue != null && !currentQueue.isEmpty()) {
+            // Se l'indice è andato oltre la fine della coda ( SequentialStrategy ha restituito queueSize)
+            // premendo indietro ritorniamo all'ultimo brano valido
+            if (this.currentIndex >= currentQueue.size()) {
+                this.currentIndex = currentQueue.size() - 1;
+            } else if (this.currentIndex > 0) {
+                this.currentIndex--;
+            } else {
+                // Altrimenti lo forziamo a rimanere a 0 (Ricomincia la canzone da capo)
+                this.currentIndex = 0;
+                System.out.println("[MANAGER] Sei già al primo brano. L'indice resta a 0.");
+            }
         }
     }
 
