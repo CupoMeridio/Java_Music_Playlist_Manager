@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.ComboBox?>
+
+<!--
+    View secondaria per l'inserimento di un nuovo brano.
+
+    Non viene dichiarato fx:controller, perché il progetto utilizza
+    un solo controller centrale: PrimaryViewController.
+
+    Questa view viene caricata dinamicamente dal PrimaryViewController
+    tramite FXMLLoader e loader.setController(this).
+-->
+
+<VBox spacing="15.0"
+      fillWidth="true"
+      maxWidth="Infinity"
+      maxHeight="Infinity"
+      xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1">
+
+    <!-- Margini interni della finestra -->
+    <padding>
+        <Insets top="25.0" right="25.0" bottom="25.0" left="25.0" />
+    </padding>
+
+    <children>
+
+        <!-- Titolo del form -->
+        <Label text="Aggiungi nuovo brano"
+               style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+        <!--
+            GridPane usato per disporre etichette e campi di input.
+
+            La seconda colonna ha hgrow="ALWAYS":
+            questo permette ai TextField di espandersi quando la finestra
+            viene allargata orizzontalmente.
+        -->
+        <GridPane hgap="12.0"
+                  vgap="12.0"
+                  maxWidth="Infinity">
+
+            <columnConstraints>
+                <!-- Colonna delle etichette: larghezza quasi fissa -->
+                <ColumnConstraints minWidth="80.0" prefWidth="90.0" />
+
+                <!-- Colonna dei campi input: si espande con la finestra -->
+                <ColumnConstraints hgrow="ALWAYS" fillWidth="true" />
+            </columnConstraints>
+
+            <children>
+                <Label text="Titolo:"
+                       GridPane.rowIndex="0"
+                       GridPane.columnIndex="0" />
+
+                <TextField fx:id="addTrackTitleField"
+                           maxWidth="Infinity"
+                           GridPane.rowIndex="0"
+                           GridPane.columnIndex="1" />
+
+                <Label text="Autore:"
+                       GridPane.rowIndex="1"
+                       GridPane.columnIndex="0" />
+
+                <TextField fx:id="addTrackAuthorField"
+                           maxWidth="Infinity"
+                           GridPane.rowIndex="1"
+                           GridPane.columnIndex="1" />
+
+                <Label text="Durata:"
+                       GridPane.rowIndex="2"
+                       GridPane.columnIndex="0" />
+
+                <TextField fx:id="addTrackDurationField"
+                           promptText="Secondi"
+                           maxWidth="Infinity"
+                           GridPane.rowIndex="2"
+                           GridPane.columnIndex="1" />
+
+                <Label text="Genere:"
+                       GridPane.rowIndex="3"
+                       GridPane.columnIndex="0" />
+
+                <ComboBox fx:id="addTrackGenreComboBox"
+                          promptText="Seleziona genere"
+                          maxWidth="Infinity"
+                          GridPane.rowIndex="3"
+                          GridPane.columnIndex="1" />
+
+                <Label text="Anno:"
+                       GridPane.rowIndex="4"
+                       GridPane.columnIndex="0" />
+
+                <TextField fx:id="addTrackYearField"
+                           maxWidth="Infinity"
+                           GridPane.rowIndex="4"
+                           GridPane.columnIndex="1" />
+            </children>
+        </GridPane>
+
+        <!--
+            Label per mostrare eventuali errori di validazione.
+            Il testo viene impostato dal PrimaryViewController.
+        -->
+        <Label fx:id="addTrackErrorLabel"
+               text=""
+               style="-fx-text-fill: red;" />
+
+        <!--
+            Spaziatore verticale.
+            Se la finestra viene allungata in altezza, questo Region occupa
+            lo spazio libero e mantiene i bottoni nella parte bassa.
+        -->
+        <Region VBox.vgrow="ALWAYS" />
+
+        <!-- Pulsanti finali del form -->
+        <HBox spacing="10.0" alignment="CENTER_LEFT">
+            <children>
+                <!--
+                    Pulsanti del form: Salva aggiunge il brano alla Library,
+                    Annulla chiude la finestra. L'aggiornamento della tabella
+                    principale sarà integrato nella fase di collegamento con la View.
+                -->
+                <Button text="Salva" onAction="#handleSaveTrack" />
+                <Button text="Annulla" onAction="#handleCancelAddTrack" />
+            </children>
+        </HBox>
+
+    </children>
+</VBox>
