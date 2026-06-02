@@ -48,6 +48,11 @@ public class LibraryTest {
         for (Track t : currentTracks) {
             library.removeTrack(t);
         }
+        
+        List<Playlist> currentPlaylists = library.getPlaylists();
+        for (Playlist p : currentPlaylists) {
+            library.removePlaylist(p);
+        }
     }
 
     // TEST SINGLETON
