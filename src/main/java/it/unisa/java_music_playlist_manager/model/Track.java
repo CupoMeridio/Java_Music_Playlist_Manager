@@ -112,11 +112,10 @@ public final class Track implements Playable, Subject {
             observer.update();
         }
     }
-    
-    /*Solo play verra effettivamente implementata in futuro in quanto Track è la foglia*/
-    @Override
+
+   @Override
     public void play() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        System.out.println("[AUDIO] Avvio la riproduzione del brano: \"" + this.title + "\" di " + this.author);
     }
 
     @Override

@@ -4,11 +4,14 @@ public class StoppedState implements PlaybackState {
 
     @Override
     public void play(PlaybackManager context) {
-        // Il PlaybackManager ha già verificato che la coda contiene musica.
+        // Recuperiamo il brano corrente impostato nel manager
         Track track = context.getCurrentTrack();
-
-        System.out.println("[STATO: STOPPED] -> Avvio riproduzione: " + track.getTitle());
-        context.changeState(new PlayingState());
+        if (track != null) {
+            track.play();
+            context.changeState(new PlayingState());
+        } else {
+            System.out.println("[STATO: STOPPED] -> Impossibile avviare: nessun brano presente nella coda.");
+        }
     }
 
     @Override
