@@ -57,10 +57,19 @@ public class PrimaryViewController implements Observer {
 
     @SuppressWarnings("unchecked")
     private void refreshTableData() {
+        String currentView = viewTitleLabel.getText();
+
         if (currentOpenedPlaylist != null) {
+            // Se c'è una playlist aperta, mostra i brani della playlist
             ObservableList<Track> trackList = FXCollections.observableArrayList(currentOpenedPlaylist.getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
-        } else if ("Musica".equals(viewTitleLabel.getText()) || "Coda di riproduzione".equals(viewTitleLabel.getText())) {
+        } else if ("Coda di riproduzione".equals(currentView)) {
+            // se siamo nella coda, mostra i brani in riproduzione nel playbackmanager
+            List<Track> actualQueue = PlaybackManager.getInstance().getCurrentQueue();
+            ObservableList<Track> trackList = FXCollections.observableArrayList(actualQueue);
+            ((TableView<Track>) songTableView).setItems(trackList);
+        } else if ("Musica".equals(currentView)) {
+            // Se siamo in Musica, mostra i brani totali della Libreria
             ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         }
@@ -632,32 +641,24 @@ public class PrimaryViewController implements Observer {
             Track selectedTrack = (Track) selectedItem;
             String currentView = viewTitleLabel.getText();
 
+            // Se abbiamo una playlist aperta nel dettaglio, prendiamo i brani da lì
             if (currentOpenedPlaylist != null) {
                 System.out.println("[CONTROLLER] Brano selezionato dalla playlist: " + currentOpenedPlaylist.getTitle());
                 PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, currentOpenedPlaylist.getTracks());
 
             } else if ("Musica".equals(currentView) || "Coda di riproduzione".equals(currentView)) {
                 System.out.println("[CONTROLLER] Brano selezionato dalla Libreria.");
-                // Carica tutti i brani della libreria e imposta l'indice su quello selezionato
-                PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
-
-            } else if ("Playlist".equals(currentView)) {
-                System.out.println("[CONTROLLER] Brano selezionato da una Playlist.");
-                // TODO: Quando sarà pronto  Playlist, qua prendiamo i brani della playlist corrente:
-                // List<Track> playlistTracks = currentSelectedPlaylist.getTracks();
-                // PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, playlistTracks);
-
-                // da cancellare dopo: visto che non c'è playlist per ora prenndo sempre da library
                 PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
             }
         }
 
-        // 3. Delega l'azione di Play allo stato del PlaybackManager (Stopped, Playing o Paused)
+        // 3. Delega l'azione di Play allo stato del PlaybackManager
         PlaybackManager.getInstance().pressPlay();
 
         // 4. Aggiorna l'interfaccia grafica inferiore
         updatePlayerUI();
     }
+
 
     @FXML
     private void handleNextAction() {
