@@ -128,4 +128,30 @@ public class LibraryTest {
         assertDoesNotThrow(() -> library.removeTrack(null), "Rimuovere una traccia nulla non dovrebbe lanciare eccezioni");
         assertEquals(1, library.getTracks().size(), "La libreria non deve subire modifiche");
     }
+    
+        // TEST MODIFICA TRACCE NELLA LIBRERIA
+
+    @Test
+    public void testModificaTracciaSiRifletteNellaLibreria() {
+        
+        library.addTrack(track1); // track1 era "Bohemian Rhapsody" impostata in setUp()
+        
+        // recuperoa lista e prendo primo brano
+        Track tracciaRecuperata = library.getTracks().get(0);
+        
+        // modifico titolo
+        tracciaRecuperata.setTitle("Bohemian Rhapsody (Remastered)");
+        
+        // richiedo nuovamente lista tracce
+        Track tracciaInLibreria = library.getTracks().get(0);
+        
+        // verifico che modifica sia propagata
+        assertEquals("Bohemian Rhapsody (Remastered)", tracciaInLibreria.getTitle(), 
+                "La modifica di una traccia deve riflettersi correttamente all'interno della Library");
+        
+        // devono puntare allo stesso oggetto in memoria
+        assertSame(track1, tracciaInLibreria, 
+                "La traccia nella libreria deve essere lo stesso oggetto originariamente inserito");
+    }
+
 }
