@@ -13,5 +13,5 @@ public interface Playable {
     public void add(Playable component);
     public boolean remove (Playable component);
     public String getTitle();
-    public int getDuration(); // in secondi per track e in numero di track per Playlist  
+    public int getDuration(); // in secondi per track e la somma delle durate delle canzoni per la playlist  
 }

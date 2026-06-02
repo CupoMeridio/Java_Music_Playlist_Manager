@@ -14,7 +14,7 @@ public class Playlist implements Playable{
     private Set <Playable> tracks ;
     private final String id;
 
-    public Playlist(String title, int duration) {
+    public Playlist(String title) {
         this.id = UUID.randomUUID().toString();
         this.title = title;
         this.tracks =  new LinkedHashSet<>();
@@ -25,6 +25,15 @@ public class Playlist implements Playable{
             throw new IllegalArgumentException("Il nome della playlist non può essere vuoto o nullo.");
         }
         this.title = title;
+    }
+    
+    private int computeDurationPlaylist( Set <Playable> collezione){
+        int duration =0;
+        for (Playable i : collezione) {
+            
+            duration+= i.getDuration();
+        };
+        return duration;
     }
     
     @Override
@@ -53,7 +62,7 @@ public class Playlist implements Playable{
 
     @Override
     public int getDuration() {
-        return this.tracks.size();
+        return computeDurationPlaylist( this.tracks);
     }
     
     @Override
