@@ -1,6 +1,9 @@
 package it.unisa.java_music_playlist_manager;
 
 import java.io.IOException;
+import it.unisa.java_music_playlist_manager.model.Library;
+import it.unisa.java_music_playlist_manager.model.Track;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -12,6 +15,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 /**
   * Controller per la gestione della vista principale (primaryView.fxml).
@@ -90,6 +97,25 @@ public class PrimaryViewController {
     private Button volumeButton;
     @FXML
     private Slider volumeSlider;
+
+    // CONTROLLI PER ADD TRACK
+    @FXML
+    private TextField addTrackTitleField;
+
+    @FXML
+    private TextField addTrackAuthorField;
+
+    @FXML
+    private TextField addTrackDurationField;
+
+    @FXML
+    private TextField addTrackYearField;
+
+    @FXML
+    private Label addTrackErrorLabel;
+
+    @FXML
+    private ComboBox<String> addTrackGenreComboBox;
 
     // METODO DI INIZIALIZZAZIONE
     @FXML
@@ -201,11 +227,59 @@ public class PrimaryViewController {
          songTableView.getColumns().addAll(nameCol, countCol, dateCol);
      }
 
+    private void openAddTrackView() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/addTrackView.fxml"));
+
+            // Usa lo stesso controller già esistente
+            loader.setController(this);
+
+            Parent root = loader.load();
+            // Popoliamo la ComboBox del form "Aggiungi brano".
+            // Questa operazione va fatta dopo loader.load(), perché solo dopo il caricamento
+            // dell'FXML il campo addTrackGenreComboBox viene collegato al nodo grafico.
+            if (addTrackGenreComboBox != null) {
+                addTrackGenreComboBox.getItems().setAll(
+                        "Pop",
+                        "Rock",
+                        "Jazz",
+                        "Classica",
+                        "Hip Hop",
+                        "Rap",
+                        "Elettronica"
+                );
+            }
+
+            // Pulizia eventuale del messaggio di errore ogni volta che si apre il form
+            if (addTrackErrorLabel != null) {
+                addTrackErrorLabel.setText("");
+            }
+
+            Stage stage = new Stage();
+            stage.setTitle("Aggiungi brano");
+            stage.setScene(new Scene(root));
+
+            // Dimensioni minime per evitare che il form diventi troppo piccolo.
+            stage.setMinWidth(360);
+            stage.setMinHeight(300);
+
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.showAndWait();
+
+            // Per ora basta così. Quando Observer sarà completo, la tabella si aggiornerà automaticamente.
+            System.out.println("Finestra inserimento brano chiusa.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     private void handleActionBtnClick() {
         String currentView = viewTitleLabel.getText();
         if ("Musica".equals(currentView)) {
             System.out.println("Azione: Apertura dialogo per aggiungere un nuovo brano alla libreria");
+            openAddTrackView();
         } else if ("Playlist".equals(currentView)) {
             System.out.println("Azione: Apertura dialogo per creare una nuova playlist");
         }
@@ -248,4 +322,64 @@ public class PrimaryViewController {
         System.out.println("Player: Muto / Attiva audio");
     }
 
+    // Metodo per salvare
+    @FXML
+    private void handleSaveTrack() {
+        try {
+            // salvo yearText durationText e come String non come int perchè altrimenti non posso verificare se il field è vuoto
+            String title = addTrackTitleField.getText().trim();
+            String author = addTrackAuthorField.getText().trim();
+            String durationText = addTrackDurationField.getText().trim();
+            String genre = addTrackGenreComboBox.getValue();
+            String yearText = addTrackYearField.getText().trim();
+
+
+            // 1. Prima controllo se ci sono campi vuoti
+            if (title.isEmpty() || author.isEmpty() || durationText.isEmpty()
+                    || genre == null || yearText.isEmpty()) {
+                addTrackErrorLabel.setText("Compila tutti i campi obbligatori.");
+                return;
+            }
+
+            // 2. Solo dopo controllo se durata e anno sono numeri
+            int duration;
+            int year;
+
+            try {
+                duration = Integer.parseInt(durationText);
+            } catch (NumberFormatException e) {
+                addTrackErrorLabel.setText("La durata deve essere un numero valido.");
+                return;
+            }
+
+            try {
+                year = Integer.parseInt(yearText);
+            } catch (NumberFormatException e) {
+                addTrackErrorLabel.setText("L'anno deve essere un numero valido.");
+                return;
+            }
+
+            // 3. Creo il brano: qui intervengono anche le validazioni della classe Track
+            Track track = new Track(title, author, duration, genre, year);
+
+            // 4. Aggiungo il brano alla Library
+            Library.getInstance().addTrack(track);
+            System.out.println("Brano aggiunto: " + track.getTitle());
+            System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
+
+            // 5. Chiudo la finestra
+            Stage stage = (Stage) addTrackTitleField.getScene().getWindow();
+            stage.close();
+
+        } catch (IllegalArgumentException e) {
+            addTrackErrorLabel.setText(e.getMessage());
+        }
+    }
+
+    // Metodo per annullare l'aggiunta di una track dal form di addTrack
+    @FXML
+    private void handleCancelAddTrack() {
+        Stage stage = (Stage) addTrackTitleField.getScene().getWindow();
+        stage.close();
+    }
 }
