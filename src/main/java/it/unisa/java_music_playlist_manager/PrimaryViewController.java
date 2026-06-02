@@ -25,6 +25,9 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
 import it.unisa.java_music_playlist_manager.model.Observer;
 
 /**
@@ -211,14 +214,33 @@ public class PrimaryViewController implements Observer {
     private void handleDeleteTrack() {
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
 
-        if (selectedItem instanceof Track) {
-            Track selectedTrack = (Track) selectedItem;
+        if (!(selectedItem instanceof Track)) {
+            return;
+        }
+
+        Track selectedTrack = (Track) selectedItem;
+
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Conferma eliminazione");
+        confirmAlert.setHeaderText("Eliminare il brano selezionato?");
+        confirmAlert.setContentText(
+                "Stai per eliminare il brano \"" + selectedTrack.getTitle() + "\" dalla libreria.\n" +
+                        "Il brano verrà rimosso anche da tutte le playlist in cui è presente.\n\n" +
+                        "Vuoi continuare?"
+        );
+
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
             boolean removed = Library.getInstance().removeTrack(selectedTrack);
+
             if (removed) {
                 System.out.println("Brano eliminato dalla libreria e dalle playlist: " + selectedTrack.getTitle());
             } else {
-                System.out.println("Brano non trovato nella libreria.");
+                System.out.println("Il brano selezionato non è stato trovato nella libreria.");
             }
+        } else {
+            System.out.println("Eliminazione annullata dall'utente.");
         }
     }
 
