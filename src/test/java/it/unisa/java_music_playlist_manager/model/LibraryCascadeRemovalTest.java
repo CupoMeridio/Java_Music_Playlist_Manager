@@ -5,68 +5,102 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
+/**
+ * Suite di test unitari automatizzati per verificare l'integrità del modello
+ * Library, la gestione dei contatori globali e le relazioni a cascata (Composite)
+ * con le classi Playlist e Track.
+ */
 public class LibraryCascadeRemovalTest {
 
     private Library library;
 
+    /**
+     * Configurazione preliminare eseguita prima di OGNI singolo metodo di test.
+     * Trattandosi di un Singleton, svuota esplicitamente il catalogo per garantire
+     * l'isolamento e l'indipendenza dei test, prevenendo bug di persistenza in memoria.
+     */
     @BeforeEach
     public void setUp() {
-        // 1. Otteniamo l'istanza del Singleton
+        // 1. Otteniamo l'istanza centralizzata del Singleton Library
         library = Library.getInstance();
         
-        // CORREZIONE CRITICA: Estraiamo una COPIA delle liste prima di ciclare.
-        // Fare library.removeTrack(t) dentro un ciclo for-each sulla lista originale 
-        // causerebbe una ConcurrentModificationException.
-        List<Track> copieTracce = library.getTracks(); // getTracks() ritorna già una copia (new ArrayList)
+        // CORREZIONE ARCHITETTURALE: Estraiamo una copia difensiva prima di iterare.
+        // Invocare removeTrack() o removePlaylist() direttamente dentro un ciclo for-each 
+        // sulla collezione interna genererebbe una ConcurrentModificationException.
+        List<Track> copieTracce = library.getTracks(); 
         for (Track t : copieTracce) {
             library.removeTrack(t);
         }
 
-        List<Playlist> copiePlaylist = library.getPlaylists(); // getPlaylists() ritorna già una copia
+        List<Playlist> copiePlaylist = library.getPlaylists(); 
         for (Playlist p : copiePlaylist) {
             library.removePlaylist(p);
         }
     }
 
     // ====================================================================================
-    //  Verifica effettivo inserimento e aumento del conteggio globale
+    // TEST 1: Inserimento Playlist e Incremento Contatore Globale (Dati Validi)
     // ====================================================================================
     @Test
     public void testInserimentoEIncrementoConteggioGlobalePlaylist() {
-        // 1. Controllo dello stato iniziale: la libreria deve essere vuota (conteggio = 0) dopo il setUp
+        // Controllo dello stato iniziale: la libreria deve partire da zero elementi
         int conteggioIniziale = library.getPlaylists().size();
-        assertEquals(0, conteggioIniziale, "La libreria dovrebbe essere inizialmente vuota per questo test.");
+        assertEquals(0, conteggioIniziale, "La libreria deve essere inizialmente vuota per questo test.");
 
-        // 2. Creazione della playlist con dati conformi e validi (gli spazi intermedi/laterali sono gestiti)
+        // Creazione della playlist con dati conformi e validi (gli spazi laterali sono accettati dal dominio)
         Playlist playlistValida = new Playlist("  I Miei Classici Rock  ");
 
-        // 3. Eseguiamo l'azione: il sistema inserisce la nuova playlist nella libreria generale
+        // Azione: Registrazione della playlist all'interno del catalogo di sistema
         library.addPlaylist(playlistValida);
 
-        // 4. Verifica dell'aumento del conteggio globale delle playlist nel sistema
+        // Verifica: Il contatore globale deve essere aumentato esattamente di 1
         int conteggioFinale = library.getPlaylists().size();
         assertEquals(1, conteggioFinale, "Il conteggio globale delle playlist deve essere aumentato esattamente di 1.");
         
-        // 5. Verifica dell'effettivo inserimento dell'oggetto corretto
+        // Verifica di consistenza: L'oggetto inserito deve essere effettivamente presente
         assertTrue(library.getPlaylists().contains(playlistValida), 
             "La playlist valida deve essere effettivamente presente all'interno della Library.");
     }
 
     // ====================================================================================
-    // Verifica rimozione a cascata (Cascade Removal)
+    // TEST 2: Diminuzione del Numero di Playlist Totali alla Rimozione
+    // ====================================================================================
+    @Test
+    public void testRimozionePlaylistDiminuisceConteggioGlobale() {
+        // Creazione e inserimento di due playlist distinte nel sistema
+        Playlist playlist1 = new Playlist("Playlist Rock");
+        Playlist playlist2 = new Playlist("Playlist Pop");
+        library.addPlaylist(playlist1);
+        library.addPlaylist(playlist2);
+        
+        // Verifica dello stato pre-rimozione
+        assertEquals(2, library.getPlaylists().size(), "La libreria deve memorizzare inizialmente 2 playlist.");
+
+        // Azione: Cancellazione di una singola playlist dal catalogo globale
+        boolean isRemoved = library.removePlaylist(playlist1);
+
+        // Asserzioni di verifica: l'operazione deve avere successo e aggiornare i dati globali
+        assertTrue(isRemoved, "Il metodo removePlaylist deve restituire true confermando l'azione.");
+        assertEquals(1, library.getPlaylists().size(), "Il numero totale di playlist deve essere diminuito esattamente a 1.");
+        assertFalse(library.getPlaylists().contains(playlist1), "La playlist rimossa non deve più figurare nel sistema.");
+        assertTrue(library.getPlaylists().contains(playlist2), "La playlist non coinvolta deve continuare a esistere regolarmente.");
+    }
+
+    // ====================================================================================
+    // TEST 3: Effetto a Cascata - La Rimozione del Brano Ripulisce le Playlist (Cascade Removal)
     // ====================================================================================
     @Test
     public void testRimozioneVerificaLibrary() {
-        // 2. Prepariamo i dati di test isolati e puliti
+        // Preparazione dei dati di test in uno scenario isolato e controllato
         Track tracciaDaRimuovere = new Track("Anarchy in the U.K.", "Sex Pistols", 212, "Punk", 1976);
         Playlist playlistContenitore = new Playlist("Punk Rock Playlist");
 
-        // 3. Costruiamo le relazioni nel sistema
+        // Costruzione dei legami: la traccia fa parte sia del catalogo che della specifica playlist
         library.addTrack(tracciaDaRimuovere);
         playlistContenitore.add(tracciaDaRimuovere); 
         library.addPlaylist(playlistContenitore);
 
-        // Verifichiamo la consistenza dello stato iniziale del test
+        // Validazione dello stato di partenza (La playlist ha una traccia e accumula 212 secondi di durata)
         assertEquals(212, playlistContenitore.getDuration(), 
             "La playlist deve inizialmente accumulare la durata della traccia inserita.");
         assertTrue(library.getTracks().contains(tracciaDaRimuovere), 
@@ -74,22 +108,57 @@ public class LibraryCascadeRemovalTest {
         assertTrue(playlistContenitore.contains(tracciaDaRimuovere),
             "La playlist deve contenere internamente la traccia appena aggiunta.");
 
-        // 4. Eseguiamo l'azione: Rimozione dal catalogo globale
+        // Azione: Eliminazione della traccia dal catalogo principale (es. per motivi di copyright)
         boolean isRemoved = library.removeTrack(tracciaDaRimuovere);
 
-        // 5. ASSERZIONI DI VERIFICA
+        // Asserzioni di verifica sul corretto comportamento del sistema
         assertTrue(isRemoved, "Il metodo removeTrack deve restituire true confermando l'avvenuta rimozione.");
         
-        // Verifica Proprietà A: Sparita dalla libreria globale
+        // Proprietà A: Il brano scompare dal catalogo della Library
         assertFalse(library.getTracks().contains(tracciaDaRimuovere), 
             "La traccia deve essere stata eliminata definitivamente dalla Library.");
 
-        // Verifica Proprietà B (Effetto a cascata): Rimossa automaticamente dalla playlist.
-        // Usiamo sia il metodo contains() della tua playlist che il ricalcolo della durata a 0.
+        // Proprietà B (Effetto a cascata): La Library ha ripulito autonomamente la Playlist.
+        // Il brano non deve più risultare associato alla playlist e la durata deve ricalcolarsi a zero.
         assertFalse(playlistContenitore.contains(tracciaDaRimuovere),
             "La traccia deve essere stata eliminata a cascata dall'interno della playlist.");
-        
         assertEquals(0, playlistContenitore.getDuration(), 
             "La durata della playlist deve azzerarsi in quanto non contiene più elementi.");
+    }
+
+    // ====================================================================================
+    // TEST 4: Isolamento dei Cicli di Vita - La Cancellazione della Playlist Preserva i Brani
+    // ====================================================================================
+    @Test
+    public void testEliminazionePlaylistPreservaBraniInLibreria() {
+        // Creazione di due tracce inserite nel catalogo principale
+        Track track1 = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975);
+        Track track2 = new Track("Stairway to Heaven", "Led Zeppelin", 482, "Rock", 1971);
+        library.addTrack(track1);
+        library.addTrack(track2);
+
+        // Creazione di una playlist che raggruppa queste due tracce
+        Playlist playlist = new Playlist("Rock Anthems");
+        playlist.add(track1);
+        playlist.add(track2);
+        library.addPlaylist(playlist);
+
+        // Controllo di consistenza dello stato iniziale
+        assertEquals(2, library.getTracks().size(), "La libreria deve contenere inizialmente 2 tracce.");
+        assertEquals(1, library.getPlaylists().size(), "La libreria deve contenere inizialmente 1 playlist.");
+
+        // Azione: Smantellamento/Cancellazione della playlist dal sistema globale
+        library.removePlaylist(playlist);
+
+        // Asserzioni di verifica: La playlist sparisce, ma il ciclo di vita dei brani è indipendente
+        assertEquals(0, library.getPlaylists().size(), "La playlist deve risultare rimossa con successo.");
+        
+        // I brani DEVONO continuare a esistere indisturbati nel catalogo principale
+        assertEquals(2, library.getTracks().size(), 
+            "I brani non devono essere eliminati dalla Library quando si cancella un semplice contenitore (playlist).");
+        assertTrue(library.getTracks().contains(track1), 
+            "Il primo brano deve essere ancora disponibile nel catalogo globale.");
+        assertTrue(library.getTracks().contains(track2), 
+            "Il secondo brano deve essere ancora disponibile nel catalogo globale.");
     }
 }
