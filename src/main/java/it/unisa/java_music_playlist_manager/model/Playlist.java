@@ -35,6 +35,10 @@ public class Playlist implements Playable{
         }
         return duration;
     }
+
+    public boolean contains(Playable component) {
+        return tracks.contains(component);
+    }
     
     @Override
     public void play() {
