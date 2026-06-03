@@ -52,31 +52,29 @@ public class PlaylistTest {
     }
 
     // ==========================================
-    // 2. TEST COMPOSITE & GESTIONE DUPLICATI
+    // 2. TEST GESTIONE TRACCE & DUPLICATI
     // ==========================================
 
     @Test
     public void testAggiuntaElementiEControlloDuplicati() {
-        playlist.add(traccia1);
-        playlist.add(traccia2);
+        playlist.addTrack(traccia1);
+        playlist.addTrack(traccia2);
         
         // Tentiamo di aggiungere nuovamente la traccia1 (stesso ID)
-        playlist.add(traccia1);
+        playlist.addTrack(traccia1);
 
         // La durata totale non deve considerare il duplicato.
-        // Se traccia1 venisse inserita due volte, la durata sarebbe (334*2) + 170 = 838.
-        // Con il Set deve essere esattamente 334 + 170 = 504.
         int durataAttesa = traccia1.getDuration() + traccia2.getDuration(); 
         assertEquals(durataAttesa, playlist.getDuration(), 
-            "Il set interno deve impedire il calcolo di tracce duplicate.");
+            "La playlist deve impedire l'inserimento di tracce duplicate.");
     }
 
     @Test
     public void testRimozioneElemento() {
-        playlist.add(traccia1);
-        playlist.add(traccia2);
+        playlist.addTrack(traccia1);
+        playlist.addTrack(traccia2);
         
-        boolean rimosso = playlist.remove(traccia1);
+        boolean rimosso = playlist.removeTrack(traccia1);
         
         assertTrue(rimosso, "La rimozione di un elemento esistente deve restituire true.");
         assertEquals(traccia2.getDuration(), playlist.getDuration(), 
@@ -84,31 +82,13 @@ public class PlaylistTest {
     }
 
     // ==========================================
-    // 3. TEST CALCOLO DURATA DINAMICA (COMPOSITE)
+    // 3. TEST CALCOLO DURATA DINAMICA
     // ==========================================
 
     @Test
     public void testCalcoloDurataPlaylistVuota() {
         Playlist playlistVuota = new Playlist("Vuota");
         assertEquals(0, playlistVuota.getDuration(), 
-            "Una playlist senza componenti deve avere durata pari a 0 secondi.");
-    }
-
-    @Test
-    public void testCalcoloDurataRicorsiva() {
-        playlist.add(traccia1); // 334 secondi
-        
-        // Creiamo una sotto-playlist (rispetta la struttura ad albero del Composite)
-        Playlist sottoPlaylist = new Playlist("Sotto Playlist");
-        sottoPlaylist.add(traccia2); // 170 secondi
-        
-        // Aggiungiamo la sotto-playlist alla playlist principale
-        playlist.add(sottoPlaylist);
-        
-        // Il calcolo deve sommare ricorsivamente: 334 + 170 = 504
-        int durataTotaleAttesa = traccia1.getDuration() + traccia2.getDuration();
-        
-        assertEquals(durataTotaleAttesa, playlist.getDuration(), 
-            "Il metodo computeDurationPlaylist deve navigare ricorsivamente l'albero del Composite.");
+            "Una playlist senza brani deve avere durata pari a 0 secondi.");
     }
 }

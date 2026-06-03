@@ -4,22 +4,20 @@
  */
 package it.unisa.java_music_playlist_manager.model;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.UUID;
 
-public class Playlist implements Playable{
+public class Playlist {
     
     private String title; 
-    private Set <Playable> tracks ;
+    private final List<Track> tracks;
     private final String id;
 
     public Playlist(String title) {
         this.id = UUID.randomUUID().toString();
         this.setTitle(title);
-        this.tracks =  new LinkedHashSet<>();
+        this.tracks = new ArrayList<>();
     }
 
     public void setTitle(String title) {
@@ -28,67 +26,45 @@ public class Playlist implements Playable{
         }
         this.title = title;
     }
-    
-    private int computeDurationPlaylist( Set <Playable> collezione){
-        int duration =0;
-        for (Playable i : collezione) {
-            
-            duration+= i.getDuration();
-        }
-        return duration;
-    }
 
-    public boolean contains(Playable component) {
-        return tracks.contains(component);
+    public boolean contains(Track track) {
+        return tracks.contains(track);
     }
 
     public int getTrackCount() {
-        return getTracks().size();
+        return tracks.size();
     }
 
     public List<Track> getTracks() {
-        List<Track> result = new ArrayList<>();
-        collectTracks(this.tracks, result);
-        return result;
+        return new ArrayList<>(tracks);
     }
 
-    private void collectTracks(Set<Playable> components, List<Track> result) {
-        for (Playable component : components) {
-            if (component instanceof Track track) {
-                result.add(track);
-            } else if (component instanceof Playlist playlist) {
-                result.addAll(playlist.getTracks());
-            }
+    public void addTrack(Track track) {
+        if (track == null) {
+            throw new IllegalArgumentException("Impossibile aggiungere un brano nullo.");
         }
-    }
-    
-    @Override
-    public void play() {
-        System.out.println("Riproduzione della playlist: " + title);
-        for (Playable component : tracks) {
-            component.play();
+        if (!tracks.contains(track)) {
+            tracks.add(track);
         }
     }
 
-    @Override
-    public void add(Playable component) {
-       if (component == null) throw new IllegalArgumentException("Impossibile aggiungere un componente nullo.");
-        tracks.add(component); // Il Set rifiuterà automaticamente l'elemento se già presente
+    public boolean removeTrack(Track track) {
+        if (track == null) {
+            return false;
+        }
+        return tracks.remove(track);
     }
 
-    @Override
-    public boolean remove(Playable component) {
-       return tracks.remove(component);
-    }
-
-    @Override
     public String getTitle() {
         return this.title;
     }
 
-    @Override
     public int getDuration() {
-        return computeDurationPlaylist( this.tracks);
+        int duration = 0;
+        for (Track t : tracks) {
+            duration += t.getDuration();
+        }
+        return duration;
     }
     
     @Override

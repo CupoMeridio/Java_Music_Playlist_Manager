@@ -15,7 +15,7 @@ import java.util.UUID;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class Track implements Playable, Subject {
+public final class Track implements Subject {
     
     private final List<Observer> observers = new ArrayList<>();
     
@@ -113,20 +113,6 @@ public final class Track implements Playable, Subject {
         }
     }
 
-   @Override
-    public void play() {
-        System.out.println("[AUDIO] Avvio la riproduzione del brano: \"" + this.title + "\" di " + this.author);
-    }
-
-    @Override
-    public void add(Playable component) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public boolean remove(Playable component) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
     
     @Override
     public boolean equals(Object o) {

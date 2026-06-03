@@ -53,7 +53,7 @@ public class Library implements Subject{
         if (isRemoved) {
 
             for (Playlist playlist : this.playlists) {
-                playlist.remove(track);
+                playlist.removeTrack(track);
             }
 
             notifyObservers();

@@ -166,8 +166,8 @@ public class LibraryTest {
         library.addTrack(track2);
 
         Playlist playlist = new Playlist("Preferiti");
-        playlist.add(track1);
-        playlist.add(track2);
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
 
         library.addPlaylist(playlist);
 

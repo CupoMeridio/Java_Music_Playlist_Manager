@@ -1,10 +1,10 @@
 package it.unisa.java_music_playlist_manager;
 
-import java.io.IOException;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import it.unisa.java_music_playlist_manager.service.LibraryService;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
@@ -18,7 +18,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -44,6 +43,7 @@ import it.unisa.java_music_playlist_manager.model.Observer;
   */
 public class PrimaryViewController implements Observer {
 
+    private final LibraryService libraryService = LibraryService.getInstance();
     private Track currentEditingTrack = null;
     private Playlist currentOpenedPlaylist = null;
 
@@ -73,6 +73,31 @@ public class PrimaryViewController implements Observer {
             ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         }
+    }
+
+    private void updateTablePlaceholder() {
+        if (songTableView == null) {
+            return;
+        }
+
+        String currentView = viewTitleLabel != null ? viewTitleLabel.getText() : "";
+        String placeholderText;
+
+        if ("Playlist".equals(currentView)) {
+            placeholderText = "Non ci sono playlist. Clicca \"Nuova playlist\" per crearne una.";
+        } else if (currentOpenedPlaylist != null) {
+            placeholderText = "Questa playlist non contiene brani. Clicca \"Aggiungi brano\" per inserirne uno.";
+        } else if ("Coda di riproduzione".equals(currentView)) {
+            placeholderText = "Non ci sono brani in coda. Clicca \"Aggiungi brano\" nella Libreria musicale per popolarla.";
+        } else {
+            placeholderText = "Non ci sono brani. Clicca \"Aggiungi brano\" per inserirne uno.";
+        }
+
+        Label placeholderLabel = new Label(placeholderText);
+        placeholderLabel.setWrapText(true);
+        placeholderLabel.setMaxWidth(420);
+        placeholderLabel.setStyle("-fx-alignment: center; -fx-text-alignment: center; -fx-text-fill: #666666; -fx-padding: 16;");
+        songTableView.setPlaceholder(placeholderLabel);
     }
 
     // CONTROLLI BARRA LATERALE
@@ -279,7 +304,7 @@ public class PrimaryViewController implements Observer {
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean removed = Library.getInstance().removeTrack(selectedTrack);
+            boolean removed = libraryService.deleteTrack(selectedTrack);
 
             if (removed) {
                 System.out.println("Brano eliminato dalla libreria e dalle playlist: " + selectedTrack.getTitle());
@@ -308,8 +333,7 @@ public class PrimaryViewController implements Observer {
 
         result.ifPresent(name -> {
             try {
-                selectedPlaylist.setTitle(name);
-                Library.getInstance().notifyObservers();
+                libraryService.renamePlaylist(selectedPlaylist, name);
                 showPlaylistColumns();
                 System.out.println("Playlist modificata: " + selectedPlaylist.getTitle());
             } catch (IllegalArgumentException e) {
@@ -341,7 +365,7 @@ public class PrimaryViewController implements Observer {
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean removed = Library.getInstance().removePlaylist(selectedPlaylist);
+            boolean removed = libraryService.deletePlaylist(selectedPlaylist);
 
             if (removed) {
                 showPlaylistColumns();
@@ -425,6 +449,7 @@ public class PrimaryViewController implements Observer {
 
          ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
 
+         updateTablePlaceholder();
          refreshTableData();
      }
 
@@ -451,6 +476,7 @@ public class PrimaryViewController implements Observer {
 
          ObservableList<Playlist> playlistList = FXCollections.observableArrayList(Library.getInstance().getPlaylists());
          ((TableView<Playlist>) songTableView).setItems(playlistList);
+         updateTablePlaceholder();
      }
 
     private void openPlaylistDetail(Playlist playlist) {
@@ -475,8 +501,7 @@ public class PrimaryViewController implements Observer {
 
         result.ifPresent(name -> {
             try {
-                Playlist playlist = new Playlist(name);
-                Library.getInstance().addPlaylist(playlist);
+                Playlist playlist = libraryService.createPlaylist(name);
                 showPlaylistColumns();
                 System.out.println("Playlist creata: " + playlist.getTitle());
             } catch (IllegalArgumentException e) {
@@ -598,8 +623,7 @@ public class PrimaryViewController implements Observer {
         Optional<Playlist> result = dialog.showAndWait();
 
         result.ifPresent(playlist -> {
-            playlist.add(selectedTrack);
-            Library.getInstance().notifyObservers();
+            libraryService.addTrackToPlaylist(selectedTrack, playlist);
             System.out.println(
                     "Brano \"" + selectedTrack.getTitle()
                             + "\" aggiunto alla playlist \""
@@ -717,19 +741,11 @@ public class PrimaryViewController implements Observer {
 
             // creo ed aggiorno il brano
             if (currentEditingTrack != null) {
-                currentEditingTrack.setTitle(title);
-                currentEditingTrack.setAuthor(author);
-                currentEditingTrack.setDuration(duration);
-                currentEditingTrack.setGenre(genre);
-                currentEditingTrack.setYear(year);
+                libraryService.updateTrack(currentEditingTrack, title, author, duration, genre, year);
                 System.out.println("Brano modificato: " + currentEditingTrack.getTitle());
             } else {
-                Track track = new Track(title, author, duration, genre, year);
+                Track track = libraryService.addTrack(title, author, duration, genre, year);
                 track.attach(this);
-
-                // Aggiunta alla Library.
-                // La Library notificherà automaticamente gli Observer.
-                Library.getInstance().addTrack(track);
                 System.out.println("Brano aggiunto: " + track.getTitle());
                 System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
             }

@@ -1,5 +1,5 @@
 module it.unisa.java_music_playlist_manager {
-    requires javafx.controls;
+    requires transitive javafx.controls;
     requires javafx.fxml;
     requires java.base;
 

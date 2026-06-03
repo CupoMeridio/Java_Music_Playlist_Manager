@@ -97,7 +97,7 @@ public class LibraryCascadeRemovalTest {
 
         // Costruzione dei legami: la traccia fa parte sia del catalogo che della specifica playlist
         library.addTrack(tracciaDaRimuovere);
-        playlistContenitore.add(tracciaDaRimuovere); 
+        playlistContenitore.addTrack(tracciaDaRimuovere); 
         library.addPlaylist(playlistContenitore);
 
         // Validazione dello stato di partenza (La playlist ha una traccia e accumula 212 secondi di durata)
@@ -139,8 +139,8 @@ public class LibraryCascadeRemovalTest {
 
         // Creazione di una playlist che raggruppa queste due tracce
         Playlist playlist = new Playlist("Rock Anthems");
-        playlist.add(track1);
-        playlist.add(track2);
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
         library.addPlaylist(playlist);
 
         // Controllo di consistenza dello stato iniziale
