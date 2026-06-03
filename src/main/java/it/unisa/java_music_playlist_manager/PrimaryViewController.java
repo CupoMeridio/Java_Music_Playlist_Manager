@@ -4,7 +4,6 @@ import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
-import it.unisa.java_music_playlist_manager.service.LibraryService;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
@@ -43,7 +42,6 @@ import it.unisa.java_music_playlist_manager.model.Observer;
   */
 public class PrimaryViewController implements Observer {
 
-    private final LibraryService libraryService = LibraryService.getInstance();
     private Track currentEditingTrack = null;
     private Playlist currentOpenedPlaylist = null;
 
@@ -304,7 +302,7 @@ public class PrimaryViewController implements Observer {
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean removed = libraryService.deleteTrack(selectedTrack);
+            boolean removed = Library.getInstance().removeTrack(selectedTrack);
 
             if (removed) {
                 System.out.println("Brano eliminato dalla libreria e dalle playlist: " + selectedTrack.getTitle());
@@ -333,7 +331,8 @@ public class PrimaryViewController implements Observer {
 
         result.ifPresent(name -> {
             try {
-                libraryService.renamePlaylist(selectedPlaylist, name);
+                selectedPlaylist.setTitle(name);
+                Library.getInstance().notifyObservers();
                 showPlaylistColumns();
                 System.out.println("Playlist modificata: " + selectedPlaylist.getTitle());
             } catch (IllegalArgumentException e) {
@@ -365,7 +364,7 @@ public class PrimaryViewController implements Observer {
         Optional<ButtonType> result = confirmAlert.showAndWait();
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            boolean removed = libraryService.deletePlaylist(selectedPlaylist);
+            boolean removed = Library.getInstance().removePlaylist(selectedPlaylist);
 
             if (removed) {
                 showPlaylistColumns();
@@ -501,7 +500,8 @@ public class PrimaryViewController implements Observer {
 
         result.ifPresent(name -> {
             try {
-                Playlist playlist = libraryService.createPlaylist(name);
+                Playlist playlist = new Playlist(name);
+                Library.getInstance().addPlaylist(playlist);
                 showPlaylistColumns();
                 System.out.println("Playlist creata: " + playlist.getTitle());
             } catch (IllegalArgumentException e) {
@@ -623,7 +623,8 @@ public class PrimaryViewController implements Observer {
         Optional<Playlist> result = dialog.showAndWait();
 
         result.ifPresent(playlist -> {
-            libraryService.addTrackToPlaylist(selectedTrack, playlist);
+            playlist.addTrack(selectedTrack);
+            Library.getInstance().notifyObservers();
             System.out.println(
                     "Brano \"" + selectedTrack.getTitle()
                             + "\" aggiunto alla playlist \""
@@ -741,10 +742,16 @@ public class PrimaryViewController implements Observer {
 
             // creo ed aggiorno il brano
             if (currentEditingTrack != null) {
-                libraryService.updateTrack(currentEditingTrack, title, author, duration, genre, year);
+                currentEditingTrack.setTitle(title);
+                currentEditingTrack.setAuthor(author);
+                currentEditingTrack.setDuration(duration);
+                currentEditingTrack.setGenre(genre);
+                currentEditingTrack.setYear(year);
+                Library.getInstance().notifyObservers();
                 System.out.println("Brano modificato: " + currentEditingTrack.getTitle());
             } else {
-                Track track = libraryService.addTrack(title, author, duration, genre, year);
+                Track track = new Track(title, author, duration, genre, year);
+                Library.getInstance().addTrack(track);
                 track.attach(this);
                 System.out.println("Brano aggiunto: " + track.getTitle());
                 System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
