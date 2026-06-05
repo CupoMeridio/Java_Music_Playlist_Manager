@@ -4,30 +4,51 @@ public class PlayingState implements PlaybackState {
 
     @Override
     public void play(PlaybackManager context) {
-        System.out.println("[PLAYING] -> Musica già in corso. Interpreto il click come PAUSA.");
-        // Logica per stoppare momentaneamente l'audio...
-        context.changeState(new PausedState()); // Transizione automatica a Pausa!
+        System.out.println("[STATO: PLAYING] -> Click su Play. Metto in PAUSA.");
+        context.changeState(new PausedState());
+        context.triggerRealPause();
     }
-
 
     @Override
     public void stop(PlaybackManager context) {
-        System.out.println("[STATO: PLAYING] -> Riproduzione INTERROTTA.");
-        context.resetQueue(); // Riporta l'indice a 0
+        System.out.println("[STATO: PLAYING] -> Click su STOP. Interrompo la musica.");
+        context.triggerRealStop();
+        context.resetQueue();
         context.changeState(new StoppedState());
     }
 
     @Override
     public void next(PlaybackManager context) {
         System.out.println("[STATO: PLAYING] -> Salto alla prossima traccia...");
-        context.advanceQueue(); // Sposta avanti l'indice
+        context.advanceTrack();
 
         Track nextTrack = context.getCurrentTrack();
         if (nextTrack != null) {
             System.out.println("[STATO: PLAYING] Ora riproduco: " + nextTrack.getTitle());
-            // Restiamo in PlayingState ma l'audio è cambiato
+            context.triggerRealPlayback();
         } else {
             System.out.println("[STATO: PLAYING] Coda terminata. Spengo il lettore.");
+            context.triggerRealStop();
+            context.resetQueue();
+            context.changeState(new StoppedState());
+        }
+    }
+
+    @Override
+    public void nextPlayable(PlaybackManager context) {
+        Playable currentPlayable = context.getCurrentPlayable();
+        String currentTitle = (currentPlayable != null) ? currentPlayable.getTitle() : "Sconosciuto";
+        System.out.println("[STATO: PLAYING] -> SKIP dell'intero elemento: " + currentTitle);
+
+        context.advancePlayable();
+
+        Track nextTrack = context.getCurrentTrack();
+        if (nextTrack != null) {
+            System.out.println("[STATO: PLAYING] Caricato nuovo blocco. Ora riproduco: " + nextTrack.getTitle());
+            context.triggerRealPlayback();
+        } else {
+            System.out.println("[STATO: PLAYING] Nessun altro elemento in coda. Spengo il lettore.");
+            context.triggerRealStop();
             context.resetQueue();
             context.changeState(new StoppedState());
         }
@@ -35,18 +56,13 @@ public class PlayingState implements PlaybackState {
 
     @Override
     public void previous(PlaybackManager context) {
-        System.out.println("[STATO: PLAYING] -> Richiesta traccia precedente.");
+        System.out.println("[STATO: PLAYING] -> Torno alla traccia precedente.");
+        context.regressTrack();
 
-        // Il manager sposta indietro l'indice
-        context.regressQueue();
-
-        // Recuperiamo la traccia (sarà la precedente o la prima se eravamo già all'inizio)
         Track prevTrack = context.getCurrentTrack();
         if (prevTrack != null) {
             System.out.println("[STATO: PLAYING] Ora riproduco: " + prevTrack.getTitle());
+            context.triggerRealPlayback();
         }
     }
-
 }
-
-

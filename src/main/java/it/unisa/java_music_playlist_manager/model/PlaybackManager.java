@@ -1,7 +1,6 @@
 package it.unisa.java_music_playlist_manager.model;
 import java.util.ArrayList;
 import java.util.List;
-
 public class PlaybackManager {
     // Singleton
     private static PlaybackManager instance;
@@ -10,8 +9,9 @@ public class PlaybackManager {
     private PlaybackState currentState;
 
     // Struttura dati della coda
-    private List<Track> currentQueue;
-    private int currentIndex;
+    private final List<Playable> queue = new ArrayList<>();
+    private int currentPlayableIndex = 0;
+    private int currentTrackIndexInPlayable = 0;
 
     // Riferimento alla strategia corrente (Pattern Strategy)
     private PlaybackStrategy currentStrategy;
@@ -19,8 +19,6 @@ public class PlaybackManager {
     // Costruttore privato
     private PlaybackManager() {
         this.currentState = new StoppedState(); // Stato iniziale di default
-        this.currentQueue = new ArrayList<>();
-        this.currentIndex = 0;
         this.currentStrategy = new SequentialStrategy(); // di default parte con la riproduzione sequenziale
     }
 
@@ -32,13 +30,146 @@ public class PlaybackManager {
         return instance;
     }
 
-    // Metodo richiamato dal Controller per caricare le canzoni da riprodurre
-    public void setQueue(List<Track> newTracks) {
-        if (newTracks != null) {
-            this.currentQueue = newTracks;
-            this.currentIndex = 0;
-            System.out.println("[MANAGER] Coda aggiornata con " + newTracks.size() + " brani.");
+    // ---- GESTIONE DELLO STATO (Deleghe) ----
+    public void changeState(PlaybackState state) {
+        this.currentState = state;
+    }
+
+    public void pressPlay() {
+        if (queue.isEmpty()) {
+            System.out.println("[MANAGER - ERROR] Impossibile avviare il player: nessuna canzone caricata nella coda.");
+            return;
         }
+        currentState.play(this);
+    }
+
+    public void pressStop() {
+        if (queue.isEmpty()) return;
+        currentState.stop(this);
+    }
+
+    public void pressNext() {
+        if (queue.isEmpty()) return;
+        currentState.next(this);
+    }
+
+    public void pressNextPlayable() {
+        if (queue.isEmpty()) return;
+        currentState.nextPlayable(this);
+    }
+
+    public void pressPrevious() {
+        if (queue.isEmpty()) return;
+        currentState.previous(this);
+    }
+
+    // ---- METODI PRATICI DI CODA ----
+    public void addToQueue(Playable playable) {
+        queue.add(playable);
+    }
+
+    public void setQueue(List<? extends Playable> newItems) {
+        if (newItems != null) {
+            this.queue.clear();
+            this.queue.addAll(newItems);
+            this.currentPlayableIndex = 0;
+            this.currentTrackIndexInPlayable = 0;
+            System.out.println("[MANAGER] Coda aggiornata con " + newItems.size() + " elementi Playable.");
+        }
+    }
+
+    public Track getCurrentTrack() {
+        if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) {
+            return null;
+        }
+        Playable currentPlayable = queue.get(currentPlayableIndex);
+        List<Track> tracks = currentPlayable.getTracks();
+
+        if (currentTrackIndexInPlayable >= tracks.size() || currentTrackIndexInPlayable < 0) {
+            return null;
+        }
+        return tracks.get(currentTrackIndexInPlayable);
+    }
+
+    public Playable getCurrentPlayable() {
+        if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) {
+            return null;
+        }
+        return queue.get(currentPlayableIndex);
+    }
+
+    public int getCurrentPlayableIndex() {
+        return this.currentPlayableIndex;
+    }
+
+    public int getCurrentTrackIndexInPlayable() {
+        return this.currentTrackIndexInPlayable;
+    }
+
+    public PlaybackState getCurrentState() {
+        return this.currentState;
+    }
+
+    public List<Playable> getCurrentQueue() {
+        return new ArrayList<>(queue);
+    }
+
+    public void advanceTrack() {
+        if (queue.isEmpty()) return;
+
+        Playable currentPlayable = queue.get(currentPlayableIndex);
+        List<Track> tracks = currentPlayable.getTracks();
+        currentTrackIndexInPlayable++;
+
+        // Se abbiamo finito le canzoni di questo Playable, passa al prossimo Playable della coda
+        if (currentTrackIndexInPlayable >= tracks.size()) {
+            currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
+            currentTrackIndexInPlayable = 0;
+
+            // Se il nuovo Playable è vuoto e non abbiamo finito la coda, cerchiamo il prossimo
+            if (currentPlayableIndex < queue.size() && queue.get(currentPlayableIndex).getTracks().isEmpty()) {
+                advanceTrack();
+            }
+        }
+    }
+
+    public void advancePlayable() {
+        if (queue.isEmpty()) return;
+        currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
+        currentTrackIndexInPlayable = 0;
+
+        // Se l'elemento saltato porta a un elemento vuoto, cerca il prossimo brano valido
+        if (currentPlayableIndex < queue.size() && queue.get(currentPlayableIndex).getTracks().isEmpty()) {
+            advanceTrack();
+        }
+    }
+
+    public void regressTrack() {
+        if (queue.isEmpty()) return;
+
+        currentTrackIndexInPlayable--;
+
+        // Se andiamo sotto zero, dobbiamo tornare al Playable precedente
+        if (currentTrackIndexInPlayable < 0) {
+            currentPlayableIndex--;
+            if (currentPlayableIndex >= 0) {
+                List<Track> prevTracks = queue.get(currentPlayableIndex).getTracks();
+                if (prevTracks.isEmpty()) {
+                    regressTrack(); // Salta playlist vuote all'indietro
+                } else {
+                    currentTrackIndexInPlayable = prevTracks.size() - 1;
+                }
+            } else {
+                // Eravamo già all'inizio di tutta la coda
+                currentPlayableIndex = 0;
+                currentTrackIndexInPlayable = 0;
+            }
+        }
+    }
+
+    public void resetQueue() {
+        this.currentPlayableIndex = 0;
+        this.currentTrackIndexInPlayable = 0;
     }
 
     // Metodo richiamato dal Controller per cambiare strategia a runtime
@@ -49,142 +180,50 @@ public class PlaybackManager {
         }
     }
 
-    // Metodo richiamato dagli Stati concreti per cambiare lo stato dell'app
-    public void changeState(PlaybackState newState) {
-        this.currentState = newState;
-    }
-
-    // Prossima canzone definita dalla strategia corrente
-    public void advanceQueue() {
-        if (currentQueue != null && !currentQueue.isEmpty()) {
-            // Delega il calcolo del prossimo indice alla strategia attiva
-            this.currentIndex = currentStrategy.getNextIndex(this.currentIndex, this.currentQueue.size());
-            System.out.println("[MANAGER] Avanzamento coda. Nuovo indice calcolato: " + this.currentIndex);
-        }
-    }
-
-    // Canzone precedente
-    public void regressQueue() {
-        if (currentQueue != null && !currentQueue.isEmpty()) {
-            // Se l'indice è andato oltre la fine della coda ( SequentialStrategy ha restituito queueSize)
-            // premendo indietro ritorniamo all'ultimo brano valido
-            if (this.currentIndex >= currentQueue.size()) {
-                this.currentIndex = currentQueue.size() - 1;
-            } else if (this.currentIndex > 0) {
-                this.currentIndex--;
-            } else {
-                // Altrimenti lo forziamo a rimanere a 0 (Ricomincia la canzone da capo)
-                this.currentIndex = 0;
-                System.out.println("[MANAGER] Sei già al primo brano. L'indice resta a 0.");
-            }
-        }
-    }
-
-    public void resetQueue() {
-        this.currentIndex = 0;
-    }
-
-    public Track getCurrentTrack() {
-        if (currentQueue == null || currentIndex >= currentQueue.size() || currentIndex < 0) {
-            return null;
-        }
-        return currentQueue.get(currentIndex);
-    }
-
-    public int getCurrentIndex() {
-        return this.currentIndex;
-    }
-
-    public PlaybackState getCurrentState() {
-        return this.currentState;
-    }
-
-    public List<Track> getCurrentQueue() {
-        if (this.currentQueue == null) {
-            return new ArrayList<>(); // Ritorna una lista vuota anziché null per evitare crash nella UI
-        }
-        return this.currentQueue;
-    }
-
     /**
-     * Carica nel player la lista di brani corrente (Libreria o Playlist)
-     * e imposta l'indice esattamente sulla canzone selezionata dall'utente.
+     * Carica nel player la lista di elementi Playable e imposta gli indici
+     * sulla traccia selezionata all'interno del Playable corrispondente.
      */
-    public void selectAndLoadTrack(Track selectedTrack, List<Track> tracksContext) {
-        if (tracksContext != null && !tracksContext.isEmpty() && selectedTrack != null) {
-            this.currentQueue = tracksContext;
+    public void selectAndLoadTrack(Track selectedTrack, List<? extends Playable> context) {
+        if (context != null && !context.isEmpty() && selectedTrack != null) {
+            this.queue.clear();
+            this.queue.addAll(context);
 
-            // 1. Tentativo standard tramite uguaglianza di riferimento/ID
-            this.currentIndex = tracksContext.indexOf(selectedTrack);
+            // Cerchiamo il Playable che contiene la traccia selezionata
+            for (int i = 0; i < queue.size(); i++) {
+                Playable p = queue.get(i);
+                List<Track> tracks = p.getTracks();
+                int trackIdx = tracks.indexOf(selectedTrack);
 
-            // 2. Fallback di sicurezza: se restituisce -1, cerchiamo per contenuto reale (Titolo e Autore)
-            if (this.currentIndex == -1) {
-                for (int i = 0; i < tracksContext.size(); i++) {
-                    Track t = tracksContext.get(i);
-                    if (t.getTitle().equalsIgnoreCase(selectedTrack.getTitle()) &&
-                            t.getAuthor().equalsIgnoreCase(selectedTrack.getAuthor())) {
-                        this.currentIndex = i;
-                        break; // Trovato!
-                    }
+                if (trackIdx != -1) {
+                    this.currentPlayableIndex = i;
+                    this.currentTrackIndexInPlayable = trackIdx;
+                    System.out.println("[MANAGER] Caricato Playable " + i + " alla traccia " + trackIdx);
+                    return;
                 }
             }
 
-            // 3. Fallback se non lo trova
-            if (this.currentIndex == -1) {
-                this.currentIndex = 0;
-            }
-
-            System.out.println("[MANAGER] Coda caricata con successo (" + tracksContext.size() + " brani). " +
-                    "Brano attivo: " + this.currentQueue.get(this.currentIndex).getTitle() + " [Indice: " + this.currentIndex + "]");
-        } else {
-            System.out.println("[MANAGER - ERROR] Tentato caricamento di un contesto vuoto o nullo.");
+            // Fallback se non trovato
+            this.currentPlayableIndex = 0;
+            this.currentTrackIndexInPlayable = 0;
         }
     }
 
-
-
-    // --- INTERFACCIA PER I BOTTONI (Metodi delegati allo Stato Corrente) ---
-
-    public void pressPlay() {
-        // CONTROLLO DI SICUREZZA: Verifichiamo solo se la coda contiene elementi
-        if (currentQueue == null || currentQueue.isEmpty()) {
-            System.out.println("[MANAGER - ERROR] Impossibile avviare il player: nessuna canzone caricata nella coda.");
-            return;
+    // ---- METODI PRATICI DI LOGICA AUDIO REALISTICA ----
+    public void triggerRealPlayback() {
+        Track current = getCurrentTrack();
+        if (current != null) {
+            System.out.println("🔊 [AUDIO PLAYER] Avvio riproduzione fisica: " + current.getTitle());
         }
-
-        // Se l'indice è fuori dai giochi per errore, resettalo al primo brano della coda caricata
-        if (currentIndex < 0 || currentIndex >= currentQueue.size()) {
-            System.out.println("[MANAGER - WARNING] Indice " + currentIndex + " non valido per la coda attuale. Reset a 0.");
-            currentIndex = 0;
-        }
-
-        // Se siamo qui, la coda è sicuramente valida e non vuota!
-        currentState.play(this);
-    }
-    public void pressStop() {
-        // Sicurezza: se la coda è già vuota, non c'è nulla da interrompere
-        if (currentQueue == null || currentQueue.isEmpty()) {
-            System.out.println("[MANAGER] Coda vuota, nulla da interrompere.");
-            return;
-        }
-        currentState.stop(this);
     }
 
-    public void pressNext() {
-        if (currentQueue == null || currentQueue.isEmpty()) {
-            System.out.println("[MANAGER] Coda vuota, impossibile andare al brano successivo.");
-            return;
-        }
-        currentState.next(this);
+    public void triggerRealStop() {
+        System.out.println("🔇 [AUDIO PLAYER] Audio interrotto e resettato.");
     }
 
-    public void pressPrevious() {
-        if (currentQueue == null || currentQueue.isEmpty()) {
-            System.out.println("[MANAGER] Coda vuota, impossibile andare al brano precedente.");
-            return;
-        }
-        currentState.previous(this);
+    public void triggerRealPause() {
+        Track current = getCurrentTrack();
+        String title = (current != null) ? current.getTitle() : "Nessuna traccia";
+        System.out.println("⏸️ [AUDIO PLAYER] Audio in PAUSA su: " + title);
     }
-
-
-}
+}}
