@@ -10,12 +10,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -98,15 +95,11 @@ public class PrimaryViewController implements Observer {
         songTableView.setPlaceholder(placeholderLabel);
     }
 
-    // CONTROLLI BARRA LATERALE
+    // CONTROLLER INIETTATI DA fx:include
     @FXML
-    private TextField searchField;
+    private SidebarController sidebarController;
     @FXML
-    private Button musicLibraryButton;
-    @FXML
-    private Button playQueueButton;
-    @FXML
-    private Button playlistButton;
+    private PlayerController playerBarController;
 
     // CONTROLLI AREA CENTRALE
     @FXML
@@ -138,82 +131,23 @@ public class PrimaryViewController implements Observer {
     @FXML
     private TableColumn<?, ?> durationColumn;
 
-    // CONTROLLI BARRA DI RIPRODUZIONE
-    @FXML
-    private Label currentTimeLabel;
-    @FXML
-    private Slider progressSlider;
-    @FXML
-    private Label totalTimeLabel;
-    @FXML
-    private ImageView albumCoverImageView;
-    @FXML
-    private Label currentTrackTitle;
-    @FXML
-    private Label currentTrackDetails;
-    @FXML
-    private Button shuffleButton;
-    @FXML
-    private Button prevButton;
-    @FXML
-    private Button playPauseButton;
-    @FXML
-    private Button nextButton;
-    @FXML
-    private Button repeatButton;
-    @FXML
-    private Button volumeButton;
-    @FXML
-    private Slider volumeSlider;
-
-    // CONTROLLI PER ADD TRACK
-    @FXML
-    private TextField addTrackTitleField;
-
-    @FXML
-    private TextField addTrackAuthorField;
-
-    @FXML
-    private TextField addTrackDurationField;
-
-    @FXML
-    private TextField addTrackYearField;
-
-    @FXML
-    private Label addTrackErrorLabel;
-
-    @FXML
-    private ComboBox<String> addTrackGenreComboBox;
-
-    @FXML
-    private Label formTitleLabel;
-
     // METODO DI INIZIALIZZAZIONE
     @FXML
     public void initialize() {
         Library.getInstance().attach(this);
+
+        // Collegamento callback del SidebarController
+        sidebarController.setOnNavigate(this::handleNavigate);
+
+        // Collegamento callback del PlayerController
+        playerBarController.setOnPlayPauseClicked(() -> handlePlayPauseAction());
+        playerBarController.setOnPlayerStateChanged(() -> syncTableSelection());
 
         if (sortComboBox != null) {
             sortComboBox.getItems().addAll("A - Z", "Z - A", "Artista", "Anno", "Durata");
         }
         if (genreComboBox != null) {
             genreComboBox.getItems().addAll("Tutti i generi", "Pop", "Rock", "Jazz", "Classica", "Hip Hop");
-        }
-
-        // Inizializzazione tempi a zero
-        if (currentTimeLabel != null) {
-            currentTimeLabel.setText("00:00:00");
-        }
-        if (totalTimeLabel != null) {
-            totalTimeLabel.setText("00:00:00");
-        }
-
-        // Inizializzazione metadati brano a vuoto
-        if (currentTrackTitle != null) {
-            currentTrackTitle.setText("");
-        }
-        if (currentTrackDetails != null) {
-            currentTrackDetails.setText("");
         }
 
         // Configurazione iniziale delle colonne (Vista Brani)
@@ -377,8 +311,17 @@ public class PrimaryViewController implements Observer {
         }
     }
 
-    // GESTORI EVENTI BARRA LATERALE
-    @FXML
+    // GESTORI EVENTI BARRA LATERALE (chiamati dal SidebarController tramite callback)
+    private void handleNavigate(String viewId) {
+        if ("Musica".equals(viewId)) {
+            handleMusicLibraryAction();
+        } else if ("Coda".equals(viewId)) {
+            handlePlayQueueAction();
+        } else if ("Playlist".equals(viewId)) {
+            handlePlaylistAction();
+        }
+    }
+
     private void handleMusicLibraryAction() {
         currentOpenedPlaylist = null;
         viewTitleLabel.setText("Musica");
@@ -391,7 +334,6 @@ public class PrimaryViewController implements Observer {
         System.out.println("Navigazione: Libreria musicale (Vista Brani)");
     }
 
-    @FXML
     private void handlePlayQueueAction() {
         currentOpenedPlaylist = null;
         viewTitleLabel.setText("Coda di riproduzione");
@@ -403,7 +345,6 @@ public class PrimaryViewController implements Observer {
         System.out.println("Navigazione: Coda di riproduzione");
     }
 
-    @FXML
     private void handlePlaylistAction() {
         currentOpenedPlaylist = null;
         viewTitleLabel.setText("Playlist");
@@ -518,52 +459,12 @@ public class PrimaryViewController implements Observer {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/views/addTrackView.fxml"));
 
-            // Usa lo stesso controller già esistente
-            loader.setController(this);
-
             Parent root = loader.load();
 
-            if (formTitleLabel != null) {
-                if (currentEditingTrack != null) {
-                    formTitleLabel.setText("Modifica brano");
-                } else {
-                    formTitleLabel.setText("Aggiungi nuovo brano");
-                }
-            }
-
-            // Popoliamo la ComboBox del form "Aggiungi brano".
-            // Questa operazione va fatta dopo loader.load(), perché solo dopo il caricamento
-            // dell'FXML il campo addTrackGenreComboBox viene collegato al nodo grafico.
-            if (addTrackGenreComboBox != null) {
-                addTrackGenreComboBox.getItems().setAll(
-                        "Pop",
-                        "Rock",
-                        "Jazz",
-                        "Classica",
-                        "Hip Hop",
-                        "Rap",
-                        "Elettronica"
-                );
-            }
-
-            if (currentEditingTrack != null) {
-                addTrackTitleField.setText(currentEditingTrack.getTitle());
-                addTrackAuthorField.setText(currentEditingTrack.getAuthor());
-                addTrackDurationField.setText(String.valueOf(currentEditingTrack.getDuration()));
-                addTrackYearField.setText(String.valueOf(currentEditingTrack.getYear()));
-                addTrackGenreComboBox.setValue(currentEditingTrack.getGenre());
-            } else {
-                addTrackTitleField.setText("");
-                addTrackAuthorField.setText("");
-                addTrackDurationField.setText("");
-                addTrackYearField.setText("");
-                addTrackGenreComboBox.setValue(null);
-            }
-
-            // Pulizia eventuale del messaggio di errore ogni volta che si apre il form
-            if (addTrackErrorLabel != null) {
-                addTrackErrorLabel.setText("");
-            }
+            // Recupera il controller creato automaticamente dall'FXMLLoader
+            AddTrackController controller = loader.getController();
+            controller.setOnTrackSaved(this);
+            controller.initForm(currentEditingTrack);
 
             Stage stage = new Stage();
             stage.setTitle("Aggiungi brano");
@@ -639,22 +540,7 @@ public class PrimaryViewController implements Observer {
         System.out.println("Azione: Avvio riproduzione casuale di tutta la libreria");
     }
 
-    // GESTORI EVENTI BARRA DI RIPRODUZIONE (PLAYER)
-    @FXML
-    private void handleShuffleToggle() {
-        System.out.println("Player: Toggle riproduzione casuale");
-    }
-
-    @FXML
-    private void handlePrevAction() {
-        System.out.println("Player: Richiesta traccia precedente.");
-        // Delega allo stato corrente tramite il manager
-        PlaybackManager.getInstance().pressPrevious();
-        // Aggiorna i testi a schermo
-        updatePlayerUI();
-    }
-
-    @FXML
+    // GESTORE PLAY/PAUSE (chiamato dal PlayerController tramite callback)
     private void handlePlayPauseAction() {
         System.out.println("[CONTROLLER] Click sul pulsante Play/Pause.");
 
@@ -684,115 +570,25 @@ public class PrimaryViewController implements Observer {
         updatePlayerUI();
     }
 
-
-    @FXML
-    private void handleNextAction() {
-        System.out.println("Player: Click sul pulsante Traccia Successiva.");
-        // Delega allo stato corrente tramite il manager
-        PlaybackManager.getInstance().pressNext();
-        // Sincronizza l'interfaccia grafica
-        updatePlayerUI();
-    }
-    @FXML
-    private void handleRepeatToggle() {
-        System.out.println("Player: Toggle ripetizione (ciclo)");
-    }
-
-    @FXML
-    private void handleVolumeMuteToggle() {
-        System.out.println("Player: Muto / Attiva audio");
-    }
-
-    // metodo per salvare
-    @FXML
-    private void handleSaveTrack() {
-        try {
-            // salvo yearText durationText e come String non come int perchè altrimenti non posso verificare se il field è vuoto
-            String title = addTrackTitleField.getText().trim();
-            String author = addTrackAuthorField.getText().trim();
-            String durationText = addTrackDurationField.getText().trim();
-            String genre = addTrackGenreComboBox.getValue();
-            String yearText = addTrackYearField.getText().trim();
-
-
-            // campi vuoti
-            if (title.isEmpty() || author.isEmpty() || durationText.isEmpty()
-                    || genre == null || yearText.isEmpty()) {
-                addTrackErrorLabel.setText("Compila tutti i campi obbligatori.");
-                return;
-            }
-
-
-            int duration;
-            int year;
-
-            try {
-                duration = Integer.parseInt(durationText);
-            } catch (NumberFormatException e) {
-                addTrackErrorLabel.setText("La durata deve essere un numero valido.");
-                return;
-            }
-
-            try {
-                year = Integer.parseInt(yearText);
-            } catch (NumberFormatException e) {
-                addTrackErrorLabel.setText("L'anno deve essere un numero valido.");
-                return;
-            }
-
-            // creo ed aggiorno il brano
-            if (currentEditingTrack != null) {
-                currentEditingTrack.setTitle(title);
-                currentEditingTrack.setAuthor(author);
-                currentEditingTrack.setDuration(duration);
-                currentEditingTrack.setGenre(genre);
-                currentEditingTrack.setYear(year);
-                Library.getInstance().notifyObservers();
-                System.out.println("Brano modificato: " + currentEditingTrack.getTitle());
-            } else {
-                Track track = new Track(title, author, duration, genre, year);
-                Library.getInstance().addTrack(track);
-                track.attach(this);
-                System.out.println("Brano aggiunto: " + track.getTitle());
-                System.out.println("Numero brani in libreria: " + Library.getInstance().getTracks().size());
-            }
-
-            // chiudo finestra
-            Stage stage = (Stage) addTrackTitleField.getScene().getWindow();
-            stage.close();
-
-        } catch (IllegalArgumentException e) {
-            addTrackErrorLabel.setText(e.getMessage());
-        }
-    }
-
-    // Metodo per annullare l'aggiunta di una track dal form di addTrack
-    @FXML
-    private void handleCancelAddTrack() {
-        Stage stage = (Stage) addTrackTitleField.getScene().getWindow();
-        stage.close();
-    }
-
-
-
     /**
-     * Sincronizza le Label della barra di riproduzione inferiore
-     * e lo stato del bottone Play/Pause con il brano correntemente nel PlaybackManager.
+     * Aggiorna l'interfaccia del player e sincronizza la selezione della tabella.
+     * Delega l'aggiornamento delle label del player al PlayerController.
      */
     private void updatePlayerUI() {
+        playerBarController.updatePlayerUI();
+        syncTableSelection();
+    }
+
+    /**
+     * Sincronizza la selezione della tabella con il brano correntemente
+     * in riproduzione nel PlaybackManager.
+     */
+    private void syncTableSelection() {
         PlaybackManager manager = PlaybackManager.getInstance();
         Track currentTrack = manager.getCurrentTrack();
 
         if (currentTrack != null) {
-            // 1. Aggiorna i testi del player in basso
-            if (currentTrackTitle != null) {
-                currentTrackTitle.setText(currentTrack.getTitle());
-            }
-            if (currentTrackDetails != null) {
-                currentTrackDetails.setText(currentTrack.getAuthor());
-            }
-
-            // 2. Sincronizzazione del cursore/selezione della tabella
+            // Sincronizzazione del cursore/selezione della tabella
             if (songTableView != null && !songTableView.getItems().isEmpty()) {
                 int indexAttivo = manager.getCurrentIndex();
 
@@ -801,39 +597,10 @@ public class PrimaryViewController implements Observer {
                     songTableView.scrollTo(indexAttivo);
                 }
             }
-
         } else {
-            // Se non c'è nessun brano in riproduzione
-            if (currentTrackTitle != null) {
-                currentTrackTitle.setText("Nessun brano in riproduzione");
-            }
-            if (currentTrackDetails != null) {
-                currentTrackDetails.setText("");
-            }
             if (songTableView != null) {
                 songTableView.getSelectionModel().clearSelection();
             }
         }
-
-        // GESTIONE CAMBIO DINAMICO DEL TESTO DEL BOTTONE PLAY/PAUSA
-
-        if (playPauseButton != null) {
-            // Recuperiamo il nome della classe dello stato attuale (played/paused/stopped)
-            String currentStateName = manager.getCurrentState().getClass().getSimpleName();
-
-            // Se lo stato contiene "Play" o "Playing", significa che la musica si sente.
-            // Il bottone deve quindi offrire l'azione di fermarsi -> Mostra "Pausa" o "Stop"
-            if (currentStateName.toLowerCase().contains("play")) {
-                playPauseButton.setText("||");
-            } else {
-                // Se siamo in StoppedState o PausedState, il brano è fermo.
-                // Il bottone deve offrire l'azione di ripartire -> Mostra "Play"
-                playPauseButton.setText("▶");
-            }
-        }
     }
 }
-
-
-
-

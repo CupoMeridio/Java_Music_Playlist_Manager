@@ -4,11 +4,8 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Priority?>
@@ -25,27 +22,7 @@
    
    <!-- 1. BARRA LATERALE (LEFT) -->
    <left>
-      <VBox prefWidth="220.0" spacing="15.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;">
-         <padding>
-            <Insets bottom="15.0" left="15.0" right="15.0" top="20.0" />
-         </padding>
-         <children>
-            <!-- Titolo Applicazione (Opzionale) -->
-            <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Lettore musicale" />
-            
-            <!-- Barra di Ricerca -->
-            <TextField fx:id="searchField" promptText="Cerca" />
-            
-            <!-- Pulsanti Principali Sidebar -->
-            <VBox spacing="8.0" VBox.vgrow="ALWAYS">
-               <children>
-                  <Button fx:id="musicLibraryButton" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Libreria musicale" onAction="#handleMusicLibraryAction" />
-                  <Button fx:id="playQueueButton" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Coda di riproduzione" onAction="#handlePlayQueueAction" />
-                  <Button fx:id="playlistButton" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Playlist" onAction="#handlePlaylistAction" />
-               </children>
-            </VBox>
-         </children>
-      </VBox>
+      <fx:include fx:id="sidebar" source="views/SidebarView.fxml"/>
    </left>
    
    <!-- 2. SEZIONE CENTRALE PRINCIPALE (CENTER) -->
@@ -115,72 +92,7 @@
    
    <!-- 3. BARRA DI RIPRODUZIONE IN BASSO (BOTTOM) -->
    <bottom>
-      <VBox spacing="10.0" style="-fx-border-color: #cccccc; -fx-border-width: 1 0 0 0;">
-         <padding>
-            <Insets bottom="15.0" left="15.0" right="15.0" top="10.0" />
-         </padding>
-         <children>
-            <!-- Riga 1: Barra di Progresso (Timeline) con Tempi -->
-            <HBox alignment="CENTER" spacing="10.0">
-               <children>
-                  <Label fx:id="currentTimeLabel" text="00:00:00" />
-                  <Slider fx:id="progressSlider" HBox.hgrow="ALWAYS" />
-                  <Label fx:id="totalTimeLabel" text="00:00:00" />
-               </children>
-            </HBox>
-            
-            <!-- Riga 2: Dettagli Brano, Controlli Riproduzione, Volume e Opzioni -->
-            <HBox alignment="CENTER" spacing="20.0">
-               <children>
-                  
-                  <!-- Lato Sinistro: Copertina e Info Traccia -->
-                  <HBox alignment="CENTER_LEFT" prefWidth="250.0" spacing="10.0" HBox.hgrow="NEVER">
-                     <children>
-                        <!-- Copertina del Brano -->
-                        <ImageView fx:id="albumCoverImageView" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #999999; -fx-border-width: 1;">
-                           <!-- Image placeholder can be loaded programmatically -->
-                        </ImageView>
-                        
-                        <!-- Metadati del Brano (Titolo e Artista) -->
-                        <VBox alignment="CENTER_LEFT" spacing="3.0">
-                           <children>
-                              <Label fx:id="currentTrackTitle" style="-fx-font-weight: bold;" text="" />
-                              <Label fx:id="currentTrackDetails" style="-fx-font-size: 11px;" text="" textOverrun="ELLIPSIS" />
-                           </children>
-                        </VBox>
-                     </children>
-                  </HBox>
-                  
-                  <!-- Spaziatore a sinistra per centrare i controlli -->
-                  <Region HBox.hgrow="ALWAYS" />
-                  
-                  <!-- Centro: Controlli Riproduzione (Casuale, Indietro, Play/Pausa, Avanti, Ciclo) -->
-                  <HBox alignment="CENTER" spacing="15.0" HBox.hgrow="NEVER">
-                     <children>
-                        <Button fx:id="shuffleButton" text="🔀" onAction="#handleShuffleToggle" />
-                        <Button fx:id="prevButton" text="⏮" onAction="#handlePrevAction" />
-                        <Button fx:id="playPauseButton" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="▶" onAction="#handlePlayPauseAction" />
-                        <Button fx:id="nextButton" text="⏭" onAction="#handleNextAction" />
-                        <Button fx:id="repeatButton" text="🔁" onAction="#handleRepeatToggle" />
-                     </children>
-                  </HBox>
-                  
-                  <!-- Spaziatore a destra per spingere il volume a destra -->
-                  <Region HBox.hgrow="ALWAYS" />
-                  
-                  <!-- Lato Destro: Volume -->
-                  <HBox alignment="CENTER_RIGHT" prefWidth="250.0" spacing="10.0" HBox.hgrow="NEVER">
-                     <children>
-                        <!-- Controllo Volume -->
-                        <Button fx:id="volumeButton" text="🔊" onAction="#handleVolumeMuteToggle" />
-                        <Slider fx:id="volumeSlider" max="100.0" prefWidth="100.0" value="50.0" />
-                     </children>
-                  </HBox>
-                  
-               </children>
-            </HBox>
-         </children>
-      </VBox>
+      <fx:include fx:id="playerBar" source="views/PlayerBarView.fxml"/>
    </bottom>
    
 </BorderPane>

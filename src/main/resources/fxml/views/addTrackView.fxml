@@ -14,11 +14,8 @@
 <!--
     View secondaria per l'inserimento o la modifica di un brano.
 
-    Non viene dichiarato fx:controller, perché il progetto utilizza
-    un solo controller centrale: PrimaryViewController.
-
-    Questa view viene caricata dinamicamente dal PrimaryViewController
-    tramite FXMLLoader e loader.setController(this).
+    Collegata al controller AddTrackController, che gestisce
+    la logica del form di inserimento e modifica brani.
 -->
 
 <VBox spacing="15.0"
@@ -26,7 +23,8 @@
       maxWidth="Infinity"
       maxHeight="Infinity"
       xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1">
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.unisa.java_music_playlist_manager.AddTrackController">
 
     <!-- Margini interni della finestra -->
     <padding>
