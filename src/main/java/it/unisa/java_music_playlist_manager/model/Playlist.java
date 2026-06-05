@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Playlist {
+public class Playlist implements Playable {
     
     private String title; 
-    private final List<Track> tracks;
+    private final List<Playable> elements;
     private final String id;
 
     public Playlist(String title) {
         this.id = UUID.randomUUID().toString();
         this.setTitle(title);
-        this.tracks = new ArrayList<>();
+        this.elements = new ArrayList<>();
     }
 
     public void setTitle(String title) {
@@ -27,41 +27,57 @@ public class Playlist {
         this.title = title;
     }
 
-    public boolean contains(Track track) {
-        return tracks.contains(track);
+    public void add(Playable element) {
+        if (element == null) {
+            throw new IllegalArgumentException("Impossibile aggiungere un componente nullo.");
+        }
+        if (!elements.contains(element)) {
+            elements.add(element);
+        }
+    }
+
+    public void remove(Playable element) {
+        if (element == null) {
+            return;
+        }
+        elements.remove(element);
+    }
+
+    public boolean contains(Playable element) {
+        return elements.contains(element);
     }
 
     public int getTrackCount() {
-        return tracks.size();
+        return getTracks().size();
     }
 
+    @Override
     public List<Track> getTracks() {
-        return new ArrayList<>(tracks);
+        List<Track> allTracks = new ArrayList<>();
+        // Sfrutta la ricorsione del Composite per raccogliere tutte le tracce
+        for (Playable element : elements) {
+            allTracks.addAll(element.getTracks());
+        }
+        return allTracks;
     }
 
     public void addTrack(Track track) {
-        if (track == null) {
-            throw new IllegalArgumentException("Impossibile aggiungere un brano nullo.");
-        }
-        if (!tracks.contains(track)) {
-            tracks.add(track);
-        }
+        add(track);
     }
 
     public boolean removeTrack(Track track) {
-        if (track == null) {
-            return false;
-        }
-        return tracks.remove(track);
+        if (track == null) return false;
+        return elements.remove(track);
     }
 
+    @Override
     public String getTitle() {
         return this.title;
     }
 
     public int getDuration() {
         int duration = 0;
-        for (Track t : tracks) {
+        for (Track t : getTracks()) {
             duration += t.getDuration();
         }
         return duration;

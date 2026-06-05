@@ -13,9 +13,16 @@ import java.util.UUID;
 // ma con il fatto ceh si possa modificare, dovrebbe avvisare il controller
 // quando la track viene modificata
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public final class Track implements Subject {
+/**
+ * Classe che rappresenta il singolo brano musicale, dotandolo di tutti i metadati
+ * con controlli integrità inseriti nei setter e richiamati nel costruttore
+ */
+
+
+public final class Track implements Playable, Subject {
     
     private final List<Observer> observers = new ArrayList<>();
     
@@ -114,6 +121,12 @@ public final class Track implements Subject {
     }
 
     
+    @Override
+    public List<Track> getTracks() {
+        // Una traccia restituisce semplicemente se stessa all'interno di una lista
+        return Collections.singletonList(this); // utilizzato per l'ottimizzazione di memoria perchè è una lista con un solo elemento
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
