@@ -62,4 +62,15 @@ public class PausedState implements PlaybackState {
             System.out.println("[STATO: PAUSED] Coda agganciata su: " + prevTrack.getTitle());
         }
     }
+
+    @Override
+    public void previousPlayable(PlaybackManager context) {
+        System.out.println("[STATO: PAUSED] -> Salto al blocco precedente (rimanendo in pausa)...");
+        context.regressPlayable();
+
+        Track prevTrack = context.getCurrentTrack();
+        if (prevTrack != null) {
+            System.out.println("[STATO: PAUSED] Coda agganciata sul blocco precedente: " + prevTrack.getTitle());
+        }
+    }
 }

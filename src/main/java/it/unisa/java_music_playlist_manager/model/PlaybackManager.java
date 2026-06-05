@@ -63,9 +63,21 @@ public class PlaybackManager {
         currentState.previous(this);
     }
 
+    public void pressPreviousPlayable() {
+        if (queue.isEmpty()) return;
+        currentState.previousPlayable(this);
+    }
+
     // ---- METODI PRATICI DI CODA ----
     public void addToQueue(Playable playable) {
+        if (playable == null) {
+            throw new IllegalArgumentException("Impossibile aggiungere un elemento nullo alla coda.");
+        }
         queue.add(playable);
+        if (queue.size() == 1) {
+            resetQueue();
+            skipEmptyPlayablesForward();
+        }
     }
 
     public void setQueue(List<? extends Playable> newItems) {
@@ -74,6 +86,7 @@ public class PlaybackManager {
             this.queue.addAll(newItems);
             this.currentPlayableIndex = 0;
             this.currentTrackIndexInPlayable = 0;
+            skipEmptyPlayablesForward();
             System.out.println("[MANAGER] Coda aggiornata con " + newItems.size() + " elementi Playable.");
         }
     }
@@ -125,11 +138,7 @@ public class PlaybackManager {
         if (currentTrackIndexInPlayable >= tracks.size()) {
             currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
             currentTrackIndexInPlayable = 0;
-
-            // Se il nuovo Playable è vuoto e non abbiamo finito la coda, cerchiamo il prossimo
-            if (currentPlayableIndex < queue.size() && queue.get(currentPlayableIndex).getTracks().isEmpty()) {
-                advanceTrack();
-            }
+            skipEmptyPlayablesForward();
         }
     }
 
@@ -137,39 +146,82 @@ public class PlaybackManager {
         if (queue.isEmpty()) return;
         currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
         currentTrackIndexInPlayable = 0;
+        skipEmptyPlayablesForward();
+    }
 
-        // Se l'elemento saltato porta a un elemento vuoto, cerca il prossimo brano valido
-        if (currentPlayableIndex < queue.size() && queue.get(currentPlayableIndex).getTracks().isEmpty()) {
-            advanceTrack();
+    public void regressPlayable() {
+        if (queue.isEmpty()) return;
+
+        if (currentPlayableIndex >= queue.size()) {
+            currentPlayableIndex = queue.size() - 1;
+        } else {
+            currentPlayableIndex--;
         }
+
+        skipEmptyPlayablesBackwardToStart();
     }
 
     public void regressTrack() {
         if (queue.isEmpty()) return;
 
-        currentTrackIndexInPlayable--;
-
-        // Se andiamo sotto zero, dobbiamo tornare al Playable precedente
-        if (currentTrackIndexInPlayable < 0) {
-            currentPlayableIndex--;
-            if (currentPlayableIndex >= 0) {
-                List<Track> prevTracks = queue.get(currentPlayableIndex).getTracks();
-                if (prevTracks.isEmpty()) {
-                    regressTrack(); // Salta playlist vuote all'indietro
-                } else {
-                    currentTrackIndexInPlayable = prevTracks.size() - 1;
-                }
-            } else {
-                // Eravamo già all'inizio di tutta la coda
-                currentPlayableIndex = 0;
-                currentTrackIndexInPlayable = 0;
-            }
+        if (currentPlayableIndex >= queue.size()) {
+            currentPlayableIndex = queue.size() - 1;
+            moveToLastTrackOfCurrentPlayableOrPrevious();
+            return;
         }
+
+        if (currentTrackIndexInPlayable > 0) {
+            currentTrackIndexInPlayable--;
+            return;
+        }
+
+        currentPlayableIndex--;
+        moveToLastTrackOfCurrentPlayableOrPrevious();
     }
 
     public void resetQueue() {
         this.currentPlayableIndex = 0;
         this.currentTrackIndexInPlayable = 0;
+    }
+
+    private void skipEmptyPlayablesForward() {
+        while (currentPlayableIndex < queue.size()
+                && queue.get(currentPlayableIndex).getTracks().isEmpty()) {
+            int nextIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
+            if (nextIndex <= currentPlayableIndex) {
+                currentPlayableIndex = queue.size();
+                break;
+            }
+            currentPlayableIndex = nextIndex;
+        }
+        currentTrackIndexInPlayable = 0;
+    }
+
+    private void moveToLastTrackOfCurrentPlayableOrPrevious() {
+        while (currentPlayableIndex >= 0) {
+            List<Track> tracks = queue.get(currentPlayableIndex).getTracks();
+            if (!tracks.isEmpty()) {
+                currentTrackIndexInPlayable = tracks.size() - 1;
+                return;
+            }
+            currentPlayableIndex--;
+        }
+
+        currentPlayableIndex = 0;
+        currentTrackIndexInPlayable = 0;
+    }
+
+    private void skipEmptyPlayablesBackwardToStart() {
+        while (currentPlayableIndex >= 0) {
+            if (!queue.get(currentPlayableIndex).getTracks().isEmpty()) {
+                currentTrackIndexInPlayable = 0;
+                return;
+            }
+            currentPlayableIndex--;
+        }
+
+        currentPlayableIndex = 0;
+        currentTrackIndexInPlayable = 0;
     }
 
     // Metodo richiamato dal Controller per cambiare strategia a runtime

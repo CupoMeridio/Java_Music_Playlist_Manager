@@ -31,6 +31,12 @@ public class Playlist implements Playable {
         if (element == null) {
             throw new IllegalArgumentException("Impossibile aggiungere un componente nullo.");
         }
+        if (element == this) {
+            throw new IllegalArgumentException("Una playlist non può contenere se stessa.");
+        }
+        if (element instanceof Playlist playlist && playlist.containsRecursive(this)) {
+            throw new IllegalArgumentException("Impossibile creare una dipendenza ciclica tra playlist.");
+        }
         if (!elements.contains(element)) {
             elements.add(element);
         }
@@ -45,6 +51,18 @@ public class Playlist implements Playable {
 
     public boolean contains(Playable element) {
         return elements.contains(element);
+    }
+
+    private boolean containsRecursive(Playable target) {
+        for (Playable element : elements) {
+            if (element.equals(target)) {
+                return true;
+            }
+            if (element instanceof Playlist playlist && playlist.containsRecursive(target)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getTrackCount() {

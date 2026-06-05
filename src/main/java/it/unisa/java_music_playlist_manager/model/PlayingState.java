@@ -65,4 +65,19 @@ public class PlayingState implements PlaybackState {
             context.triggerRealPlayback();
         }
     }
+
+    @Override
+    public void previousPlayable(PlaybackManager context) {
+        Playable currentPlayable = context.getCurrentPlayable();
+        String currentTitle = (currentPlayable != null) ? currentPlayable.getTitle() : "Sconosciuto";
+        System.out.println("[STATO: PLAYING] -> SKIP all'elemento precedente da: " + currentTitle);
+
+        context.regressPlayable();
+
+        Track prevTrack = context.getCurrentTrack();
+        if (prevTrack != null) {
+            System.out.println("[STATO: PLAYING] Caricato blocco precedente. Ora riproduco: " + prevTrack.getTitle());
+            context.triggerRealPlayback();
+        }
+    }
 }

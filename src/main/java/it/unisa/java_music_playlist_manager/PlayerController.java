@@ -101,6 +101,16 @@ public class PlayerController {
     }
 
     @FXML
+    private void handlePreviousPlayableAction() {
+        System.out.println("Player: Click sul pulsante Elemento Precedente.");
+        PlaybackManager.getInstance().pressPreviousPlayable();
+        updatePlayerUI();
+        if (onPlayerStateChanged != null) {
+            onPlayerStateChanged.run();
+        }
+    }
+
+    @FXML
     private void handlePlayPauseAction() {
         if (onPlayPauseClicked != null) {
             onPlayPauseClicked.run();

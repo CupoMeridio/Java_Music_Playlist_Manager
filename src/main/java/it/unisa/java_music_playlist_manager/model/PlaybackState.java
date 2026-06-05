@@ -6,5 +6,6 @@ public interface PlaybackState {
     void next(PlaybackManager context);
     void nextPlayable(PlaybackManager context);
     void previous(PlaybackManager context);
+    void previousPlayable(PlaybackManager context);
 }
 

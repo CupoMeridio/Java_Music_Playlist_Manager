@@ -91,4 +91,32 @@ public class PlaylistTest {
         assertEquals(0, playlistVuota.getDuration(), 
             "Una playlist senza brani deve avere durata pari a 0 secondi.");
     }
+
+    @Test
+    public void testPlaylistAnnidataRestituisceTutteLeTracce() {
+        Playlist playlistAnnidata = new Playlist("Annidata");
+        playlistAnnidata.addTrack(traccia2);
+        playlist.addTrack(traccia1);
+        playlist.add(playlistAnnidata);
+
+        assertEquals(2, playlist.getTrackCount(),
+                "Il composite deve appiattire anche le playlist annidate.");
+        assertEquals(traccia1.getDuration() + traccia2.getDuration(), playlist.getDuration(),
+                "La durata deve includere le tracce delle playlist annidate.");
+    }
+
+    @Test
+    public void testPlaylistNonPuoContenereSeStessa() {
+        assertThrows(IllegalArgumentException.class, () -> playlist.add(playlist),
+                "Una playlist non deve poter contenere se stessa.");
+    }
+
+    @Test
+    public void testPlaylistNonPuoCreareCicliIndiretti() {
+        Playlist playlistAnnidata = new Playlist("Annidata");
+        playlist.add(playlistAnnidata);
+
+        assertThrows(IllegalArgumentException.class, () -> playlistAnnidata.add(playlist),
+                "Il composite deve rifiutare cicli indiretti tra playlist.");
+    }
 }

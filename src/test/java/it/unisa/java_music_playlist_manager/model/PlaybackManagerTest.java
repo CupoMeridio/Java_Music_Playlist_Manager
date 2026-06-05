@@ -1,179 +1,253 @@
 package it.unisa.java_music_playlist_manager.model;
 
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class PlaybackManagerTest {
 
     private PlaybackManager manager;
-    private List<Track> testTracks;
+    private Track track1;
+    private Track track2;
+    private Track track3;
 
     @BeforeEach
     public void setUp() {
-        // Recuperiamo l'istanza del Singleton
         manager = PlaybackManager.getInstance();
-
-        // Resettiamo lo stato e la strategia per partire da una situazione pulita ed evitare interferenze
         manager.changeState(new StoppedState());
         manager.setStrategy(new SequentialStrategy());
-        manager.resetQueue();
+        manager.setQueue(new ArrayList<>());
 
-        // Creiamo una lista di test con 3 brani
-        testTracks = new ArrayList<>();
-        testTracks.add(new Track("Song 1", "Artist 1", 180, "Pop", 2026));
-        testTracks.add(new Track("Song 2", "Artist 2", 200, "Rock", 2026));
-        testTracks.add(new Track("Song 3", "Artist 3", 220, "Jazz", 2026));
-
-        // Carichiamo la coda nel manager
-        manager.setQueue(testTracks);
+        track1 = new Track("Song 1", "Artist 1", 180, "Pop", 2026);
+        track2 = new Track("Song 2", "Artist 2", 200, "Rock", 2026);
+        track3 = new Track("Song 3", "Artist 3", 220, "Jazz", 2026);
     }
 
-    /**
-     *  I comandi di skip spostano la riproduzione in avanti e all'indietro
-     * rispettando l'ordine degli elementi.
-     */
     @Test
-    public void testSkipForwardAndBackwardInOrder() {
-        // All'inizio l'indice deve essere 0
-        assertEquals(0, manager.getCurrentIndex(), "Il lettore deve partire dal primo brano (indice 0).");
+    public void testSkipForwardAndBackwardInsideSingleTracks() {
+        manager.setQueue(List.of(track1, track2, track3));
 
-        // Simuliamo il comando di skip in avanti (pressNext)
-        manager.advanceQueue(); // Avanza l'indice tramite la strategia
-        assertEquals(1, manager.getCurrentIndex(), "Dopo uno skip in avanti, l'indice deve essere 1.");
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+        assertEquals("Song 1", manager.getCurrentTrack().getTitle());
+
+        manager.advanceTrack();
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
         assertEquals("Song 2", manager.getCurrentTrack().getTitle());
 
-        // Simuliamo il comando di skip all'indietro (pressPrevious)
-        manager.regressQueue();
-        assertEquals(0, manager.getCurrentIndex(), "Dopo uno skip all'indietro, l'indice deve tornare a 0.");
+        manager.regressTrack();
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
         assertEquals("Song 1", manager.getCurrentTrack().getTitle());
     }
 
-    /**
-     *  Validare il comportamento in corrispondenza del PRIMO elemento della lista.
-     * Premendo 'indietro' dal primo brano, l'indice deve restare bloccato a 0.
-     */
     @Test
-    public void testRegressQueueAtFirstElement() {
-        // Siamo già sul primo brano (indice 0). Proviamo a tornare indietro.
-        manager.regressQueue();
+    public void testSkipForwardInsidePlaylistThenNextPlayable() {
+        Playlist playlist = new Playlist("Playlist A");
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
 
-        // L'indice deve rimanere bloccato a 0 (grazie al controllo di sicurezza che hai scritto nel manager!)
-        assertEquals(0, manager.getCurrentIndex(), "Premendo indietro dal primo brano, l'indice deve rimanere 0.");
-        assertNotNull(manager.getCurrentTrack(), "Il brano corrente non deve essere null.");
+        manager.setQueue(List.of(playlist, track3));
+
+        assertEquals(track1, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+
+        manager.advanceTrack();
+        assertEquals(track2, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(1, manager.getCurrentTrackIndexInPlayable());
+
+        manager.advancePlayable();
+        assertEquals(track3, manager.getCurrentTrack());
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
     }
 
-    /**
-     * Validare il comportamento in corrispondenza dell'ULTIMO elemento della lista.
-     * Premendo 'avanti' dall'ultimo brano, il sistema deve segnalare la fine della coda.
-     */
     @Test
-    public void testAdvanceQueueAtLastElement() {
-        // Ci portiamo manualmente sull'ultimo brano (indice 2)
-        manager.advanceQueue(); // va a 1
-        manager.advanceQueue(); // va a 2
-        assertEquals(2, manager.getCurrentIndex(), "Verifica di essere sull'ultimo brano valido.");
+    public void testPreviousPlayableReturnsToFirstTrackOfPreviousQueueElement() {
+        Playlist playlist = new Playlist("Playlist A");
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
 
-        // Forziamo l'ultimo skip in avanti oltre la fine della lista
-        manager.advanceQueue();
+        manager.setQueue(List.of(playlist, track3));
+        manager.advancePlayable();
 
-        // La SequentialStrategy manderà l'indice a 3 (pari a testTracks.size())
-        assertEquals(testTracks.size(), manager.getCurrentIndex(),
-                "Oltre l'ultimo brano, l'indice deve diventare pari alla dimensione della coda.");
+        manager.regressPlayable();
 
-        // Di conseguenza, getCurrentTrack() deve restituire null per far capire al sistema di fermarsi
-        assertNull(manager.getCurrentTrack(),
-                "Oltre l'ultimo brano, il brano corrente deve essere null per consentire l'arresto.");
+        assertEquals(track1, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testPreviousPlayableSkipsEmptyPlaylistBackward() {
+        Playlist emptyPlaylist = new Playlist("Vuota");
+
+        manager.setQueue(List.of(track1, emptyPlaylist, track2));
+
+        manager.regressPlayable();
+
+        assertEquals(track1, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testAdvanceTrackAtEndOfPlaylistMovesToNextQueueElement() {
+        Playlist playlist = new Playlist("Playlist A");
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
+
+        manager.setQueue(List.of(playlist, track3));
+
+        manager.advanceTrack();
+        manager.advanceTrack();
+
+        assertEquals(track3, manager.getCurrentTrack());
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testAdvanceTrackAtEndOfQueueReturnsNullTrack() {
+        manager.setQueue(List.of(track1));
+
+        manager.advanceTrack();
+
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertNull(manager.getCurrentTrack());
+    }
+
+    @Test
+    public void testRegressTrackAtFirstElementStaysAtStart() {
+        manager.setQueue(List.of(track1, track2));
+
+        manager.regressTrack();
+
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+        assertEquals(track1, manager.getCurrentTrack());
+    }
+
+    @Test
+    public void testRegressTrackFromSingleTrackReturnsToLastTrackOfPreviousPlaylist() {
+        Playlist playlist = new Playlist("Playlist A");
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
+
+        manager.setQueue(List.of(playlist, track3));
+        manager.advancePlayable();
+
+        manager.regressTrack();
+
+        assertEquals(track2, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(1, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testRegressTrackAfterEndOfQueueReturnsToLastTrack() {
+        manager.setQueue(List.of(track1, track2));
+        manager.advanceTrack();
+        manager.advanceTrack();
+
+        manager.regressTrack();
+
+        assertEquals(track2, manager.getCurrentTrack());
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testRegressTrackSkipsEmptyPlaylistBackward() {
+        Playlist emptyPlaylist = new Playlist("Vuota");
+
+        manager.setQueue(List.of(track1, emptyPlaylist, track2));
+        manager.advanceTrack();
+
+        assertEquals(track2, manager.getCurrentTrack());
+
+        manager.regressTrack();
+
+        assertEquals(track1, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testEmptyPlaylistIsSkippedWhenQueueStarts() {
+        Playlist emptyPlaylist = new Playlist("Vuota");
+
+        manager.setQueue(List.of(emptyPlaylist, track1));
+
+        assertEquals(track1, manager.getCurrentTrack());
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
     }
 
     @Test
     public void testPressPlayDaStoppedPassaAPlaying() {
-        // Stato iniziale forzato a Stopped
+        manager.setQueue(List.of(track1));
         manager.changeState(new StoppedState());
-
-        assertTrue(manager.getCurrentState() instanceof StoppedState,
-                "Prima del comando Play, il player deve essere in StoppedState.");
 
         manager.pressPlay();
 
-        assertTrue(manager.getCurrentState() instanceof PlayingState,
-                "Premendo Play con una coda caricata, il player deve passare a PlayingState.");
+        assertTrue(manager.getCurrentState() instanceof PlayingState);
     }
 
     @Test
     public void testPressPlayDaPlayingPassaAPaused() {
-        manager.changeState(new StoppedState());
+        manager.setQueue(List.of(track1));
 
-        manager.pressPlay(); // Stopped -> Playing
+        manager.pressPlay();
+        manager.pressPlay();
 
-        assertTrue(manager.getCurrentState() instanceof PlayingState,
-                "Dopo il primo Play, il player deve essere in PlayingState.");
-
-        manager.pressPlay(); // Playing -> Paused
-
-        assertTrue(manager.getCurrentState() instanceof PausedState,
-                "Premendo Play mentre il player è in riproduzione, deve passare a PausedState.");
+        assertTrue(manager.getCurrentState() instanceof PausedState);
     }
 
     @Test
     public void testPressPlayDaPausedPassaAPlaying() {
-        manager.changeState(new StoppedState());
+        manager.setQueue(List.of(track1));
 
-        manager.pressPlay(); // Stopped -> Playing
-        manager.pressPlay(); // Playing -> Paused
+        manager.pressPlay();
+        manager.pressPlay();
+        manager.pressPlay();
 
-        assertTrue(manager.getCurrentState() instanceof PausedState,
-                "Il player deve trovarsi in PausedState prima della ripresa.");
-
-        manager.pressPlay(); // Paused -> Playing
-
-        assertTrue(manager.getCurrentState() instanceof PlayingState,
-                "Premendo Play da PausedState, il player deve tornare a PlayingState.");
+        assertTrue(manager.getCurrentState() instanceof PlayingState);
     }
 
     @Test
-    public void testPressStopDaPlayingPassaAStopped() {
-        manager.changeState(new StoppedState());
+    public void testPressStopDaPlayingPassaAStoppedAndResettaIndici() {
+        manager.setQueue(List.of(track1, track2));
 
-        manager.pressPlay(); // Stopped -> Playing
+        manager.pressPlay();
+        manager.pressNext();
+        manager.pressStop();
 
-        assertTrue(manager.getCurrentState() instanceof PlayingState,
-                "Dopo Play, il player deve essere in PlayingState.");
-
-        manager.pressStop(); // Playing -> Stopped
-
-        assertTrue(manager.getCurrentState() instanceof StoppedState,
-                "Premendo Stop durante la riproduzione, il player deve passare a StoppedState.");
-
-        assertEquals(0, manager.getCurrentIndex(),
-                "Dopo Stop, l'indice della coda deve essere riportato a 0.");
+        assertTrue(manager.getCurrentState() instanceof StoppedState);
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
     }
 
     @Test
     public void testComandiRiproduzioneConCodaVuotaNonCausanoCrash() {
-        // Svuotiamo la coda per simulare assenza di file caricati
         manager.setQueue(new ArrayList<>());
         manager.changeState(new StoppedState());
 
-        assertDoesNotThrow(() -> manager.pressPlay(),
-                "Premere Play con coda vuota non deve causare errori.");
+        assertDoesNotThrow(() -> manager.pressPlay());
+        assertDoesNotThrow(() -> manager.pressStop());
+        assertDoesNotThrow(() -> manager.pressNext());
+        assertDoesNotThrow(() -> manager.pressNextPlayable());
+        assertDoesNotThrow(() -> manager.pressPrevious());
+        assertDoesNotThrow(() -> manager.pressPreviousPlayable());
 
-        assertDoesNotThrow(() -> manager.pressStop(),
-                "Premere Stop con coda vuota non deve causare errori.");
-
-        assertDoesNotThrow(() -> manager.pressNext(),
-                "Premere Next con coda vuota non deve causare errori.");
-
-        assertDoesNotThrow(() -> manager.pressPrevious(),
-                "Premere Previous con coda vuota non deve causare errori.");
-
-        assertTrue(manager.getCurrentState() instanceof StoppedState,
-                "Con coda vuota, il player deve rimanere in StoppedState.");
-
-        assertNull(manager.getCurrentTrack(),
-                "Con coda vuota non deve esserci nessun brano corrente.");
+        assertTrue(manager.getCurrentState() instanceof StoppedState);
+        assertNull(manager.getCurrentTrack());
     }
 }

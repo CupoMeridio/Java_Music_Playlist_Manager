@@ -38,5 +38,9 @@ public class StoppedState implements PlaybackState {
         // Non chiamiamo context.regressTrack(), non facciamo nulla.
     }
 
+    @Override
+    public void previousPlayable(PlaybackManager context) {
+        System.out.println("[STATO: STOPPED] Azione ignorata: impossibile saltare al blocco precedente mentre il lettore è spento.");
+    }
 
 }
