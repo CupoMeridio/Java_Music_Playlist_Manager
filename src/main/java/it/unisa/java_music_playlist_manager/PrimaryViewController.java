@@ -1,6 +1,7 @@
 package it.unisa.java_music_playlist_manager;
 
 import it.unisa.java_music_playlist_manager.model.Library;
+import it.unisa.java_music_playlist_manager.model.Playable;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
@@ -30,13 +31,13 @@ import java.util.Optional;
 import it.unisa.java_music_playlist_manager.model.Observer;
 
 /**
-  * Controller per la gestione della vista principale (primaryView.fxml).
-  * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di gestione eventi
-  * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e NetBeans.
-  *
-  * Attualmente i metodi di gestione eventi implementano stampe a console come placeholder
-  * in attesa dell'integrazione delle classi di logica e dei modelli dati del programma.
-  */
+ * Controller per la gestione della vista principale (primaryView.fxml).
+ * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di gestione eventi
+ * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e NetBeans.
+ *
+ * Attualmente i metodi di gestione eventi implementano stampe a console come placeholder
+ * in attesa dell'integrazione delle classi di logica e dei modelli dati del programma.
+ */
 public class PrimaryViewController implements Observer {
 
     private Track currentEditingTrack = null;
@@ -59,10 +60,10 @@ public class PrimaryViewController implements Observer {
             ObservableList<Track> trackList = FXCollections.observableArrayList(currentOpenedPlaylist.getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         } else if ("Coda di riproduzione".equals(currentView)) {
-            // se siamo nella coda, mostra i brani in riproduzione nel playbackmanager
-            List<Track> actualQueue = PlaybackManager.getInstance().getCurrentQueue();
-            ObservableList<Track> trackList = FXCollections.observableArrayList(actualQueue);
-            ((TableView<Track>) songTableView).setItems(trackList);
+            // se siamo nella coda, mostra gli elementi Playable (Tracce o Playlist)
+            List<Playable> actualQueue = PlaybackManager.getInstance().getCurrentQueue();
+            ObservableList<Playable> playableList = FXCollections.observableArrayList(actualQueue);
+            ((TableView<Playable>) songTableView).setItems(playableList);
         } else if ("Musica".equals(currentView)) {
             // Se siamo in Musica, mostra i brani totali della Libreria
             ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
@@ -341,7 +342,7 @@ public class PrimaryViewController implements Observer {
         actionButton.setManaged(false);
         genreFilterContainer.setVisible(true);
         genreFilterContainer.setManaged(true);
-        showSongsColumns(); // La coda mostra solitamente i brani
+        showQueueColumns();
         System.out.println("Navigazione: Coda di riproduzione");
     }
 
@@ -358,66 +359,87 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
+     * Configura le colonne della tabella per la visualizzazione della coda (Playable).
+     */
+    @SuppressWarnings("unchecked")
+    private void showQueueColumns() {
+        songTableView.getColumns().clear();
+
+        TableColumn<Playable, String> titleCol = new TableColumn<>("Elemento (Traccia/Playlist)");
+        titleCol.setPrefWidth(350);
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+
+        TableColumn<Playable, Integer> durationCol = new TableColumn<>("Durata");
+        durationCol.setPrefWidth(100);
+        durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+
+        ((TableView<Playable>) songTableView).getColumns().addAll(titleCol, durationCol);
+
+        updateTablePlaceholder();
+        refreshTableData();
+    }
+
+    /**
      * Configura le colonne della tabella per la visualizzazione dei brani.
      */
     @SuppressWarnings("unchecked")
     private void showSongsColumns() {
-         songTableView.getColumns().clear();
+        songTableView.getColumns().clear();
 
-         TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
-         titleCol.setPrefWidth(200);
-         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
+        titleCol.setPrefWidth(200);
+        titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-         TableColumn<Track, String> artistCol = new TableColumn<>("Artista");
-         artistCol.setPrefWidth(150);
-         artistCol.setCellValueFactory(new PropertyValueFactory<>("author"));
+        TableColumn<Track, String> artistCol = new TableColumn<>("Artista");
+        artistCol.setPrefWidth(150);
+        artistCol.setCellValueFactory(new PropertyValueFactory<>("author"));
 
-         TableColumn<Track, String> albumCol = new TableColumn<>("Album");
-         albumCol.setPrefWidth(150);
+        TableColumn<Track, String> albumCol = new TableColumn<>("Album");
+        albumCol.setPrefWidth(150);
 
-         TableColumn<Track, Integer> yearCol = new TableColumn<>("Anno");
-         yearCol.setPrefWidth(80);
-         yearCol.setCellValueFactory(new PropertyValueFactory<>("year"));
+        TableColumn<Track, Integer> yearCol = new TableColumn<>("Anno");
+        yearCol.setPrefWidth(80);
+        yearCol.setCellValueFactory(new PropertyValueFactory<>("year"));
 
-         TableColumn<Track, String> genreCol = new TableColumn<>("Genere");
-         genreCol.setPrefWidth(120);
-         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
+        TableColumn<Track, String> genreCol = new TableColumn<>("Genere");
+        genreCol.setPrefWidth(120);
+        genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
 
-         TableColumn<Track, Integer> durationCol = new TableColumn<>("Durata");
-         durationCol.setPrefWidth(80);
-         durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+        TableColumn<Track, Integer> durationCol = new TableColumn<>("Durata");
+        durationCol.setPrefWidth(80);
+        durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
 
-         ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
+        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
 
-         updateTablePlaceholder();
-         refreshTableData();
-     }
+        updateTablePlaceholder();
+        refreshTableData();
+    }
 
-     /**
-      * Configura le colonne della tabella per la visualizzazione delle playlist.
-      */
-     @SuppressWarnings("unchecked")
-     private void showPlaylistColumns() {
-         songTableView.getColumns().clear();
+    /**
+     * Configura le colonne della tabella per la visualizzazione delle playlist.
+     */
+    @SuppressWarnings("unchecked")
+    private void showPlaylistColumns() {
+        songTableView.getColumns().clear();
 
-         TableColumn<Playlist, String> nameCol = new TableColumn<>("Nome Playlist");
-         nameCol.setPrefWidth(300);
-         nameCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        TableColumn<Playlist, String> nameCol = new TableColumn<>("Nome Playlist");
+        nameCol.setPrefWidth(300);
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-         TableColumn<Playlist, Integer> countCol = new TableColumn<>("Numero Brani");
-         countCol.setPrefWidth(150);
-         countCol.setCellValueFactory(new PropertyValueFactory<>("trackCount"));
+        TableColumn<Playlist, Integer> countCol = new TableColumn<>("Numero Brani");
+        countCol.setPrefWidth(150);
+        countCol.setCellValueFactory(new PropertyValueFactory<>("trackCount"));
 
-         TableColumn<Playlist, Integer> durationCol = new TableColumn<>("Durata");
-         durationCol.setPrefWidth(150);
-         durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+        TableColumn<Playlist, Integer> durationCol = new TableColumn<>("Durata");
+        durationCol.setPrefWidth(150);
+        durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
 
-         ((TableView<Playlist>) songTableView).getColumns().addAll(nameCol, countCol, durationCol);
+        ((TableView<Playlist>) songTableView).getColumns().addAll(nameCol, countCol, durationCol);
 
-         ObservableList<Playlist> playlistList = FXCollections.observableArrayList(Library.getInstance().getPlaylists());
-         ((TableView<Playlist>) songTableView).setItems(playlistList);
-         updateTablePlaceholder();
-     }
+        ObservableList<Playlist> playlistList = FXCollections.observableArrayList(Library.getInstance().getPlaylists());
+        ((TableView<Playlist>) songTableView).setItems(playlistList);
+        updateTablePlaceholder();
+    }
 
     private void openPlaylistDetail(Playlist playlist) {
         currentOpenedPlaylist = playlist;
@@ -547,19 +569,20 @@ public class PrimaryViewController implements Observer {
         // 1. Recuperiamo l'elemento attualmente selezionato nella tabella
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
 
-        // 2. Se l'utente ha effettivamente selezionato una canzone
-        if (selectedItem instanceof Track) {
-            Track selectedTrack = (Track) selectedItem;
+        // 2. Se l'utente ha selezionato una traccia o un playable
+        if (selectedItem instanceof Track selectedTrack) {
             String currentView = viewTitleLabel.getText();
 
             // Se abbiamo una playlist aperta nel dettaglio, prendiamo i brani da lì
             if (currentOpenedPlaylist != null) {
                 System.out.println("[CONTROLLER] Brano selezionato dalla playlist: " + currentOpenedPlaylist.getTitle());
                 PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, currentOpenedPlaylist.getTracks());
-
-            } else if ("Musica".equals(currentView) || "Coda di riproduzione".equals(currentView)) {
+            } else if ("Musica".equals(currentView)) {
                 System.out.println("[CONTROLLER] Brano selezionato dalla Libreria.");
                 PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
+            } else if ("Coda di riproduzione".equals(currentView)) {
+                System.out.println("[CONTROLLER] Brano selezionato dalla Coda.");
+                PlaybackManager.getInstance().selectAndLoadTrack(selectedTrack, PlaybackManager.getInstance().getCurrentQueue());
             }
         }
 
@@ -590,7 +613,7 @@ public class PrimaryViewController implements Observer {
         if (currentTrack != null) {
             // Sincronizzazione del cursore/selezione della tabella
             if (songTableView != null && !songTableView.getItems().isEmpty()) {
-                int indexAttivo = manager.getCurrentIndex();
+                int indexAttivo = manager.getCurrentPlayableIndex();
 
                 if (indexAttivo >= 0 && indexAttivo < songTableView.getItems().size()) {
                     songTableView.getSelectionModel().select(indexAttivo);

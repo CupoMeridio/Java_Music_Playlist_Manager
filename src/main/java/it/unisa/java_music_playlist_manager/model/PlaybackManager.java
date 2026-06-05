@@ -226,4 +226,4 @@ public class PlaybackManager {
         String title = (current != null) ? current.getTitle() : "Nessuna traccia";
         System.out.println("⏸️ [AUDIO PLAYER] Audio in PAUSA su: " + title);
     }
-}}
+}

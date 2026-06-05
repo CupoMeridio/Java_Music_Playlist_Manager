@@ -120,6 +120,18 @@ public class PlayerController {
     }
 
     @FXML
+    private void handleNextPlayableAction() {
+        System.out.println("Player: Click sul pulsante Salta Intero Elemento.");
+        // Delega allo stato corrente tramite il manager
+        PlaybackManager.getInstance().pressNextPlayable();
+        // Sincronizza l'interfaccia grafica
+        updatePlayerUI();
+        if (onPlayerStateChanged != null) {
+            onPlayerStateChanged.run();
+        }
+    }
+
+    @FXML
     private void handleRepeatToggle() {
         System.out.println("Player: Toggle ripetizione (ciclo)");
     }
@@ -168,7 +180,7 @@ public class PlayerController {
             } else {
                 // Se siamo in StoppedState o PausedState, il brano è fermo.
                 // Il bottone deve offrire l'azione di ripartire -> Mostra "Play"
-                playPauseButton.setText("▶");
+                playPauseButton.setText("▶️");
             }
         }
     }
