@@ -164,13 +164,27 @@ public class PrimaryViewController implements Observer {
         MenuItem addToPlaylistItem = new MenuItem("Aggiungi a playlist");
         addToPlaylistItem.setOnAction(e -> handleAddTrackToPlaylist());
 
+        MenuItem addTrackToQueueItem = new MenuItem("Aggiungi brano alla coda");
+        addTrackToQueueItem.setOnAction(e -> handleAddTrackToQueue());
+
+        MenuItem addPlaylistToQueueItem = new MenuItem("Aggiungi playlist alla coda");
+        addPlaylistToQueueItem.setOnAction(e -> handleAddPlaylistToQueue());
+
         MenuItem editPlaylistItem = new MenuItem("Modifica playlist");
         editPlaylistItem.setOnAction(e -> handleEditPlaylist());
 
         MenuItem deletePlaylistItem = new MenuItem("Elimina playlist");
         deletePlaylistItem.setOnAction(e -> handleDeletePlaylist());
 
-        contextMenu.getItems().addAll(editItem, deleteItem, addToPlaylistItem, editPlaylistItem, deletePlaylistItem);
+        contextMenu.getItems().addAll(
+                editItem,
+                deleteItem,
+                addToPlaylistItem,
+                addTrackToQueueItem,
+                editPlaylistItem,
+                deletePlaylistItem,
+                addPlaylistToQueueItem
+        );
         songTableView.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {
@@ -181,15 +195,19 @@ public class PrimaryViewController implements Observer {
             editItem.setDisable(noTrackSelected);
             deleteItem.setDisable(noTrackSelected);
             addToPlaylistItem.setDisable(noTrackSelected);
+            addTrackToQueueItem.setDisable(noTrackSelected);
 
             editItem.setVisible(!noTrackSelected);
             deleteItem.setVisible(!noTrackSelected);
             addToPlaylistItem.setVisible(!noTrackSelected);
+            addTrackToQueueItem.setVisible(!noTrackSelected);
 
             editPlaylistItem.setDisable(noPlaylistSelected);
             deletePlaylistItem.setDisable(noPlaylistSelected);
+            addPlaylistToQueueItem.setDisable(noPlaylistSelected);
             editPlaylistItem.setVisible(!noPlaylistSelected);
             deletePlaylistItem.setVisible(!noPlaylistSelected);
+            addPlaylistToQueueItem.setVisible(!noPlaylistSelected);
         });
 
         songTableView.setOnMouseClicked(event -> {
@@ -554,6 +572,37 @@ public class PrimaryViewController implements Observer {
                             + playlist.getTitle() + "\"."
             );
         });
+    }
+
+    private void handleAddTrackToQueue() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (!(selectedItem instanceof Track selectedTrack)) {
+            return;
+        }
+
+        PlaybackManager.getInstance().addToQueue(selectedTrack);
+        refreshQueueViewIfVisible();
+        System.out.println("Brano aggiunto alla coda: " + selectedTrack.getTitle());
+    }
+
+    private void handleAddPlaylistToQueue() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (!(selectedItem instanceof Playlist selectedPlaylist)) {
+            return;
+        }
+
+        PlaybackManager.getInstance().addToQueue(selectedPlaylist);
+        refreshQueueViewIfVisible();
+        System.out.println("Playlist aggiunta alla coda: " + selectedPlaylist.getTitle());
+    }
+
+    private void refreshQueueViewIfVisible() {
+        if ("Coda di riproduzione".equals(viewTitleLabel.getText())) {
+            refreshTableData();
+            updateTablePlaceholder();
+        }
     }
 
     // GESTORI EVENTI AREA CENTRALE=

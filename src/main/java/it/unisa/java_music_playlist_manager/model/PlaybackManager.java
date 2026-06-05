@@ -265,17 +265,17 @@ public class PlaybackManager {
     public void triggerRealPlayback() {
         Track current = getCurrentTrack();
         if (current != null) {
-            System.out.println("🔊 [AUDIO PLAYER] Avvio riproduzione fisica: " + current.getTitle());
+            System.out.println("[AUDIO PLAYER] Avvio riproduzione fisica: " + current.getTitle());
         }
     }
 
     public void triggerRealStop() {
-        System.out.println("🔇 [AUDIO PLAYER] Audio interrotto e resettato.");
+        System.out.println("[AUDIO PLAYER] Audio interrotto e resettato.");
     }
 
     public void triggerRealPause() {
         Track current = getCurrentTrack();
         String title = (current != null) ? current.getTitle() : "Nessuna traccia";
-        System.out.println("⏸️ [AUDIO PLAYER] Audio in PAUSA su: " + title);
+        System.out.println("[AUDIO PLAYER] Audio in pausa su: " + title);
     }
 }
