@@ -29,6 +29,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Optional;
 import it.unisa.java_music_playlist_manager.model.Observer;
+import it.unisa.java_music_playlist_manager.model.Tag;
+import java.util.Set;
 
 /**
  * Controller per la gestione della vista principale (primaryView.fxml).
@@ -131,6 +133,9 @@ public class PrimaryViewController implements Observer {
     private TableColumn<?, ?> genreColumn;
     @FXML
     private TableColumn<?, ?> durationColumn;
+    
+    @FXML
+    private TableColumn<?, ?> tagColumn;
 
     // METODO DI INIZIALIZZAZIONE
     @FXML
@@ -426,9 +431,41 @@ public class PrimaryViewController implements Observer {
         TableColumn<Track, Integer> durationCol = new TableColumn<>("Durata");
         durationCol.setPrefWidth(80);
         durationCol.setCellValueFactory(new PropertyValueFactory<>("duration"));
+        
+        TableColumn<Track, Set<Tag>> tagCol = new TableColumn<>("tags");
+        
+        tagCol.setPrefWidth(180);
+        tagCol.setCellValueFactory(new PropertyValueFactory<>("tags"));
+        
+        tagCol.setCellFactory(column -> new javafx.scene.control.TableCell<Track, Set<Tag>>() {
+            @Override
+            protected void updateItem(java.util.Set<Tag> tags, boolean empty) {
+                super.updateItem(tags, empty);
+                
+                if (empty || tags == null || tags.isEmpty()) {
+                    setGraphic(null);
+                    return;
+                }
+                
+                javafx.scene.layout.FlowPane flowPane = new javafx.scene.layout.FlowPane(5, 4);
+                
+                tags.forEach(tag -> {
+                    if (tag == null) return;
+                    Label badge = new Label(tag.getIcon());
+                    badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
+                    
+                    javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip("Tag: " + tag.getIcon());
+                    javafx.scene.control.Tooltip.install(badge, tooltip); // Meglio usare install() per retrocompatibilità
+                    
+                    flowPane.getChildren().add(badge);
+                });
+                
+                setGraphic(flowPane);
+            }
+        });
 
-        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
-
+        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol,tagCol );
+        
         updateTablePlaceholder();
         refreshTableData();
     }
