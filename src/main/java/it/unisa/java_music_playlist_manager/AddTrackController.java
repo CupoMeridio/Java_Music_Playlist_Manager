@@ -3,6 +3,8 @@ package it.unisa.java_music_playlist_manager;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Observer;
+import it.unisa.java_music_playlist_manager.model.TagPredefined;
+import java.util.List;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -16,6 +18,11 @@ import javafx.scene.media.MediaPlayer;
 import java.io.File;
 import javafx.collections.MapChangeListener;
 import javafx.application.Platform;
+
+// IMPORTAZIONE PER CONTROLSFX
+import org.controlsfx.control.CheckComboBox;
+
+import it.unisa.java_music_playlist_manager.model.Tag;
 
 /**
  * Controller per la gestione della vista di inserimento/modifica brano (addTrackView.fxml).
@@ -51,6 +58,9 @@ public class AddTrackController {
 
     @FXML
     private Label formTitleLabel;
+    
+    @FXML
+    private CheckComboBox<Tag> addTrackTagComboBox;
 
     @FXML
     private Button saveTrackButton;
@@ -94,9 +104,7 @@ public class AddTrackController {
             }
         }
 
-        // Popoliamo la ComboBox del form "Aggiungi brano".
-        // Questa operazione va fatta dopo loader.load(), perché solo dopo il caricamento
-        // dell'FXML il campo addTrackGenreComboBox viene collegato al nodo grafico.
+        // Popoliamo la ComboBox del form "Aggiungi brano" con la lista estesa di generi
         if (addTrackGenreComboBox != null) {
             addTrackGenreComboBox.getItems().setAll(
                 "Rock", "Pop", "Jazz", "Classica", "Hip Hop", "R&B", "Metal", 
@@ -113,8 +121,27 @@ public class AddTrackController {
             extractedDuration = currentEditingTrack.getDuration();
             addTrackYearField.setText(String.valueOf(currentEditingTrack.getYear()));
             addTrackGenreComboBox.setValue(currentEditingTrack.getGenre());
+            
+            // Gestione file audio reale
             selectedFilePath = currentEditingTrack.getFilePath();
-            filePathLabel.setText(new File(selectedFilePath).getName());
+            if (selectedFilePath != null && !selectedFilePath.isEmpty()) {
+                filePathLabel.setText(new File(selectedFilePath).getName());
+            } else {
+                filePathLabel.setText("Nessun file associato");
+            }
+
+            // --- SINCRONIZZAZIONE DELLA CHECKCOMBOBOX IN MODALITÀ MODIFICA ---
+            if (addTrackTagComboBox != null) {
+                // Svuota le spunte residue per evitare che rimangano quelle del brano aperto in precedenza
+                addTrackTagComboBox.getCheckModel().clearChecks();
+                
+                // Se il brano ha dei tag, accendi le spunte corrispondenti nella tendina
+                if (currentEditingTrack.getTags() != null) {
+                    currentEditingTrack.getTags().forEach(tag -> {
+                        addTrackTagComboBox.getCheckModel().check(tag);
+                    });
+                }
+            }
         } else {
             addTrackTitleField.setText("");
             addTrackAuthorField.setText("");
@@ -124,6 +151,11 @@ public class AddTrackController {
             addTrackGenreComboBox.setValue(null);
             selectedFilePath = null;
             filePathLabel.setText("Nessun file selezionato");
+
+            // --- PULIZIA IN CASO DI NUOVO INSERIMENTO ---
+            if (addTrackTagComboBox != null) {
+                addTrackTagComboBox.getCheckModel().clearChecks();
+            }
         }
 
         // Pulizia eventuale del messaggio di errore ogni volta che si apre il form
@@ -141,6 +173,8 @@ public class AddTrackController {
             String album = addTrackAlbumField.getText().trim();
             String genre = addTrackGenreComboBox.getValue();
             String yearText = addTrackYearField.getText().trim();
+
+            List<Tag> selectedTags = addTrackTagComboBox != null ? addTrackTagComboBox.getCheckModel().getCheckedItems() : null;
 
             // Titolo e File sono obbligatori
             if (title.isEmpty()) {
@@ -171,10 +205,27 @@ public class AddTrackController {
                 currentEditingTrack.setGenre(genre);
                 currentEditingTrack.setYear(year);
                 currentEditingTrack.setFilePath(selectedFilePath);
+                
+                // Aggiornamento dei Tag nella modifica
+                currentEditingTrack.removeAllTags();
+                if (selectedTags != null) {
+                    selectedTags.forEach(tag -> {
+                        if (tag != null) currentEditingTrack.addTag(tag);
+                    });
+                }
+                
                 Library.getInstance().notifyObservers();
                 System.out.println("Brano modificato: " + currentEditingTrack.getTitle());
             } else {
+                // Costruttore aggiornato con selectedFilePath ed estratto la durata dai metadati
                 Track track = new Track(title, author, album, extractedDuration, genre, year, selectedFilePath);
+                
+                if (selectedTags != null) {
+                    selectedTags.forEach(t -> {
+                        if (t != null) track.addTag(t);
+                    });
+                }
+                
                 Library.getInstance().addTrack(track);
                 if (trackObserver != null) {
                     track.attach(trackObserver);
@@ -251,7 +302,6 @@ public class AddTrackController {
                                 }
                                 case "year", "date" -> {
                                     if (addTrackYearField.getText().isEmpty()) {
-                                        // Spesso il "year" è un Integer, ma a volte una String "2024-01-01"
                                         String yearVal = value.toString();
                                         if (yearVal.length() >= 4) {
                                             addTrackYearField.setText(yearVal.substring(0, 4));
@@ -261,15 +311,12 @@ public class AddTrackController {
                                 case "genre" -> {
                                     if (addTrackGenreComboBox.getValue() == null) {
                                         String extractedGenre = value.toString();
-                                        // Cerca una corrispondenza (case-insensitive) nella lista dei generi disponibili
                                         for (String availableGenre : addTrackGenreComboBox.getItems()) {
                                             if (availableGenre.equalsIgnoreCase(extractedGenre)) {
                                                 addTrackGenreComboBox.setValue(availableGenre);
                                                 break;
                                             }
                                         }
-                                        // Se non trova una corrispondenza esatta ma il genere estratto non è vuoto,
-                                        // potremmo opzionalmente aggiungerlo o lasciarlo "Generico"
                                         if (addTrackGenreComboBox.getValue() == null && !extractedGenre.isEmpty()) {
                                             addTrackGenreComboBox.getItems().add(extractedGenre);
                                             addTrackGenreComboBox.setValue(extractedGenre);
@@ -288,7 +335,7 @@ public class AddTrackController {
                         System.out.println("[METADATA] Durata estratta: " + extractedDuration + " secondi.");
                     }
                     setLoading(false);
-                    tempPlayer.dispose(); // Liberiamo le risorse del player temporaneo
+                    tempPlayer.dispose(); 
                 });
 
                 // Gestione errore nel caricamento del media
@@ -304,7 +351,7 @@ public class AddTrackController {
                 String nameWithoutExt = (lastDot > 0) ? fileName.substring(0, lastDot) : fileName;
                 addTrackTitleField.setText(nameWithoutExt);
 
-                // Se dopo 3 secondi non è ancora pronto, sblocchiamo comunque (timeout di sicurezza)
+                // Timeout di sicurezza
                 new Thread(() -> {
                     try {
                         Thread.sleep(3000);
@@ -337,5 +384,16 @@ public class AddTrackController {
                 saveTrackButton.setDisable(loading);
             }
         });
+    }
+
+    /**
+     * Metodo di inizializzazione di JavaFX. Viene eseguito automaticamente 
+     * al caricamento dell'FXML. Popoliamo la CheckComboBox con i tag predefiniti.
+     */
+    @FXML
+    public void initialize() {
+        if (addTrackTagComboBox != null) {
+            addTrackTagComboBox.getItems().addAll(TagPredefined.values());
+        }   
     }
 }

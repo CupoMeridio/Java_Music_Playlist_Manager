@@ -32,14 +32,13 @@ import it.unisa.java_music_playlist_manager.model.Observer;
 import java.io.IOException;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import it.unisa.java_music_playlist_manager.model.Tag;
+import java.util.Set;
 
 /**
  * Controller per la gestione della vista principale (primaryView.fxml).
  * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di gestione eventi
  * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e NetBeans.
- *
- * Attualmente i metodi di gestione eventi implementano stampe a console come placeholder
- * in attesa dell'integrazione delle classi di logica e dei modelli dati del programma.
  */
 public class PrimaryViewController implements Observer {
 
@@ -123,7 +122,7 @@ public class PrimaryViewController implements Observer {
     @FXML
     private ComboBox<String> genreComboBox;
 
-    // Tabella Brani (tipi generici generici '?' in attesa del modello Track)
+    // Tabella Brani
     @FXML
     private TableView<?> songTableView;
     @FXML
@@ -138,6 +137,8 @@ public class PrimaryViewController implements Observer {
     private TableColumn<?, ?> genreColumn;
     @FXML
     private TableColumn<?, ?> durationColumn;
+    @FXML
+    private TableColumn<?, ?> tagColumn;
 
     // METODO DI INIZIALIZZAZIONE
     @FXML
@@ -360,7 +361,6 @@ public class PrimaryViewController implements Observer {
         }
     }
 
-    // GESTORI EVENTI BARRA LATERALE (chiamati dal SidebarController tramite callback)
     private void handleNavigate(String viewId) {
         if (null != viewId) switch (viewId) {
             case "Musica" -> handleMusicLibraryAction();
@@ -406,9 +406,6 @@ public class PrimaryViewController implements Observer {
         System.out.println("Navigazione: Riepilogo Playlist (Master View)");
     }
 
-    /**
-     * Configura le colonne della tabella per la visualizzazione della coda (Playable).
-     */
     @SuppressWarnings("unchecked")
     private void showQueueColumns() {
         songTableView.getColumns().clear();
@@ -434,9 +431,6 @@ public class PrimaryViewController implements Observer {
         refreshTableData();
     }
 
-    /**
-     * Configura le colonne della tabella per la visualizzazione dei brani.
-     */
     @SuppressWarnings("unchecked")
     private void showSongsColumns() {
         songTableView.getColumns().clear();
@@ -467,16 +461,45 @@ public class PrimaryViewController implements Observer {
             int seconds = data.getValue().getDuration();
             return new SimpleStringProperty(String.format("%02d:%02d", seconds / 60, seconds % 60));
         });
+        
+        // Risoluzione conflitto: Reintroduzione colonna e cellFactory custom per i Tag
+        TableColumn<Track, Set<Tag>> tagCol = new TableColumn<>("Tag");
+        tagCol.setPrefWidth(180);
+        tagCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTags()));
+        
+        tagCol.setCellFactory(column -> new javafx.scene.control.TableCell<Track, Set<Tag>>() {
+            @Override
+            protected void updateItem(Set<Tag> tags, boolean empty) {
+                super.updateItem(tags, empty);
+                
+                if (empty || tags == null || tags.isEmpty()) {
+                    setGraphic(null);
+                    return;
+                }
+                
+                javafx.scene.layout.FlowPane flowPane = new javafx.scene.layout.FlowPane(5, 4);
+                
+                tags.forEach(tag -> {
+                    if (tag == null) return;
+                    Label badge = new Label(tag.getIcon());
+                    badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
+                    
+                    javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip("Tag: " + tag.getIcon());
+                    javafx.scene.control.Tooltip.install(badge, tooltip);
+                    
+                    flowPane.getChildren().add(badge);
+                });
+                
+                setGraphic(flowPane);
+            }
+        });
 
-        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol);
-
+        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
+        
         updateTablePlaceholder();
         refreshTableData();
     }
 
-    /**
-     * Configura le colonne della tabella per la visualizzazione delle playlist.
-     */
     @SuppressWarnings("unchecked")
     private void showPlaylistColumns() {
         songTableView.getColumns().clear();
@@ -542,10 +565,8 @@ public class PrimaryViewController implements Observer {
     private void openAddTrackView() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/views/addTrackView.fxml"));
-
             Parent root = loader.load();
 
-            // Recupera il controller creato automaticamente dall'FXMLLoader
             AddTrackController controller = loader.getController();
             controller.setOnTrackSaved(this);
             controller.initForm(currentEditingTrack);
@@ -553,17 +574,13 @@ public class PrimaryViewController implements Observer {
             Stage stage = new Stage();
             stage.setTitle("Aggiungi brano");
             stage.setScene(new Scene(root));
-
-            // Dimensioni minime per evitare che il form diventi troppo piccolo.
             stage.setMinWidth(360);
             stage.setMinHeight(300);
 
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
 
-            // Per ora basta così. Quando Observer sarà completo, la tabella si aggiornerà automaticamente.
             System.out.println("Finestra inserimento brano chiusa.");
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -584,13 +601,11 @@ public class PrimaryViewController implements Observer {
 
     private void handleAddTrackToPlaylist() {
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-
         if (!(selectedItem instanceof Track selectedTrack)) {
             return;
         }
 
         List<Playlist> playlists = Library.getInstance().getPlaylists();
-
         if (playlists.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Nessuna playlist");
@@ -606,21 +621,15 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Playlist:");
 
         Optional<Playlist> result = dialog.showAndWait();
-
         result.ifPresent(playlist -> {
             playlist.addTrack(selectedTrack);
             Library.getInstance().notifyObservers();
-            System.out.println(
-                    "Brano \"" + selectedTrack.getTitle()
-                            + "\" aggiunto alla playlist \""
-                            + playlist.getTitle() + "\"."
-            );
+            System.out.println("Brano \"" + selectedTrack.getTitle() + "\" aggiunto alla playlist \"" + playlist.getTitle() + "\".");
         });
     }
 
     private void handleAddTrackToQueue() {
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-
         if (!(selectedItem instanceof Track selectedTrack)) {
             return;
         }
@@ -632,7 +641,6 @@ public class PrimaryViewController implements Observer {
 
     private void handleAddPlaylistToQueue() {
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-
         if (!(selectedItem instanceof Playlist selectedPlaylist)) {
             return;
         }
@@ -649,71 +657,49 @@ public class PrimaryViewController implements Observer {
         }
     }
 
-    // GESTORI EVENTI AREA CENTRALE=
     @FXML
     private void handleShufflePlayAction() {
         System.out.println("Azione: Avvio riproduzione casuale di tutta la libreria");
     }
 
-    // GESTORE PLAY/PAUSE (chiamato dal PlayerController tramite callback)
     private void handlePlayPauseAction() {
         System.out.println("[CONTROLLER] Click sul pulsante Play/Pause.");
 
-        // 1. Recuperiamo l'elemento attualmente selezionato nella tabella
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
         PlaybackManager manager = PlaybackManager.getInstance();
 
-        // 2. Se la coda è vuota e non c'è selezione, carichiamo il contesto attuale
         if (selectedItem == null && manager.getCurrentQueue().isEmpty()) {
             String currentView = viewTitleLabel.getText();
             if (currentOpenedPlaylist != null && !currentOpenedPlaylist.getTracks().isEmpty()) {
                 List<Track> tracks = currentOpenedPlaylist.getTracks();
                 manager.selectAndLoadTrack(tracks.get(0), tracks);
-                System.out.println("[CONTROLLER] Coda vuota: caricamento automatico della playlist " + currentOpenedPlaylist.getTitle());
             } else if ("Musica".equals(currentView) && !Library.getInstance().getTracks().isEmpty()) {
                 List<Track> tracks = Library.getInstance().getTracks();
                 manager.selectAndLoadTrack(tracks.get(0), tracks);
-                System.out.println("[CONTROLLER] Coda vuota: caricamento automatico della Libreria");
             }
         }
 
-        // 3. Se l'utente ha selezionato una traccia o un playable
         if (selectedItem instanceof Track selectedTrack) {
             String currentView = viewTitleLabel.getText();
 
-            // Se abbiamo una playlist aperta nel dettaglio, prendiamo i brani da lì
             if (currentOpenedPlaylist != null) {
-                System.out.println("[CONTROLLER] Brano selezionato dalla playlist: " + currentOpenedPlaylist.getTitle());
                 manager.selectAndLoadTrack(selectedTrack, currentOpenedPlaylist.getTracks());
             } else if ("Musica".equals(currentView)) {
-                System.out.println("[CONTROLLER] Brano selezionato dalla Libreria.");
                 manager.selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
             } else if ("Coda di riproduzione".equals(currentView)) {
-                System.out.println("[CONTROLLER] Brano selezionato dalla Coda.");
                 manager.selectAndLoadTrack(selectedTrack, manager.getCurrentQueue());
             }
         }
 
-        // 4. Delega l'azione di Play allo stato del PlaybackManager
         manager.pressPlay();
-
-        // 5. Aggiorna l'interfaccia grafica inferiore
         updatePlayerUI();
     }
 
-    /**
-     * Aggiorna l'interfaccia del player e sincronizza la selezione della tabella.
-     * Delega l'aggiornamento delle label del player al PlayerController.
-     */
     private void updatePlayerUI() {
         playerBarController.updatePlayerUI();
         syncTableSelection();
     }
 
-    /**
-     * Sincronizza la selezione della tabella con il brano correntemente
-     * in riproduzione nel PlaybackManager.
-     */
     private void syncTableSelection() {
         PlaybackManager manager = PlaybackManager.getInstance();
         Track currentTrack = manager.getCurrentTrack();
@@ -721,11 +707,9 @@ public class PrimaryViewController implements Observer {
         if (currentTrack != null && songTableView != null && !songTableView.getItems().isEmpty()) {
             ObservableList<?> items = songTableView.getItems();
             
-            // Cerchiamo l'indice della traccia corrente negli elementi della tabella
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).equals(currentTrack)) {
                     final int index = i;
-                    // Usiamo Platform.runLater per assicurarci che la UI sia pronta
                     javafx.application.Platform.runLater(() -> {
                         songTableView.getSelectionModel().select(index);
                         songTableView.scrollTo(index);

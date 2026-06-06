@@ -70,6 +70,10 @@ public final class Track implements Playable, Subject {
         this.tags.remove(tag);
         notifyObservers();
     }
+    
+    public void removeAllTags(){
+        this.tags.clear();
+    }
 
     public Set<Tag> getTags() {
         return tags;

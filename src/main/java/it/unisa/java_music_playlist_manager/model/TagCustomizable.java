@@ -35,5 +35,8 @@ public class TagCustomizable implements Tag{
         return this.icon;
     }
     
-    
+     @Override
+    public String toString() {
+        return this.getIcon()+ this.getName();
+    }
 }
