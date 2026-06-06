@@ -35,8 +35,8 @@ public class LibraryTest {
         // essendo singleton devo otternere istanza
         library = Library.getInstance();
         
-        track1 = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975);
-        track2 = new Track("Stairway to Heaven", "Led Zeppelin", 482, "Rock", 1971);
+        track1 = new Track("Bohemian Rhapsody", "Queen", "A Night at the Opera", 354, "Rock", 1975, "path1.mp3");
+        track2 = new Track("Stairway to Heaven", "Led Zeppelin", "Led Zeppelin IV", 482, "Rock", 1971, "path2.mp3");
     }
     
     @AfterEach

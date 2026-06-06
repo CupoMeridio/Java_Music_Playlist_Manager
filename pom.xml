@@ -40,6 +40,13 @@
             <version>21.0.9</version>
         </dependency>
 
+        <!-- Supporto Multimedia (Audio/Video) -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>21.0.9</version>
+        </dependency>
+
         <!-- JUnit 5 per i test unitari -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -99,7 +106,8 @@
                         it.unisa.java_music_playlist_manager/it.unisa.java_music_playlist_manager.App
                     </mainClass>
                     <options>
-                        <option>--enable-native-access=javafx.graphics</option>
+                        <option>--enable-native-access=javafx.graphics,javafx.media</option>
+                        <option>--add-modules=javafx.media</option>
                     </options>
 
                 </configuration>

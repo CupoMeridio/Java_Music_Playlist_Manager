@@ -31,6 +31,8 @@ public final class Track implements Playable, Subject {
     private final String id;
     private String title;
     private String author;
+    private String album;
+    private String filePath;
     private int duration; // secondi
     private String genre;
     private int year;
@@ -38,18 +40,22 @@ public final class Track implements Playable, Subject {
     private Set<Tag> tags;
 
     // COSTRUTTORE CON CONTROLLI INTEGRITà
-    public Track(String title, String author, int duration, String genre, int year) {
+    public Track(String title, String author, String album, int duration, String genre, int year, String filePath) {
         this.id = UUID.randomUUID().toString();
         setTitle(title);
         setAuthor(author);
+        setAlbum(album);
         setDuration(duration);
         setGenre(genre);
         setYear(year);
-        tags = new LinkedHashSet();
+        setFilePath(filePath);
+        tags = new LinkedHashSet<>();
     }
 
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
+    public String getAlbum() { return album; }
+    public String getFilePath() { return filePath; }
     public int getDuration() { return duration; }
     public String getGenre() { return genre; }
     public int getYear() { return year; }
@@ -82,43 +88,56 @@ public final class Track implements Playable, Subject {
 
     public void setAuthor(String author) {
         if (author == null || author.trim().isEmpty()) {
-            throw new IllegalArgumentException("L'autore non può essere vuoto o nullo.");
-        }
-        if (this.author == null || !this.author.equals(author.trim())) {
+            this.author = "Sconosciuto";
+        } else {
             this.author = author.trim();
-            notifyObservers();
         }
+        notifyObservers();
+    }
+
+    public void setAlbum(String album) {
+        if (album == null || album.trim().isEmpty()) {
+            this.album = "Sconosciuto";
+        } else {
+            this.album = album.trim();
+        }
+        notifyObservers();
     }
 
     public void setDuration(int duration) {
-        if (duration <= 0) {
-            throw new IllegalArgumentException("La durata deve essere maggiore di zero secondi.");
-        }
-        if (this.duration != duration) {
+        if (duration < 0) {
+            this.duration = 0;
+        } else {
             this.duration = duration;
-            notifyObservers();
         }
+        notifyObservers();
     }
 
     public void setGenre(String genre) {
         if (genre == null || genre.trim().isEmpty()) {
-            throw new IllegalArgumentException("Il genere non può essere vuoto o nullo.");
-        }
-        if (this.genre == null || !this.genre.equals(genre.trim())) {
+            this.genre = "Generico";
+        } else {
             this.genre = genre.trim();
-            notifyObservers();
         }
+        notifyObservers();
     }
 
     public void setYear(int year) {
         int thisYear = LocalDate.now().getYear();
         if (year < 0 || year > thisYear) {
-            throw new IllegalArgumentException("Non puoi inserire tracce dal futuro o con anni negativi.");
-        }
-        if (this.year != year) {
+            this.year = thisYear; // Fallback all'anno corrente o 0
+        } else {
             this.year = year;
-            notifyObservers();
         }
+        notifyObservers();
+    }
+
+    public void setFilePath(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+            throw new IllegalArgumentException("Il percorso del file non può essere vuoto.");
+        }
+        this.filePath = filePath;
+        notifyObservers();
     }
     
     @Override

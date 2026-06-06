@@ -14,8 +14,8 @@ public class PlaylistTest {
     public void setUp() {
         // Inizializzazione pulita prima di ogni singolo test
         playlist = new Playlist("Classici Rock");
-        traccia1 = new Track("Whole Lotta Love", "Led Zeppelin", 334, "Rock", 1969);
-        traccia2 = new Track("Paranoid", "Black Sabbath", 170, "Metal", 1970);
+        traccia1 = new Track("Whole Lotta Love", "Led Zeppelin", "Led Zeppelin II", 334, "Rock", 1969, "path1.mp3");
+        traccia2 = new Track("Paranoid", "Black Sabbath", "Paranoid", 170, "Metal", 1970, "path2.mp3");
     }
 
     // ==========================================

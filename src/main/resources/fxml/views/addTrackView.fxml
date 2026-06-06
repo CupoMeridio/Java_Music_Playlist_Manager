@@ -11,6 +11,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.control.ComboBox?>
 
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.StackPane?>
+
 <!--
     View secondaria per l'inserimento o la modifica di un brano.
 
@@ -18,122 +21,125 @@
     la logica del form di inserimento e modifica brani.
 -->
 
-<VBox spacing="15.0"
-      fillWidth="true"
-      maxWidth="Infinity"
-      maxHeight="Infinity"
-      xmlns="http://javafx.com/javafx/21"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.unisa.java_music_playlist_manager.AddTrackController">
-
-    <!-- Margini interni della finestra -->
-    <padding>
-        <Insets top="25.0" right="25.0" bottom="25.0" left="25.0" />
-    </padding>
+<StackPane xmlns="http://javafx.com/javafx/21"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="it.unisa.java_music_playlist_manager.AddTrackController">
 
     <children>
+        <!-- Form principale -->
+        <VBox spacing="15.0"
+              fillWidth="true"
+              maxWidth="Infinity"
+              maxHeight="Infinity">
 
-        <!-- Titolo del form -->
-        <Label fx:id="formTitleLabel"
-               text="Aggiungi nuovo brano"
-               style="-fx-font-size: 20px; -fx-font-weight: bold;" />
-
-        <!--
-            GridPane usato per disporre etichette e campi di input.
-
-            La seconda colonna ha hgrow="ALWAYS":
-            questo permette ai TextField di espandersi quando la finestra
-            viene allargata orizzontalmente.
-        -->
-        <GridPane hgap="12.0"
-                  vgap="12.0"
-                  maxWidth="Infinity">
-
-            <columnConstraints>
-                <!-- Colonna delle etichette: larghezza quasi fissa -->
-                <ColumnConstraints minWidth="80.0" prefWidth="90.0" />
-
-                <!-- Colonna dei campi input: si espande con la finestra -->
-                <ColumnConstraints hgrow="ALWAYS" fillWidth="true" />
-            </columnConstraints>
+            <!-- Margini interni della finestra -->
+            <padding>
+                <Insets top="25.0" right="25.0" bottom="25.0" left="25.0" />
+            </padding>
 
             <children>
-                <Label text="Titolo:"
-                       GridPane.rowIndex="0"
-                       GridPane.columnIndex="0" />
 
-                <TextField fx:id="addTrackTitleField"
-                           maxWidth="Infinity"
-                           GridPane.rowIndex="0"
-                           GridPane.columnIndex="1" />
+                <!-- Titolo del form -->
+                <Label fx:id="formTitleLabel"
+                       text="Aggiungi nuovo brano"
+                       style="-fx-font-size: 20px; -fx-font-weight: bold;" />
 
-                <Label text="Autore:"
-                       GridPane.rowIndex="1"
-                       GridPane.columnIndex="0" />
-
-                <TextField fx:id="addTrackAuthorField"
-                           maxWidth="Infinity"
-                           GridPane.rowIndex="1"
-                           GridPane.columnIndex="1" />
-
-                <Label text="Durata:"
-                       GridPane.rowIndex="2"
-                       GridPane.columnIndex="0" />
-
-                <TextField fx:id="addTrackDurationField"
-                           promptText="Secondi"
-                           maxWidth="Infinity"
-                           GridPane.rowIndex="2"
-                           GridPane.columnIndex="1" />
-
-                <Label text="Genere:"
-                       GridPane.rowIndex="3"
-                       GridPane.columnIndex="0" />
-
-                <ComboBox fx:id="addTrackGenreComboBox"
-                          promptText="Seleziona genere"
-                          maxWidth="Infinity"
-                          GridPane.rowIndex="3"
-                          GridPane.columnIndex="1" />
-
-                <Label text="Anno:"
-                       GridPane.rowIndex="4"
-                       GridPane.columnIndex="0" />
-
-                <TextField fx:id="addTrackYearField"
-                           maxWidth="Infinity"
-                           GridPane.rowIndex="4"
-                           GridPane.columnIndex="1" />
-            </children>
-        </GridPane>
-
-        <!--
-            Label per mostrare eventuali errori di validazione.
-            Il testo viene impostato dal PrimaryViewController.
-        -->
-        <Label fx:id="addTrackErrorLabel"
-               text=""
-               style="-fx-text-fill: red;" />
-
-        <!--
-            Spaziatore verticale.
-            Se la finestra viene allungata in altezza, questo Region occupa
-            lo spazio libero e mantiene i bottoni nella parte bassa.
-        -->
-        <Region VBox.vgrow="ALWAYS" />
-
-        <!-- Pulsanti finali del form -->
-        <HBox spacing="10.0" alignment="CENTER_LEFT">
-            <children>
                 <!--
-                    Pulsanti del form: Salva aggiunge il brano alla Library o lo modifica,
-                    Annulla chiude la finestra. L'aggiornamento della tabella
-                    principale sarà integrato nella fase di collegamento con la View.
+                    GridPane usato per disporre etichette e campi di input.
                 -->
-                <Button text="Salva" onAction="#handleSaveTrack" />
-                <Button text="Annulla" onAction="#handleCancelAddTrack" />
-            </children>
-        </HBox>
+                <GridPane hgap="12.0"
+                          vgap="12.0"
+                          maxWidth="Infinity">
 
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="80.0" prefWidth="90.0" />
+                        <ColumnConstraints hgrow="ALWAYS" fillWidth="true" />
+                    </columnConstraints>
+
+                    <children>
+                        <Label text="Titolo:"
+                               GridPane.rowIndex="0"
+                               GridPane.columnIndex="0" />
+
+                        <TextField fx:id="addTrackTitleField"
+                                   maxWidth="Infinity"
+                                   GridPane.rowIndex="0"
+                                   GridPane.columnIndex="1" />
+
+                        <Label text="Autore:"
+                               GridPane.rowIndex="1"
+                               GridPane.columnIndex="0" />
+
+                        <TextField fx:id="addTrackAuthorField"
+                                   maxWidth="Infinity"
+                                   GridPane.rowIndex="1"
+                                   GridPane.columnIndex="1" />
+
+                        <Label text="Album:"
+                               GridPane.rowIndex="2"
+                               GridPane.columnIndex="0" />
+
+                        <TextField fx:id="addTrackAlbumField"
+                                   promptText="Album del brano"
+                                   maxWidth="Infinity"
+                                   GridPane.rowIndex="2"
+                                   GridPane.columnIndex="1" />
+
+                        <Label text="Genere:"
+                               GridPane.rowIndex="3"
+                               GridPane.columnIndex="0" />
+
+                        <ComboBox fx:id="addTrackGenreComboBox"
+                                  promptText="Seleziona genere"
+                                  maxWidth="Infinity"
+                                  GridPane.rowIndex="3"
+                                  GridPane.columnIndex="1" />
+
+                        <Label text="Anno:"
+                               GridPane.rowIndex="4"
+                               GridPane.columnIndex="0" />
+
+                        <TextField fx:id="addTrackYearField"
+                                   maxWidth="Infinity"
+                                   GridPane.rowIndex="4"
+                                   GridPane.columnIndex="1" />
+                    </children>
+                </GridPane>
+
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Button text="Seleziona File Audio" onAction="#handleSelectFile" />
+                    <Label fx:id="filePathLabel" text="Nessun file selezionato" style="-fx-text-fill: #666666; -fx-font-style: italic;" />
+                </HBox>
+
+                <Label fx:id="addTrackErrorLabel"
+                       text=""
+                       style="-fx-text-fill: red;" />
+
+                <Region VBox.vgrow="ALWAYS" />
+
+                <!-- Pulsanti finali del form -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Button fx:id="saveTrackButton" text="Salva" onAction="#handleSaveTrack" />
+                        <Button text="Annulla" onAction="#handleCancelAddTrack" />
+                    </children>
+                </HBox>
+
+            </children>
+        </VBox>
+
+        <!-- Overlay di caricamento -->
+        <VBox fx:id="loadingOverlay"
+              visible="false"
+              managed="false"
+              alignment="CENTER"
+              spacing="10.0"
+              style="-fx-background-color: rgba(255, 255, 255, 0.7);">
+            <children>
+                <ProgressIndicator maxWidth="50.0" maxHeight="50.0" />
+                <Label text="Analisi file audio in corso..."
+                       style="-fx-font-weight: bold; -fx-text-fill: #333333;" />
+            </children>
+        </VBox>
     </children>
-</VBox>
+</StackPane>

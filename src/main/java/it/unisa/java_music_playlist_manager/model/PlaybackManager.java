@@ -1,12 +1,24 @@
 package it.unisa.java_music_playlist_manager.model;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-public class PlaybackManager {
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+
+public class PlaybackManager implements Subject {
     // Singleton
     private static PlaybackManager instance;
 
+    // Supporto per notificare il Controller quando il MediaPlayer cambia
+    private final List<Observer> observers = new ArrayList<>();
+
     // Stato corrente del pattern State
     private PlaybackState currentState;
+
+    // Player audio reale
+    private MediaPlayer mediaPlayer;
+    private String lastPlayedFilePath;
+    private boolean audioEnabled = true;
 
     // Struttura dati della coda
     private final List<Playable> queue = new ArrayList<>();
@@ -80,6 +92,45 @@ public class PlaybackManager {
         }
     }
 
+    public void removeFromQueue(int index) {
+        if (index < 0 || index >= queue.size()) return;
+
+        boolean removingCurrent = (index == currentPlayableIndex);
+
+        queue.remove(index);
+
+        if (queue.isEmpty()) {
+            triggerRealStop();
+            resetQueue();
+            changeState(new StoppedState());
+        } else if (removingCurrent) {
+            // Se stiamo rimuovendo l'elemento corrente, resettiamo l'indice della traccia
+            currentTrackIndexInPlayable = 0;
+            
+            // Se l'indice rimosso era l'ultimo, torniamo all'inizio o fermiamo
+            if (currentPlayableIndex >= queue.size()) {
+                currentPlayableIndex = 0;
+            }
+            
+            skipEmptyPlayablesForward();
+
+            // Se eravamo in riproduzione, aggiorniamo il playback reale
+            if (currentState instanceof PlayingState) {
+                if (getCurrentTrack() != null) {
+                    triggerRealPlayback();
+                } else {
+                    triggerRealStop();
+                    changeState(new StoppedState());
+                }
+            }
+        } else if (index < currentPlayableIndex) {
+            // Se l'elemento rimosso era prima di quello corrente, scaliamo l'indice
+            currentPlayableIndex--;
+        }
+        
+        System.out.println("[MANAGER] Elemento rimosso dalla coda all'indice: " + index);
+    }
+
     public void setQueue(List<? extends Playable> newItems) {
         if (newItems != null) {
             this.queue.clear();
@@ -128,7 +179,7 @@ public class PlaybackManager {
     }
 
     public void advanceTrack() {
-        if (queue.isEmpty()) return;
+        if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) return;
 
         Playable currentPlayable = queue.get(currentPlayableIndex);
         List<Track> tracks = currentPlayable.getTracks();
@@ -143,7 +194,7 @@ public class PlaybackManager {
     }
 
     public void advancePlayable() {
-        if (queue.isEmpty()) return;
+        if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) return;
         currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
         currentTrackIndexInPlayable = 0;
         skipEmptyPlayablesForward();
@@ -182,6 +233,7 @@ public class PlaybackManager {
     public void resetQueue() {
         this.currentPlayableIndex = 0;
         this.currentTrackIndexInPlayable = 0;
+        lastPlayedFilePath = null;
     }
 
     private void skipEmptyPlayablesForward() {
@@ -263,19 +315,100 @@ public class PlaybackManager {
 
     // ---- METODI PRATICI DI LOGICA AUDIO REALISTICA ----
     public void triggerRealPlayback() {
+        if (!audioEnabled) {
+            System.out.println("[MANAGER - TEST] Riproduzione audio simulata (audio disabilitato).");
+            return;
+        }
+        
         Track current = getCurrentTrack();
-        if (current != null) {
-            System.out.println("[AUDIO PLAYER] Avvio riproduzione fisica: " + current.getTitle());
+        if (current == null || current.getFilePath() == null) {
+            System.out.println("[MANAGER - ERROR] Nessuna traccia o percorso file non valido.");
+            return;
+        }
+
+        String filePath = current.getFilePath();
+
+        // Se è la stessa traccia ed è in pausa, riprendi
+        if (mediaPlayer != null && filePath.equals(lastPlayedFilePath)) {
+            mediaPlayer.play();
+            System.out.println("[AUDIO PLAYER] Ripresa riproduzione: " + current.getTitle());
+            return;
+        }
+
+        // Altrimenti, ferma il player precedente e creane uno nuovo
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+        }
+
+        try {
+            File file = new File(filePath);
+            if (!file.exists()) {
+                System.err.println("[AUDIO PLAYER - ERROR] File non trovato: " + filePath);
+                pressNext();
+                return;
+            }
+            Media media = new Media(file.toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            lastPlayedFilePath = filePath;
+
+            mediaPlayer.setOnEndOfMedia(() -> {
+                System.out.println("[AUDIO PLAYER] Traccia terminata, passo alla prossima.");
+                pressNext();
+            });
+
+            mediaPlayer.play();
+            System.out.println("[AUDIO PLAYER] Avvio nuova riproduzione: " + current.getTitle());
+            notifyObservers();
+        } catch (Exception e) {
+            System.err.println("[AUDIO PLAYER - ERROR] Impossibile riprodurre il file: " + e.getMessage());
+            pressNext();
         }
     }
 
     public void triggerRealStop() {
-        System.out.println("[AUDIO PLAYER] Audio interrotto e resettato.");
+        if (!audioEnabled) return;
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            System.out.println("[AUDIO PLAYER] Audio interrotto e resettato.");
+        }
     }
 
     public void triggerRealPause() {
-        Track current = getCurrentTrack();
-        String title = (current != null) ? current.getTitle() : "Nessuna traccia";
-        System.out.println("[AUDIO PLAYER] Audio in pausa su: " + title);
+        if (!audioEnabled) return;
+        if (mediaPlayer != null) {
+            mediaPlayer.pause();
+            Track current = getCurrentTrack();
+            String title = (current != null) ? current.getTitle() : "Nessuna traccia";
+            System.out.println("[AUDIO PLAYER] Audio in pausa su: " + title);
+        }
+    }
+
+    // ---- METODI PER INTERFACCIA GRAFICA ----
+    public void setAudioEnabled(boolean enabled) {
+        this.audioEnabled = enabled;
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    @Override
+    public void attach(Observer observer) {
+        if (observer != null && !observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void detach(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update();
+        }
     }
 }
