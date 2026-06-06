@@ -14,7 +14,9 @@ import java.util.UUID;
 // quando la track viene modificata
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Classe che rappresenta il singolo brano musicale, dotandolo di tutti i metadati
@@ -32,6 +34,8 @@ public final class Track implements Playable, Subject {
     private int duration; // secondi
     private String genre;
     private int year;
+    
+    private Set<Tag> tags;
 
     // COSTRUTTORE CON CONTROLLI INTEGRITà
     public Track(String title, String author, int duration, String genre, int year) {
@@ -41,6 +45,7 @@ public final class Track implements Playable, Subject {
         setDuration(duration);
         setGenre(genre);
         setYear(year);
+        tags = new LinkedHashSet();
     }
 
     public String getTitle() { return title; }
@@ -50,6 +55,21 @@ public final class Track implements Playable, Subject {
     public int getYear() { return year; }
 
 
+    public void addTag( Tag tag){
+        this.tags.add(tag);
+        notifyObservers();
+    }
+    
+    public void removeTag(Tag tag){
+        this.tags.remove(tag);
+        notifyObservers();
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    
     public void setTitle(String title) {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Il titolo non può essere vuoto o nullo.");
