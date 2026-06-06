@@ -32,7 +32,9 @@ public class TrackTest {
     @BeforeEach
     public void setUp() {
         // eseguito prima di ogni singolo test. 
-        track = new Track("Epitaph", "King Crimson", 527, "Progressive Rock", 1969);
+        String baseDir = System.getProperty("user.dir");
+        String realPath = new java.io.File(baseDir, "brani di prova/Vibing Over Venus.mp3").getAbsolutePath();
+        track = new Track("Epitaph", "King Crimson", "In the Court of the Crimson King", 527, "Progressive Rock", 1969, realPath);
     }
     
     @AfterEach
@@ -47,64 +49,81 @@ public class TrackTest {
     public void testCreazioneValidaEGetters() {
         assertEquals("Epitaph", track.getTitle());
         assertEquals("King Crimson", track.getAuthor());
+        assertEquals("In the Court of the Crimson King", track.getAlbum());
         assertEquals(527, track.getDuration());
         assertEquals("Progressive Rock", track.getGenre());
         assertEquals(1969, track.getYear());
+        assertTrue(track.getFilePath().contains("Vibing Over Venus.mp3"));
     }
 
     @Test
     public void testTrimDelleStringhe() {
         // rimuove spazi vuoti?
-        Track tracciaSpaziata = new Track("   Starless   ", "  King Crimson  ", 742, "  Prog  ", 1974);
+        Track tracciaSpaziata = new Track("   Starless   ", "  King Crimson  ", "  Red  ", 742, "  Prog  ", 1974, "path.mp3");
         
         assertEquals("Starless", tracciaSpaziata.getTitle());
         assertEquals("King Crimson", tracciaSpaziata.getAuthor());
+        assertEquals("Red", tracciaSpaziata.getAlbum());
         assertEquals("Prog", tracciaSpaziata.getGenre());
     }
 
     // TEST ECCEZIONI
 
     @Test
+    public void testSetAlbumInvalido() {
+        track.setAlbum(null);
+        assertEquals("Sconosciuto", track.getAlbum());
+        track.setAlbum("");
+        assertEquals("Sconosciuto", track.getAlbum());
+    }
+
+    @Test
     public void testSetTitleInvalido() {
-        assertThrows(IllegalArgumentException.class, () -> track.setTitle(null), "Dovrebbe lanciare eccezione per titolo nullo");
-        assertThrows(IllegalArgumentException.class, () -> track.setTitle(""), "Dovrebbe lanciare eccezione per titolo vuoto");
-        assertThrows(IllegalArgumentException.class, () -> track.setTitle("   "), "Dovrebbe lanciare eccezione per titolo composto solo da spazi");
+        assertThrows(IllegalArgumentException.class, () -> track.setTitle(null));
+        assertThrows(IllegalArgumentException.class, () -> track.setTitle(""));
     }
 
     @Test
     public void testSetAuthorInvalido() {
-        assertThrows(IllegalArgumentException.class, () -> track.setAuthor(null));
-        assertThrows(IllegalArgumentException.class, () -> track.setAuthor(""));
-        assertThrows(IllegalArgumentException.class, () -> track.setAuthor("   "));
+        track.setAuthor(null);
+        assertEquals("Sconosciuto", track.getAuthor());
+        track.setAuthor("");
+        assertEquals("Sconosciuto", track.getAuthor());
     }
 
     @Test
     public void testSetDurationInvalida() {
-        assertThrows(IllegalArgumentException.class, () -> track.setDuration(0), "La durata 0 non è ammessa");
-        assertThrows(IllegalArgumentException.class, () -> track.setDuration(-150), "La durata negativa non è ammessa");
+        track.setDuration(-10);
+        assertEquals(0, track.getDuration(), "La durata negativa deve essere impostata a 0");
     }
 
     @Test
     public void testSetGenreInvalido() {
-        assertThrows(IllegalArgumentException.class, () -> track.setGenre(null));
-        assertThrows(IllegalArgumentException.class, () -> track.setGenre(""));
-        assertThrows(IllegalArgumentException.class, () -> track.setGenre("   "));
+        track.setGenre(null);
+        assertEquals("Generico", track.getGenre());
+        track.setGenre("");
+        assertEquals("Generico", track.getGenre());
     }
 
     @Test
     public void testSetYearInvalido() {
-        assertThrows(IllegalArgumentException.class, () -> track.setYear(-5), "L'anno negativo non è ammesso");
-        assertThrows(IllegalArgumentException.class, () -> track.setYear(2027), "L'anno nel futuro (oltre il 2026) non è ammesso");
+        int currentYear = java.time.LocalDate.now().getYear();
+        track.setYear(-5);
+        assertEquals(currentYear, track.getYear(), "L'anno negativo deve essere riportato all'anno corrente");
+        track.setYear(currentYear + 1);
+        assertEquals(currentYear, track.getYear(), "L'anno futuro deve essere riportato all'anno corrente");
     }
     
     @Test
     public void testCostruttoreConParametriInvalidi() {
-        // il costruttore blocca l'inserimento propagando l'eccezione dei setter
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new Track("Titolo", "Autore", -10, "Genere", 2020);
-        });
+        // il costruttore blocca l'inserimento solo per i campi critici (titolo e percorso file)
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Track("", "Autore", "Album", 120, "Genere", 2020, "path.mp3");
+        }, "Il titolo vuoto deve lanciare eccezione");
         
-        assertEquals("La durata deve essere maggiore di zero secondi.", exception.getMessage());
+        assertThrows(IllegalArgumentException.class, () -> {
+            new Track("Titolo", "Autore", "Album", 120, "Genere", 2020, "");
+        }, "Il percorso file vuoto deve lanciare eccezione");
     }
     
         // TEST PATTERN OBSERVER

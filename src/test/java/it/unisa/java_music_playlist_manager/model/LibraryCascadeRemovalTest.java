@@ -92,7 +92,7 @@ public class LibraryCascadeRemovalTest {
     @Test
     public void testRimozioneVerificaLibrary() {
         // Preparazione dei dati di test in uno scenario isolato e controllato
-        Track tracciaDaRimuovere = new Track("Anarchy in the U.K.", "Sex Pistols", 212, "Punk", 1976);
+        Track tracciaDaRimuovere = new Track("Anarchy in the U.K.", "Sex Pistols", "Never Mind the Bollocks, Here's the Sex Pistols", 212, "Punk", 1976, "path1.mp3");
         Playlist playlistContenitore = new Playlist("Punk Rock Playlist");
 
         // Costruzione dei legami: la traccia fa parte sia del catalogo che della specifica playlist
@@ -132,8 +132,8 @@ public class LibraryCascadeRemovalTest {
     @Test
     public void testEliminazionePlaylistPreservaBraniInLibreria() {
         // Creazione di due tracce inserite nel catalogo principale
-        Track track1 = new Track("Bohemian Rhapsody", "Queen", 354, "Rock", 1975);
-        Track track2 = new Track("Stairway to Heaven", "Led Zeppelin", 482, "Rock", 1971);
+        Track track1 = new Track("Bohemian Rhapsody", "Queen", "A Night at the Opera", 354, "Rock", 1975, "path1.mp3");
+        Track track2 = new Track("Stairway to Heaven", "Led Zeppelin", "Led Zeppelin IV", 482, "Rock", 1971, "path2.mp3");
         library.addTrack(track1);
         library.addTrack(track2);
 

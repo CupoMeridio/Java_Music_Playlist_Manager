@@ -2,21 +2,31 @@ package it.unisa.java_music_playlist_manager;
 
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import it.unisa.java_music_playlist_manager.model.Observer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.image.ImageView;
+import javafx.scene.media.MediaPlayer;
+import javafx.util.Duration;
 
 /**
  * Controller per la gestione della barra di riproduzione (PlayerBarView.fxml).
  * Estratto da PrimaryViewController per separare la responsabilità del player
  * dalla gestione della vista principale.
  */
-public class PlayerController {
+public class PlayerController implements Observer {
 
     private Runnable onPlayPauseClicked;
     private Runnable onPlayerStateChanged;
+
+    @Override
+    public void update() {
+        // Chiamato dal PlaybackManager quando cambia il MediaPlayer (nuova traccia)
+        setupMediaPlayerListeners();
+        updatePlayerUI();
+    }
 
     // CONTROLLI BARRA DI RIPRODUZIONE
     @FXML
@@ -49,6 +59,7 @@ public class PlayerController {
     /**
      * Imposta il callback per il click sul pulsante Play/Pause.
      * Il PrimaryViewController fornisce la logica di riproduzione.
+     * @param callback
      */
     public void setOnPlayPauseClicked(Runnable callback) {
         this.onPlayPauseClicked = callback;
@@ -57,6 +68,7 @@ public class PlayerController {
     /**
      * Imposta il callback per notificare il cambio di stato del player
      * (traccia precedente/successiva) al PrimaryViewController.
+     * @param callback
      */
     public void setOnPlayerStateChanged(Runnable callback) {
         this.onPlayerStateChanged = callback;
@@ -65,12 +77,14 @@ public class PlayerController {
     // METODO DI INIZIALIZZAZIONE
     @FXML
     public void initialize() {
+        PlaybackManager.getInstance().attach(this);
+
         // Inizializzazione tempi a zero
         if (currentTimeLabel != null) {
-            currentTimeLabel.setText("00:00:00");
+            currentTimeLabel.setText("00:00");
         }
         if (totalTimeLabel != null) {
-            totalTimeLabel.setText("00:00:00");
+            totalTimeLabel.setText("00:00");
         }
 
         // Inizializzazione metadati brano a vuoto
@@ -80,6 +94,73 @@ public class PlayerController {
         if (currentTrackDetails != null) {
             currentTrackDetails.setText("");
         }
+
+        // Gestione Volume Slider
+        if (volumeSlider != null) {
+            volumeSlider.setValue(50); // Default 50%
+            volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+                MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
+                if (mp != null) {
+                    mp.setVolume(newVal.doubleValue() / 100.0);
+                }
+            });
+        }
+
+        // Gestione Seeking tramite Slider
+        if (progressSlider != null) {
+            progressSlider.setOnMousePressed(e -> {
+                MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
+                if (mp != null) {
+                    mp.pause();
+                }
+            });
+            progressSlider.setOnMouseReleased(e -> {
+                MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
+                if (mp != null) {
+                    double seekSeconds = progressSlider.getValue();
+                    mp.seek(Duration.seconds(seekSeconds));
+                    mp.play();
+                }
+            });
+        }
+    }
+
+    private void setupMediaPlayerListeners() {
+        MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
+        if (mp == null) return;
+
+        // Sincronizzazione Volume (se l'utente ha già mosso lo slider)
+        if (volumeSlider != null) {
+            mp.setVolume(volumeSlider.getValue() / 100.0);
+        }
+
+        // Quando la durata è pronta
+        mp.setOnReady(() -> {
+            Duration totalDuration = mp.getTotalDuration();
+            if (totalTimeLabel != null) {
+                totalTimeLabel.setText(formatTime(totalDuration));
+            }
+            if (progressSlider != null) {
+                progressSlider.setMax(totalDuration.toSeconds());
+            }
+        });
+
+        // Durante la riproduzione
+        mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            if (progressSlider != null && !progressSlider.isValueChanging()) {
+                progressSlider.setValue(newTime.toSeconds());
+            }
+            if (currentTimeLabel != null) {
+                currentTimeLabel.setText(formatTime(newTime));
+            }
+        });
+    }
+
+    private String formatTime(Duration duration) {
+        int seconds = (int) duration.toSeconds();
+        int mins = seconds / 60;
+        int secs = seconds % 60;
+        return String.format("%02d:%02d", mins, secs);
     }
 
     // GESTORI EVENTI BARRA DI RIPRODUZIONE (PLAYER)

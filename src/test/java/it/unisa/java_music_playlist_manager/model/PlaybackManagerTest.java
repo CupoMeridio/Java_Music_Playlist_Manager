@@ -18,13 +18,18 @@ public class PlaybackManagerTest {
     @BeforeEach
     public void setUp() {
         manager = PlaybackManager.getInstance();
+        manager.setAudioEnabled(false); // Disabilita audio reale per i test automatici
         manager.changeState(new StoppedState());
         manager.setStrategy(new SequentialStrategy());
         manager.setQueue(new ArrayList<>());
 
-        track1 = new Track("Song 1", "Artist 1", 180, "Pop", 2026);
-        track2 = new Track("Song 2", "Artist 2", 200, "Rock", 2026);
-        track3 = new Track("Song 3", "Artist 3", 220, "Jazz", 2026);
+        // Utilizzo di un file reale dalla cartella "brani di prova" per rendere i test più veritieri
+        String baseDir = System.getProperty("user.dir");
+        String realPath = new java.io.File(baseDir, "brani di prova/Vibing Over Venus.mp3").getAbsolutePath();
+
+        track1 = new Track("Vibing Over Venus", "NCS", "Release", 180, "Electronic", 2024, realPath);
+        track2 = new Track("Song 2", "Artist 2", "Album 2", 200, "Rock", 2026, realPath);
+        track3 = new Track("Song 3", "Artist 3", "Album 3", 220, "Jazz", 2026, realPath);
     }
 
     @Test
@@ -33,7 +38,7 @@ public class PlaybackManagerTest {
 
         assertEquals(0, manager.getCurrentPlayableIndex());
         assertEquals(0, manager.getCurrentTrackIndexInPlayable());
-        assertEquals("Song 1", manager.getCurrentTrack().getTitle());
+        assertEquals("Vibing Over Venus", manager.getCurrentTrack().getTitle());
 
         manager.advanceTrack();
         assertEquals(1, manager.getCurrentPlayableIndex());
@@ -43,7 +48,7 @@ public class PlaybackManagerTest {
         manager.regressTrack();
         assertEquals(0, manager.getCurrentPlayableIndex());
         assertEquals(0, manager.getCurrentTrackIndexInPlayable());
-        assertEquals("Song 1", manager.getCurrentTrack().getTitle());
+        assertEquals("Vibing Over Venus", manager.getCurrentTrack().getTitle());
     }
 
     @Test
@@ -249,5 +254,53 @@ public class PlaybackManagerTest {
 
         assertTrue(manager.getCurrentState() instanceof StoppedState);
         assertNull(manager.getCurrentTrack());
+    }
+
+    @Test
+    public void testRemoveFromQueue() {
+        manager.setQueue(List.of(track1, track2, track3));
+        
+        // Rimuovi elemento non corrente dopo quello corrente
+        manager.removeFromQueue(2);
+        assertEquals(2, manager.getCurrentQueue().size());
+        assertEquals(track1, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+
+        // Rimuovi elemento corrente
+        manager.removeFromQueue(0);
+        assertEquals(1, manager.getCurrentQueue().size());
+        assertEquals(track2, manager.getCurrentTrack());
+        assertEquals(0, manager.getCurrentPlayableIndex());
+
+        // Rimuovi l'unico elemento rimasto
+        manager.removeFromQueue(0);
+        assertEquals(0, manager.getCurrentQueue().size());
+        assertNull(manager.getCurrentTrack());
+        assertTrue(manager.getCurrentState() instanceof StoppedState);
+    }
+
+    @Test
+    public void testComandiSuccessiviOltreFineCodaNonCausanoCrash() {
+        manager.setQueue(List.of(track1));
+        
+        // Iniziamo la riproduzione
+        manager.pressPlay(); 
+        
+        // Saltiamo alla fine della coda usando advanceTrack direttamente (che è quello che causa il crash)
+        manager.advanceTrack(); 
+        
+        // Lo stato deve essere STOPPED (perché la coda è finita) e l'indice 1
+        assertEquals(1, manager.getCurrentPlayableIndex());
+        assertNull(manager.getCurrentTrack());
+
+        // Proviamo a chiamare advanceTrack ancora (simulando il click su Next in Stopped alla fine)
+        assertDoesNotThrow(() -> manager.advanceTrack(), 
+            "Chiamare advanceTrack alla fine della coda non deve causare IndexOutOfBoundsException");
+        
+        assertDoesNotThrow(() -> manager.advancePlayable(), 
+            "Chiamare advancePlayable alla fine della coda non deve causare IndexOutOfBoundsException");
+        
+        // Verifichiamo che gli indici siano rimasti coerenti
+        assertEquals(1, manager.getCurrentPlayableIndex());
     }
 }

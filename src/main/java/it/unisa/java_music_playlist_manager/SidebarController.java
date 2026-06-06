@@ -27,6 +27,7 @@ public class SidebarController {
     /**
      * Imposta il callback di navigazione. Il Consumer riceve un identificativo
      * della vista da attivare ("Musica", "Coda", "Playlist").
+     * @param callback
      */
     public void setOnNavigate(Consumer<String> callback) {
         this.onNavigate = callback;
