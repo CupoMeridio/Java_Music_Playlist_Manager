@@ -8,8 +8,8 @@ package it.unisa.java_music_playlist_manager.model;
 public class RepeatStrategy implements PlaybackStrategy {
     @Override
     public int getNextIndex(int currentIndex, int queueSize) {
-        // Restituendo lo stesso indice, il PlaybackManager ricomincerà la riproduzione
-        // dell'elemento Playable corrente (sia esso una singola traccia o un'intera playlist).
-        return currentIndex;
+        // Ripete l'intera coda dall'inizio se siamo arrivati alla fine.
+        if (queueSize == 0) return 0;
+        return (currentIndex + 1) % queueSize;
     }
 }

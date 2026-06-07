@@ -87,6 +87,9 @@
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>
             </TableView>
+            
+            <!-- Lista per la Coda di Riproduzione (ListView) -->
+            <javafx.scene.control.ListView fx:id="queueListView" VBox.vgrow="ALWAYS" visible="false" managed="false" />
          </children>
       </VBox>
    </center>

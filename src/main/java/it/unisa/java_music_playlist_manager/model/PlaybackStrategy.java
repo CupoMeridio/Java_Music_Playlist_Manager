@@ -17,4 +17,16 @@ public interface PlaybackStrategy {
      *         se la riproduzione deve terminare.
      */
     int getNextIndex(int currentIndex, int queueSize);
+
+    /**
+     * Calcola l'indice della prossima traccia all'interno dell'elemento Playable corrente.
+     * Per default, avanza semplicemente alla traccia successiva.
+     *
+     * @param currentTrackIndex L'indice della traccia attualmente in riproduzione.
+     * @param tracksSize        Il numero totale di tracce nel Playable.
+     * @return L'indice della prossima traccia.
+     */
+    default int getNextTrackIndex(int currentTrackIndex, int tracksSize) {
+        return currentTrackIndex + 1;
+    }
 }

@@ -266,7 +266,7 @@ public class PlaybackManager implements Subject {
 
         Playable currentPlayable = queue.get(currentPlayableIndex);
         List<Track> tracks = currentPlayable.getTracks();
-        currentTrackIndexInPlayable++;
+        currentTrackIndexInPlayable = currentStrategy.getNextTrackIndex(currentTrackIndexInPlayable, tracks.size());
 
         // Se abbiamo esaurito le tracce nel Playable corrente, chiediamo alla strategia l'indice del prossimo Playable
         if (currentTrackIndexInPlayable >= tracks.size()) {
@@ -442,6 +442,22 @@ public class PlaybackManager implements Subject {
 
             this.currentPlayableIndex = 0;
             this.currentTrackIndexInPlayable = 0;
+        }
+    }
+
+    /**
+     * Imposta direttamente gli indici di riproduzione corrente.
+     * Usato dall'interfaccia utente per saltare a un punto specifico della coda.
+     */
+    public void setCurrentIndices(int playableIndex, int trackIndex) {
+        if (playableIndex >= 0 && playableIndex < queue.size()) {
+            this.currentPlayableIndex = playableIndex;
+            List<Track> tracks = queue.get(playableIndex).getTracks();
+            if (trackIndex >= 0 && trackIndex < tracks.size()) {
+                this.currentTrackIndexInPlayable = trackIndex;
+            } else {
+                this.currentTrackIndexInPlayable = 0;
+            }
         }
     }
 

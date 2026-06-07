@@ -14,6 +14,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
@@ -36,6 +38,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import it.unisa.java_music_playlist_manager.model.Tag;
 import java.util.Set;
+import java.util.HashSet;
 
 /**
  * PrimaryViewController è il coordinatore principale dell'interfaccia utente.
@@ -59,6 +62,23 @@ public class PrimaryViewController implements Observer {
     /** Playlist attualmente aperta nella vista dettaglio */
     private Playlist currentOpenedPlaylist = null;
     private final PlaylistGenerator playlistGenerator = new PlaylistGenerator();
+
+    @FXML
+    private ListView<QueueItem> queueListView;
+
+    private final Set<Playlist> expandedPlaylists = new HashSet<>();
+
+    private static class QueueItem {
+        final Playable parentPlayable;
+        final Track track;
+        final int queueIndex;
+
+        QueueItem(Playable parentPlayable, Track track, int queueIndex) {
+            this.parentPlayable = parentPlayable;
+            this.track = track;
+            this.queueIndex = queueIndex;
+        }
+    }
 
     /**
      * Metodo del pattern Observer.
@@ -86,13 +106,24 @@ public class PrimaryViewController implements Observer {
             ObservableList<Track> trackList = FXCollections.observableArrayList(currentOpenedPlaylist.getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         } else if ("Coda di riproduzione".equals(currentView)) {
-            // Mostra la coda "appiattita": estrae tutte le tracce da ogni elemento Playable in coda
-            List<Track> flattenedQueue = new ArrayList<>();
-            for (Playable p : PlaybackManager.getInstance().getCurrentQueue()) {
-                flattenedQueue.addAll(p.getTracks());
+            List<QueueItem> items = new ArrayList<>();
+            List<Playable> queue = PlaybackManager.getInstance().getCurrentQueue();
+            for (int i = 0; i < queue.size(); i++) {
+                Playable p = queue.get(i);
+                if (p instanceof Playlist playlist) {
+                    items.add(new QueueItem(p, null, i));
+                    if (expandedPlaylists.contains(playlist)) {
+                        for (Track t : playlist.getTracks()) {
+                            items.add(new QueueItem(p, t, i));
+                        }
+                    }
+                } else if (p instanceof Track track) {
+                    items.add(new QueueItem(p, track, i));
+                }
             }
-            ObservableList<Track> trackList = FXCollections.observableArrayList(flattenedQueue);
-            ((TableView<Track>) songTableView).setItems(trackList);
+            if (queueListView != null) {
+                queueListView.setItems(FXCollections.observableArrayList(items));
+            }
         } else if ("Musica".equals(currentView)) {
             // Mostra l'intera libreria musicale
             ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
@@ -127,6 +158,13 @@ public class PrimaryViewController implements Observer {
         placeholderLabel.setMaxWidth(420);
         placeholderLabel.setStyle("-fx-alignment: center; -fx-text-alignment: center; -fx-text-fill: #666666; -fx-padding: 16;");
         songTableView.setPlaceholder(placeholderLabel);
+        if (queueListView != null) {
+            Label queuePlaceholder = new Label(placeholderText);
+            queuePlaceholder.setWrapText(true);
+            queuePlaceholder.setMaxWidth(420);
+            queuePlaceholder.setStyle("-fx-alignment: center; -fx-text-alignment: center; -fx-text-fill: #666666; -fx-padding: 16;");
+            queueListView.setPlaceholder(queuePlaceholder);
+        }
     }
 
     // --- Componenti iniettati da FXML ---
@@ -211,6 +249,8 @@ public class PrimaryViewController implements Observer {
 
         // Configurazione iniziale delle colonne per la vista "Musica"
         showSongsColumns();
+        
+        setupQueueListView();
 
         // Configurazione del menu contestuale dinamico
         setupContextMenu();
@@ -231,6 +271,71 @@ public class PrimaryViewController implements Observer {
 
         updatePlayerUI();
         System.out.println("Interfaccia grafica inizializzata correttamente.");
+    }
+
+    private void setupQueueListView() {
+        if (queueListView == null) return;
+        queueListView.setCellFactory(lv -> new ListCell<>() {
+            @Override
+            protected void updateItem(QueueItem item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    if (item.parentPlayable instanceof Playlist && item.track == null) {
+                        Playlist p = (Playlist) item.parentPlayable;
+                        boolean expanded = expandedPlaylists.contains(p);
+                        String indicator = expanded ? "[-]" : "[+]";
+                        setText(indicator + " " + p.getTitle() + " (" + p.getTrackCount() + " brani)");
+                        setStyle("-fx-font-weight: bold;");
+                    } else if (item.parentPlayable instanceof Playlist && item.track != null) {
+                        setText("    " + item.track.getTitle() + " - " + item.track.getAuthor() + " (" + formatDuration(item.track.getDuration()) + ")");
+                        setStyle("-fx-font-weight: normal;");
+                    } else if (item.parentPlayable instanceof Track) {
+                        Track t = (Track) item.parentPlayable;
+                        setText(t.getTitle() + " - " + t.getAuthor() + " (" + formatDuration(t.getDuration()) + ")");
+                        setStyle("-fx-font-weight: normal;");
+                    }
+                }
+            }
+        });
+
+        javafx.scene.control.ContextMenu queueContextMenu = new javafx.scene.control.ContextMenu();
+        javafx.scene.control.MenuItem removeFromQueueItem = new javafx.scene.control.MenuItem("Rimuovi dalla coda");
+        removeFromQueueItem.setOnAction(e -> {
+            QueueItem selected = queueListView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                PlaybackManager.getInstance().removeFromQueue(selected.queueIndex);
+                refreshTableData();
+                updatePlayerUI();
+                updateTablePlaceholder();
+            }
+        });
+        queueContextMenu.getItems().add(removeFromQueueItem);
+        queueListView.setContextMenu(queueContextMenu);
+
+        queueListView.setOnMouseClicked(event -> {
+            QueueItem selected = queueListView.getSelectionModel().getSelectedItem();
+            if (selected == null) return;
+            if (event.getClickCount() == 1 && selected.parentPlayable instanceof Playlist && selected.track == null) {
+                Playlist p = (Playlist) selected.parentPlayable;
+                if (expandedPlaylists.contains(p)) expandedPlaylists.remove(p);
+                else expandedPlaylists.add(p);
+                refreshTableData();
+            } else if (event.getClickCount() == 2) {
+                if (selected.track != null) {
+                    int trackIdx = selected.parentPlayable.getTracks().indexOf(selected.track);
+                    PlaybackManager.getInstance().setCurrentIndices(selected.queueIndex, trackIdx);
+                    PlaybackManager.getInstance().pressPlay();
+                    updatePlayerUI();
+                } else if (selected.parentPlayable instanceof Playlist && !selected.parentPlayable.getTracks().isEmpty()) {
+                    PlaybackManager.getInstance().setCurrentIndices(selected.queueIndex, 0);
+                    PlaybackManager.getInstance().pressPlay();
+                    updatePlayerUI();
+                }
+            }
+        });
     }
 
     /**
@@ -479,18 +584,24 @@ public class PrimaryViewController implements Observer {
 
     @SuppressWarnings("unchecked")
     private void showQueueColumns() {
-        songTableView.getColumns().clear();
-        TableColumn<Track, String> titleCol = createColumn("Titolo", 250, t -> t.getTitle());
-        TableColumn<Track, String> artistCol = createColumn("Artista", 150, t -> t.getAuthor());
-        TableColumn<Track, String> durationCol = createColumn("Durata", 100, t -> formatDuration(t.getDuration()));
-
-        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, durationCol);
+        songTableView.setVisible(false);
+        songTableView.setManaged(false);
+        if (queueListView != null) {
+            queueListView.setVisible(true);
+            queueListView.setManaged(true);
+        }
         updateTablePlaceholder();
         refreshTableData();
     }
 
     @SuppressWarnings("unchecked")
     private void showSongsColumns() {
+        if (queueListView != null) {
+            queueListView.setVisible(false);
+            queueListView.setManaged(false);
+        }
+        songTableView.setVisible(true);
+        songTableView.setManaged(true);
         songTableView.getColumns().clear();
 
         TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
@@ -542,6 +653,12 @@ public class PrimaryViewController implements Observer {
 
     @SuppressWarnings("unchecked")
     private void showPlaylistColumns() {
+        if (queueListView != null) {
+            queueListView.setVisible(false);
+            queueListView.setManaged(false);
+        }
+        songTableView.setVisible(true);
+        songTableView.setManaged(true);
         songTableView.getColumns().clear();
         TableColumn<Playlist, String> nameCol = createColumn("Nome Playlist", 300, p -> p.getTitle());
         TableColumn<Playlist, Integer> countCol = new TableColumn<>("Numero Brani");
@@ -928,8 +1045,22 @@ public class PrimaryViewController implements Observer {
      * Si occupa di caricare il contesto corretto (tutta la libreria o la playlist corrente).
      */
     private void handlePlayPauseAction() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
         PlaybackManager manager = PlaybackManager.getInstance();
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+        
+        if ("Coda di riproduzione".equals(viewTitleLabel.getText()) && queueListView != null) {
+            QueueItem qItem = queueListView.getSelectionModel().getSelectedItem();
+            if (qItem != null && qItem.track != null) {
+                selectedItem = qItem.track;
+                int trackIdx = qItem.parentPlayable.getTracks().indexOf(qItem.track);
+                manager.setCurrentIndices(qItem.queueIndex, trackIdx);
+            } else if (qItem != null && qItem.parentPlayable != null && !qItem.parentPlayable.getTracks().isEmpty()) {
+                selectedItem = qItem.parentPlayable.getTracks().get(0);
+                manager.setCurrentIndices(qItem.queueIndex, 0);
+            } else {
+                selectedItem = null;
+            }
+        }
 
         // Se non c'è selezione, carica il primo brano della vista corrente
         if (selectedItem == null && manager.getCurrentQueue().isEmpty()) {
@@ -940,10 +1071,9 @@ public class PrimaryViewController implements Observer {
             }
         }
 
-        // Se c'è una selezione, imposta il contesto di riproduzione
-        if (selectedItem instanceof Track selectedTrack) {
+        // Se c'è una selezione e non siamo nella coda, imposta il contesto di riproduzione
+        if (selectedItem instanceof Track selectedTrack && !"Coda di riproduzione".equals(viewTitleLabel.getText())) {
             if (currentOpenedPlaylist != null) manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
-            else if ("Coda di riproduzione".equals(viewTitleLabel.getText())) manager.selectAndLoadTrack(selectedTrack, manager.getCurrentQueue());
             else manager.selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
         }
 
@@ -960,17 +1090,33 @@ public class PrimaryViewController implements Observer {
     /** Sincronizza l'elemento selezionato nella tabella con la traccia effettivamente in riproduzione. */
     private void syncTableSelection() {
         Track currentTrack = PlaybackManager.getInstance().getCurrentTrack();
-        if (currentTrack != null && songTableView != null && !songTableView.getItems().isEmpty()) {
-            ObservableList<?> items = songTableView.getItems();
-            
-            for (int i = 0; i < items.size(); i++) {
-                if (items.get(i).equals(currentTrack)) {
-                    final int index = i;
-                    javafx.application.Platform.runLater(() -> {
-                        songTableView.getSelectionModel().select(index);
-                        songTableView.scrollTo(index);
-                    });
-                    return;
+        if (currentTrack != null) {
+            if ("Coda di riproduzione".equals(viewTitleLabel.getText()) && queueListView != null && !queueListView.getItems().isEmpty()) {
+                ObservableList<QueueItem> items = queueListView.getItems();
+                int currentQueueIndex = PlaybackManager.getInstance().getCurrentPlayableIndex();
+                for (int i = 0; i < items.size(); i++) {
+                    QueueItem item = items.get(i);
+                    if (item.queueIndex == currentQueueIndex && item.track != null && item.track.equals(currentTrack)) {
+                        final int index = i;
+                        javafx.application.Platform.runLater(() -> {
+                            queueListView.getSelectionModel().select(index);
+                            queueListView.scrollTo(index);
+                        });
+                        return;
+                    }
+                }
+            } else if (songTableView != null && !songTableView.getItems().isEmpty()) {
+                ObservableList<?> items = songTableView.getItems();
+                
+                for (int i = 0; i < items.size(); i++) {
+                    if (items.get(i).equals(currentTrack)) {
+                        final int index = i;
+                        javafx.application.Platform.runLater(() -> {
+                            songTableView.getSelectionModel().select(index);
+                            songTableView.scrollTo(index);
+                        });
+                        return;
+                    }
                 }
             }
         }

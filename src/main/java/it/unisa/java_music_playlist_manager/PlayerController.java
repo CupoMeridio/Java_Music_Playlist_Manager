@@ -210,7 +210,10 @@ public class PlayerController implements Observer {
         PlaybackManager manager = PlaybackManager.getInstance();
         if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.SequentialStrategy) {
             manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatStrategy());
-            repeatButton.setStyle("-fx-text-fill: #1DB954;"); // Verde (Attivo)
+            repeatButton.setStyle("-fx-text-fill: #1DB954;"); // Verde (Attivo - Ripeti Coda)
+        } else if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.RepeatStrategy) {
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatTrackStrategy());
+            repeatButton.setStyle("-fx-text-fill: #FF8C00;"); // Arancione (Attivo - Ripeti Traccia)
         } else {
             manager.setStrategy(new it.unisa.java_music_playlist_manager.model.SequentialStrategy());
             repeatButton.setStyle("-fx-text-fill: black;"); // Default (Disattivo)
