@@ -129,13 +129,15 @@ public final class Track implements Playable, Subject {
     public void setYear(Integer year) {
         int thisYear = LocalDate.now().getYear();
 
-        if (year == null) {
-            this.year = null;
-        } else if (year > thisYear) {
-            throw new IllegalArgumentException("L'anno non può essere nel futuro.");
-        } else {
-            this.year = year;
+        if (year != null) {
+            if (year > thisYear) {
+                throw new IllegalArgumentException("L'anno non può essere nel futuro.");
+            } 
+            if (year < 0) {
+                year = null;
+            }
         }
+        this.year = year;
 
         notifyObservers();
     }

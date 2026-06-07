@@ -108,10 +108,17 @@ public class TrackTest {
     @Test
     public void testSetYearInvalido() {
         int currentYear = java.time.LocalDate.now().getYear();
+        
+        // Verifica anno nel futuro: lancia eccezione
+        assertThrows(IllegalArgumentException.class, () -> track.setYear(currentYear + 1), "L'anno futuro deve lanciare IllegalArgumentException");
+        
+        // Verifica anno null: permesso e impostato a null
+        track.setYear(null);
+        assertNull(track.getYear(), "L'anno nullo deve essere permesso e impostato a null");
+
+        // Verifica anno negativo: portato a null
         track.setYear(-5);
-        assertEquals(currentYear, track.getYear(), "L'anno negativo deve essere riportato all'anno corrente");
-        track.setYear(currentYear + 1);
-        assertEquals(currentYear, track.getYear(), "L'anno futuro deve essere riportato all'anno corrente");
+        assertNull(track.getYear(), "L'anno negativo deve essere portato a null");
     }
     
     @Test
