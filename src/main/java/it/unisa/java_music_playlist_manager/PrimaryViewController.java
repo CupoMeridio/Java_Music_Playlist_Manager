@@ -5,6 +5,8 @@ import it.unisa.java_music_playlist_manager.model.Playable;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import it.unisa.java_music_playlist_manager.model.PlaylistGenerator;
+import it.unisa.java_music_playlist_manager.model.AutomaticPlaylist;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
@@ -44,6 +46,7 @@ public class PrimaryViewController implements Observer {
 
     private Track currentEditingTrack = null;
     private Playlist currentOpenedPlaylist = null;
+    private final PlaylistGenerator playlistGenerator = new PlaylistGenerator();
 
     @Override
     public void update() {
@@ -247,8 +250,9 @@ public class PrimaryViewController implements Observer {
             removeFromQueueItem.setVisible(isQueueView);
 
             boolean isPlaylistDetailView = (currentOpenedPlaylist != null);
-            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView);
-            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView);
+            boolean isAutomaticPlaylist = currentOpenedPlaylist instanceof AutomaticPlaylist;
+            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView || isAutomaticPlaylist);
+            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView && !isAutomaticPlaylist);
         });
 
         songTableView.setOnMouseClicked(event -> {
@@ -506,41 +510,41 @@ public class PrimaryViewController implements Observer {
             int seconds = data.getValue().getDuration();
             return new SimpleStringProperty(String.format("%02d:%02d", seconds / 60, seconds % 60));
         });
-        
+
         // Risoluzione conflitto: Reintroduzione colonna e cellFactory custom per i Tag
         TableColumn<Track, Set<Tag>> tagCol = new TableColumn<>("Tag");
         tagCol.setPrefWidth(180);
         tagCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTags()));
-        
+
         tagCol.setCellFactory(column -> new javafx.scene.control.TableCell<Track, Set<Tag>>() {
             @Override
             protected void updateItem(Set<Tag> tags, boolean empty) {
                 super.updateItem(tags, empty);
-                
+
                 if (empty || tags == null || tags.isEmpty()) {
                     setGraphic(null);
                     return;
                 }
-                
+
                 javafx.scene.layout.FlowPane flowPane = new javafx.scene.layout.FlowPane(5, 4);
-                
+
                 tags.forEach(tag -> {
                     if (tag == null) return;
                     Label badge = new Label(tag.getIcon());
                     badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
-                    
+
                     javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip("Tag: " + tag.getIcon());
                     javafx.scene.control.Tooltip.install(badge, tooltip);
-                    
+
                     flowPane.getChildren().add(badge);
                 });
-                
+
                 setGraphic(flowPane);
             }
         });
 
         ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
-        
+
         updateTablePlaceholder();
         refreshTableData();
     }
@@ -582,7 +586,40 @@ public class PrimaryViewController implements Observer {
         System.out.println("Apertura playlist: " + playlist.getTitle());
     }
 
+    /**
+     * Apre il dialogo per scegliere il tipo di playlist da creare.
+     *
+     * L'utente può creare una playlist vuota, modificabile manualmente,
+     * oppure una playlist automatica basata su genere musicale o anno.
+     */
     private void openCreatePlaylistDialog() {
+        List<String> options = List.of("Playlist vuota", "Playlist automatica");
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Playlist vuota", options);
+        dialog.setTitle("Nuova playlist");
+        dialog.setHeaderText("Scegli il tipo di playlist");
+        dialog.setContentText("Tipo:");
+        dialog.setGraphic(null);
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isEmpty()) {
+            return;
+        }
+        if ("Playlist vuota".equals(result.get())) {
+            openCreateEmptyPlaylistDialog();
+        } else if ("Playlist automatica".equals(result.get())) {
+            openCreateAutomaticPlaylistDialog();
+        }
+    }
+
+    /**
+     * Apre il dialogo per creare una playlist vuota.
+     *
+     * La playlist vuota viene creata tramite PlaylistGenerator
+     * e può essere modificata manualmente dall'utente.
+     */
+    private void openCreateEmptyPlaylistDialog() {
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Nuova playlist");
         dialog.setHeaderText("Crea una nuova playlist");
@@ -593,19 +630,182 @@ public class PrimaryViewController implements Observer {
 
         result.ifPresent(name -> {
             try {
-                Playlist playlist = new Playlist(name);
+                Playlist playlist = playlistGenerator.createEmptyPlaylist(name);
                 Library.getInstance().addPlaylist(playlist);
                 showPlaylistColumns();
                 System.out.println("Playlist creata: " + playlist.getTitle());
             } catch (IllegalArgumentException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Errore");
-                alert.setHeaderText("Nome playlist non valido");
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
+                showErrorAlert(
+                        "Errore",
+                        "Nome playlist non valido",
+                        e.getMessage()
+                );
             }
         });
     }
+
+    /**
+     * Apre il dialogo per scegliere il criterio della playlist automatica.
+     * I criteri disponibili sono genere musicale e anno di uscita.
+     */
+    private void openCreateAutomaticPlaylistDialog() {
+        List<String> options = List.of("Genere", "Anno");
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("Genere", options);
+        dialog.setTitle("Playlist automatica");
+        dialog.setHeaderText("Crea una playlist automatica");
+        dialog.setContentText("Criterio:");
+        dialog.setGraphic(null);
+
+        Optional<String> result = dialog.showAndWait();
+
+        if (result.isEmpty()) {
+            return;
+        }
+
+        if ("Genere".equals(result.get())) {
+            openAutomaticPlaylistByGenreDialog();
+        } else if ("Anno".equals(result.get())) {
+            openAutomaticPlaylistByYearDialog();
+        }
+    }
+
+    /**
+     * Apre il dialogo per scegliere il genere musicale
+     * su cui basare la playlist automatica.
+     */
+    private void openAutomaticPlaylistByGenreDialog() {
+        List<String> genres = new ArrayList<>();
+
+        for (Track track : Library.getInstance().getTracks()) {
+            String genre = track.getGenre();
+
+            if (genre != null && !genre.trim().isEmpty() && !genres.contains(genre)) {
+                genres.add(genre);
+            }
+        }
+
+        genres.sort(String.CASE_INSENSITIVE_ORDER);
+
+        if (genres.isEmpty()) {
+            showInfoAlert(
+                    "Nessun genere disponibile",
+                    "Playlist automatica non creata",
+                    "Non ci sono generi disponibili nella libreria."
+            );
+            return;
+        }
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(genres.get(0), genres);
+        dialog.setTitle("Playlist automatica per genere");
+        dialog.setHeaderText("Scegli il genere");
+        dialog.setContentText("Genere:");
+        dialog.setGraphic(null);
+
+        Optional<String> result = dialog.showAndWait();
+
+        result.ifPresent(this::generateAutomaticPlaylistByGenre);
+    }
+
+    /**
+     * Apre il dialogo per scegliere l'anno di uscita
+     * su cui basare la playlist automatica.
+     */
+    private void openAutomaticPlaylistByYearDialog() {
+        List<Integer> years = new ArrayList<>();
+
+        for (Track track : Library.getInstance().getTracks()) {
+            Integer year = track.getYear();
+
+            if (year != null && !years.contains(year)) {
+                years.add(year);
+            }
+        }
+
+        years.sort(Integer::compareTo);
+
+        if (years.isEmpty()) {
+            showInfoAlert(
+                    "Nessun anno disponibile",
+                    "Playlist automatica non creata",
+                    "Non ci sono anni disponibili nella libreria."
+            );
+            return;
+        }
+
+        ChoiceDialog<Integer> dialog = new ChoiceDialog<>(years.get(0), years);
+        dialog.setTitle("Playlist automatica per anno");
+        dialog.setHeaderText("Scegli l'anno");
+        dialog.setContentText("Anno:");
+        dialog.setGraphic(null);
+
+        Optional<Integer> result = dialog.showAndWait();
+
+        result.ifPresent(this::generateAutomaticPlaylistByYear);
+    }
+
+    /**
+     * Genera una playlist automatica filtrata per genere musicale.
+     *
+     * @param genre Genere scelto dall'utente.
+     */
+    private void generateAutomaticPlaylistByGenre(String genre) {
+        Optional<Playlist> result = playlistGenerator.createPlaylistByGenre(
+                genre,
+                Library.getInstance().getTracks()
+        );
+
+        if (result.isPresent()) {
+            saveGeneratedPlaylist(
+                    result.get(),
+                    "Playlist automatica creata per genere: "
+            );
+        } else {
+            showInfoAlert(
+                    "Nessun brano trovato",
+                    "Playlist automatica non creata",
+                    "Non ci sono brani con il genere selezionato."
+            );
+        }
+    }
+
+    /**
+     * Genera una playlist automatica filtrata per anno di uscita.
+     *
+     * @param year Anno scelto dall'utente.
+     */
+    private void generateAutomaticPlaylistByYear(Integer year) {
+        Optional<Playlist> result = playlistGenerator.createPlaylistByYear(
+                year,
+                Library.getInstance().getTracks()
+        );
+
+        if (result.isPresent()) {
+            saveGeneratedPlaylist(
+                    result.get(),
+                    "Playlist automatica creata per anno: "
+            );
+        } else {
+            showInfoAlert(
+                    "Nessun brano trovato",
+                    "Playlist automatica non creata",
+                    "Non ci sono brani per l'anno selezionato."
+            );
+        }
+    }
+
+    /**
+     * Salva nella libreria la playlist generata e aggiorna la tabella.
+     *
+     * @param playlist Playlist da salvare.
+     * @param logMessage Messaggio da stampare in console.
+     */
+    private void saveGeneratedPlaylist(Playlist playlist, String logMessage) {
+        Library.getInstance().addPlaylist(playlist);
+        showPlaylistColumns();
+        System.out.println(logMessage + playlist.getTitle());
+    }
+
 
     private void openAddTrackView() {
         try {
@@ -650,13 +850,22 @@ public class PrimaryViewController implements Observer {
             return;
         }
 
-        List<Playlist> playlists = Library.getInstance().getPlaylists();
+        // Le playlist automatiche vengono escluse perchè il loro contenuto
+        // viene calcolato dinamicamente in base al criterio scelto
+        List<Playlist> playlists = new ArrayList<>();
+
+        for (Playlist playlist : Library.getInstance().getPlaylists()) {
+            if (!(playlist instanceof AutomaticPlaylist)) {
+                playlists.add(playlist);
+            }
+        }
+
         if (playlists.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Nessuna playlist");
-            alert.setHeaderText("Non ci sono playlist disponibili");
-            alert.setContentText("Crea prima una playlist.");
-            alert.showAndWait();
+            showInfoAlert(
+                    "Nessuna playlist manuale",
+                    "Non ci sono playlist modificabili disponibili",
+                    "Crea prima una playlist vuota. Le playlist automatiche non possono essere modificate manualmente."
+            );
             return;
         }
 
@@ -664,6 +873,7 @@ public class PrimaryViewController implements Observer {
         dialog.setTitle("Aggiungi a playlist");
         dialog.setHeaderText("Scegli la playlist");
         dialog.setContentText("Playlist:");
+        dialog.setGraphic(null);
 
         Optional<Playlist> result = dialog.showAndWait();
         result.ifPresent(playlist -> {
@@ -761,7 +971,7 @@ public class PrimaryViewController implements Observer {
 
         if (currentTrack != null && songTableView != null && !songTableView.getItems().isEmpty()) {
             ObservableList<?> items = songTableView.getItems();
-            
+
             for (int i = 0; i < items.size(); i++) {
                 if (items.get(i).equals(currentTrack)) {
                     final int index = i;
@@ -775,5 +985,23 @@ public class PrimaryViewController implements Observer {
         } else if (songTableView != null) {
             songTableView.getSelectionModel().clearSelection();
         }
+    }
+
+    /*Metodo utile per mostrare un messaggio informativo e non ripetere codice*/
+    private void showInfoAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    /*Metodo utile per mostrare un messaggio di errore e non ripetere codice*/
+    private void showErrorAlert(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
