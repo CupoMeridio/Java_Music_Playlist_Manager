@@ -204,6 +204,9 @@ public class PrimaryViewController implements Observer {
         MenuItem removeFromQueueItem = new MenuItem("Rimuovi dalla coda");
         removeFromQueueItem.setOnAction(e -> handleRemoveFromQueue());
 
+        MenuItem removeFromPlaylistItem = new MenuItem("Rimuovi dalla playlist");
+        removeFromPlaylistItem.setOnAction(e -> handleRemoveFromPlaylist());
+
         contextMenu.getItems().addAll(
                 editItem,
                 deleteItem,
@@ -212,7 +215,8 @@ public class PrimaryViewController implements Observer {
                 editPlaylistItem,
                 deletePlaylistItem,
                 addPlaylistToQueueItem,
-                removeFromQueueItem
+                removeFromQueueItem,
+                removeFromPlaylistItem
         );
         songTableView.setContextMenu(contextMenu);
 
@@ -241,6 +245,10 @@ public class PrimaryViewController implements Observer {
 
             removeFromQueueItem.setDisable(selectedItem == null || !isQueueView);
             removeFromQueueItem.setVisible(isQueueView);
+
+            boolean isPlaylistDetailView = (currentOpenedPlaylist != null);
+            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView);
+            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView);
         });
 
         songTableView.setOnMouseClicked(event -> {
@@ -300,6 +308,19 @@ public class PrimaryViewController implements Observer {
             }
         } else {
             System.out.println("Eliminazione annullata dall'utente.");
+        }
+    }
+
+    @FXML
+    private void handleRemoveFromPlaylist() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+
+        if (selectedItem instanceof Track selectedTrack && currentOpenedPlaylist != null) {
+            currentOpenedPlaylist.removeTrack(selectedTrack);
+            System.out.println("Brano rimosso dalla playlist: " + selectedTrack.getTitle());
+            refreshTableData();
+            updateTablePlaceholder();
+            Library.getInstance().notifyObservers(); // Opzionale per notificare altre viste in ascolto
         }
     }
 
