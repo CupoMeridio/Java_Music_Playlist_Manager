@@ -2,6 +2,8 @@ package it.unisa.java_music_playlist_manager;
 
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
+import it.unisa.java_music_playlist_manager.model.SequentialStrategy;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -163,11 +165,29 @@ public class PlayerController implements Observer {
 
     // --- Gestori eventi UI ---
 
+    /**
+     * Alterna la strategia di riproduzione tra Sequenziale e Shuffle.
+     *
+     */
     @FXML
     private void handleShuffleToggle() {
-        // Implementazione shuffle da coordinare col manager
-    }
+        PlaybackManager manager = PlaybackManager.getInstance();
 
+        // Se lo shuffle è già attivo, lo spegniamo ripristinando la strategia sequenziale
+        if (manager.getCurrentStrategy() instanceof ShuffleStrategy) {
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.SequentialStrategy());
+            shuffleButton.setStyle("-fx-text-fill: black;"); // Torna allo stato normale (non selezionato)
+        } else {
+            // Se non era attivo, attiviamo lo Shuffle
+            manager.setStrategy(new ShuffleStrategy());
+            shuffleButton.setStyle("-fx-text-fill: #1DB954;"); // selezionato
+
+            //se attivi lo shuffle si spegne il loop
+            if (repeatButton != null) {
+                repeatButton.setStyle("-fx-text-fill: black;");
+            }
+        }
+    }
     @FXML
     private void handlePrevAction() {
         PlaybackManager.getInstance().pressPrevious();
