@@ -29,6 +29,13 @@
             <children>
                 <Label fx:id="formTitleLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Aggiungi nuovo brano" />
 
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Button onAction="#handleSelectFile" text="Seleziona File Audio" />
+                        <Label fx:id="filePathLabel" style="-fx-text-fill: #666666; -fx-font-style: italic;" text="Nessun file selezionato" />
+                    </children>
+                </HBox>
+
                 <GridPane accessibleText="Tag" hgap="12.0" maxWidth="Infinity" vgap="12.0">
                     <columnConstraints>
                         <ColumnConstraints minWidth="80.0" prefWidth="90.0" />
@@ -45,20 +52,16 @@
                         <Label text="Album:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
                         <TextField fx:id="addTrackAlbumField" maxWidth="Infinity" promptText="Album del brano" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                        <Label text="Durata:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                        <TextField fx:id="addTrackDurationField" maxWidth="Infinity" promptText="Secondi" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Label text="Genere:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <ComboBox fx:id="addTrackGenreComboBox" maxWidth="Infinity" promptText="Seleziona genere" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                        <Label text="Genere:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
-                        <ComboBox fx:id="addTrackGenreComboBox" maxWidth="Infinity" promptText="Seleziona genere" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-
-                        <Label text="Anno:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
-                        <TextField fx:id="addTrackYearField" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                        <Label text="Anno:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                        <TextField fx:id="addTrackYearField" maxWidth="Infinity" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                         
-                        <Label text="Tag:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
-                        <CheckComboBox fx:id="addTrackTagComboBox" maxWidth="Infinity" title="Seleziona Tags" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                        <Label text="Tag:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                        <CheckComboBox fx:id="addTrackTagComboBox" maxWidth="Infinity" title="Seleziona Tags" GridPane.columnIndex="1" GridPane.rowIndex="5" />
                     </children>
                <rowConstraints>
-                  <RowConstraints />
                   <RowConstraints />
                   <RowConstraints />
                   <RowConstraints />
@@ -67,13 +70,6 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" />
                </rowConstraints>
                 </GridPane>
-
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <children>
-                        <Button onAction="#handleSelectFile" text="Seleziona File Audio" />
-                        <Label fx:id="filePathLabel" style="-fx-text-fill: #666666; -fx-font-style: italic;" text="Nessun file selezionato" />
-                    </children>
-                </HBox>
 
                 <Label fx:id="addTrackErrorLabel" style="-fx-text-fill: red;" text="" />
 

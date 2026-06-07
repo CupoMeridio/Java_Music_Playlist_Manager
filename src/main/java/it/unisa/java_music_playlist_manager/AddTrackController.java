@@ -162,6 +162,10 @@ public class AddTrackController {
         if (addTrackErrorLabel != null) {
             addTrackErrorLabel.setText("");
         }
+
+        // Sincronizza lo stato di abilitazione dei campi in base alla presenza del file
+        boolean fileSelected = (selectedFilePath != null && !selectedFilePath.isEmpty());
+        setFieldsDisable(!fileSelected);
     }
 
     // metodo per salvare
@@ -269,6 +273,9 @@ public class AddTrackController {
             selectedFilePath = file.getAbsolutePath();
             filePathLabel.setText(file.getName());
             
+            // Abilita i campi del form ora che il file è selezionato
+            setFieldsDisable(false);
+            
             // Attiviamo l'overlay di caricamento
             setLoading(true);
 
@@ -369,6 +376,19 @@ public class AddTrackController {
                 setLoading(false);
             }
         }
+    }
+
+    /**
+     * Abilita o disabilita i campi del form.
+     */
+    private void setFieldsDisable(boolean disable) {
+        if (addTrackTitleField != null) addTrackTitleField.setDisable(disable);
+        if (addTrackAuthorField != null) addTrackAuthorField.setDisable(disable);
+        if (addTrackAlbumField != null) addTrackAlbumField.setDisable(disable);
+        if (addTrackGenreComboBox != null) addTrackGenreComboBox.setDisable(disable);
+        if (addTrackYearField != null) addTrackYearField.setDisable(disable);
+        if (addTrackTagComboBox != null) addTrackTagComboBox.setDisable(disable);
+        if (saveTrackButton != null) saveTrackButton.setDisable(disable);
     }
 
     /**
