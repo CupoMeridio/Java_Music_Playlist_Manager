@@ -116,6 +116,8 @@ public class PrimaryViewController implements Observer {
     @FXML
     private Button shufflePlayButton;
     @FXML
+    private Button playPlaylistButton;
+    @FXML
     private ComboBox<String> sortComboBox;
     @FXML
     private HBox genreFilterContainer;
@@ -159,6 +161,20 @@ public class PrimaryViewController implements Observer {
         if (genreComboBox != null) {
             genreComboBox.getItems().addAll("Tutti i generi", "Pop", "Rock", "Jazz", "Classica", "Hip Hop");
         }
+
+        // Listener per abilitare il pulsante "Riproduci Playlist"
+        songTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            boolean isPlaylistView = "Playlist".equals(viewTitleLabel.getText());
+            if (isPlaylistView && newVal instanceof Playlist) {
+                if (playPlaylistButton != null) {
+                    playPlaylistButton.setDisable(false);
+                }
+            } else {
+                if (playPlaylistButton != null) {
+                    playPlaylistButton.setDisable(true);
+                }
+            }
+        });
 
         // Configurazione iniziale delle colonne (Vista Brani)
         showSongsColumns();
@@ -660,6 +676,16 @@ public class PrimaryViewController implements Observer {
     @FXML
     private void handleShufflePlayAction() {
         System.out.println("Azione: Avvio riproduzione casuale di tutta la libreria");
+    }
+
+    @FXML
+    private void handlePlayPlaylistAction() {
+        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
+        if (selectedItem instanceof Playlist selectedPlaylist) {
+            System.out.println("Azione: Avvio riproduzione playlist " + selectedPlaylist.getTitle());
+            PlaybackManager.getInstance().play(selectedPlaylist, false);
+            updatePlayerUI();
+        }
     }
 
     private void handlePlayPauseAction() {

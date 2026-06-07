@@ -285,6 +285,22 @@ public class PlaybackManager implements Subject {
     }
 
     /**
+     * Avvia la riproduzione di un singolo elemento Playable.
+     * 
+     */
+    public void play(Playable playable, boolean shuffle) {
+        if (playable != null) {
+            this.queue.clear();
+            this.queue.add(playable);
+            this.currentPlayableIndex = 0;
+            this.currentTrackIndexInPlayable = 0;
+            skipEmptyPlayablesForward();
+            System.out.println("[MANAGER] Avvio riproduzione da Playable: " + playable.getTitle());
+            pressPlay();
+        }
+    }
+
+    /**
      * Carica nel player la lista di elementi Playable e imposta gli indici
      * sulla traccia selezionata all'interno del Playable corrispondente.
      */
