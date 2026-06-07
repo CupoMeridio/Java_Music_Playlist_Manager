@@ -698,7 +698,7 @@ public class PrimaryViewController implements Observer {
             String currentView = viewTitleLabel.getText();
             if (currentOpenedPlaylist != null && !currentOpenedPlaylist.getTracks().isEmpty()) {
                 List<Track> tracks = currentOpenedPlaylist.getTracks();
-                manager.selectAndLoadTrack(tracks.get(0), tracks);
+                manager.selectAndLoadTrack(tracks.get(0), List.of(currentOpenedPlaylist));
             } else if ("Musica".equals(currentView) && !Library.getInstance().getTracks().isEmpty()) {
                 List<Track> tracks = Library.getInstance().getTracks();
                 manager.selectAndLoadTrack(tracks.get(0), tracks);
@@ -709,7 +709,7 @@ public class PrimaryViewController implements Observer {
             String currentView = viewTitleLabel.getText();
 
             if (currentOpenedPlaylist != null) {
-                manager.selectAndLoadTrack(selectedTrack, currentOpenedPlaylist.getTracks());
+                manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
             } else if ("Musica".equals(currentView)) {
                 manager.selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
             } else if ("Coda di riproduzione".equals(currentView)) {

@@ -284,6 +284,10 @@ public class PlaybackManager implements Subject {
         }
     }
 
+    public PlaybackStrategy getCurrentStrategy() {
+        return this.currentStrategy;
+    }
+
     /**
      * Avvia la riproduzione di un singolo elemento Playable.
      * 
@@ -344,10 +348,16 @@ public class PlaybackManager implements Subject {
 
         String filePath = current.getFilePath();
 
-        // Se è la stessa traccia ed è in pausa, riprendi
+        // Se è la stessa traccia, distinguiamo tra "ripresa dalla pausa" e "riavvio forzato" (es. skip o loop)
         if (mediaPlayer != null && filePath.equals(lastPlayedFilePath)) {
-            mediaPlayer.play();
-            System.out.println("[AUDIO PLAYER] Ripresa riproduzione: " + current.getTitle());
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                mediaPlayer.play();
+                System.out.println("[AUDIO PLAYER] Ripresa riproduzione: " + current.getTitle());
+            } else {
+                mediaPlayer.seek(javafx.util.Duration.ZERO);
+                mediaPlayer.play();
+                System.out.println("[AUDIO PLAYER] Riavvio riproduzione (skip/loop): " + current.getTitle());
+            }
             return;
         }
 

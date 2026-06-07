@@ -224,7 +224,20 @@ public class PlayerController implements Observer {
 
     @FXML
     private void handleRepeatToggle() {
-        System.out.println("Player: Toggle ripetizione (ciclo)");
+        PlaybackManager manager = PlaybackManager.getInstance();
+        it.unisa.java_music_playlist_manager.model.PlaybackStrategy current = manager.getCurrentStrategy();
+
+        if (current instanceof it.unisa.java_music_playlist_manager.model.SequentialStrategy) {
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatStrategy());
+            repeatButton.setText("🔁");
+            repeatButton.setStyle("-fx-text-fill: #1DB954;"); // Verde per indicare stato attivo
+            System.out.println("Player: Toggle ripetizione (Attivo)");
+        } else {
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.SequentialStrategy());
+            repeatButton.setText("🔁");
+            repeatButton.setStyle("-fx-text-fill: black;"); // Colore default inattivo
+            System.out.println("Player: Toggle ripetizione (Disattivato)");
+        }
     }
 
     @FXML
