@@ -1,10 +1,18 @@
 package it.unisa.java_music_playlist_manager.model;
 
+/**
+ * Rappresenta lo stato di riproduzione attiva del lettore.
+ * In questo stato, la musica sta scorrendo e i comandi hanno il seguente comportamento:
+ * - Play: Mette in pausa la riproduzione.
+ * - Stop: Interrompe l'audio e resetta la posizione nella coda.
+ * - Next/Prev: Cambiano traccia e avviano immediatamente il nuovo brano.
+ */
 public class PlayingState implements PlaybackState {
 
     @Override
     public void play(PlaybackManager context) {
         System.out.println("[STATO: PLAYING] -> Click su Play. Metto in PAUSA.");
+        // Passaggio allo stato PausedState e sospensione dell'audio reale
         context.changeState(new PausedState());
         context.triggerRealPause();
     }
@@ -12,6 +20,7 @@ public class PlayingState implements PlaybackState {
     @Override
     public void stop(PlaybackManager context) {
         System.out.println("[STATO: PLAYING] -> Click su STOP. Interrompo la musica.");
+        // Interruzione totale dell'audio, reset degli indici e passaggio allo stato StoppedState
         context.triggerRealStop();
         context.resetQueue();
         context.changeState(new StoppedState());
@@ -25,8 +34,9 @@ public class PlayingState implements PlaybackState {
         Track nextTrack = context.getCurrentTrack();
         if (nextTrack != null) {
             System.out.println("[STATO: PLAYING] Ora riproduco: " + nextTrack.getTitle());
-            context.triggerRealPlayback();
+            context.triggerRealPlayback(); // Avvio immediato della nuova traccia
         } else {
+            // Se la coda è terminata, il lettore si ferma
             System.out.println("[STATO: PLAYING] Coda terminata. Spengo il lettore.");
             context.triggerRealStop();
             context.resetQueue();

@@ -16,19 +16,37 @@ import javafx.util.Duration;
  * Estratto da PrimaryViewController per separare la responsabilità del player
  * dalla gestione della vista principale.
  */
+/**
+ * PlayerController gestisce l'interfaccia della barra di riproduzione inferiore.
+ * Si occupa di visualizzare i metadati del brano corrente, controllare il volume,
+ * gestire la barra di avanzamento e inviare comandi al {@link PlaybackManager}.
+ * 
+ * Ruolo nel progetto:
+ * - Implementa {@link Observer} per aggiornare la barra quando il player cambia traccia.
+ * - Sincronizza lo stato visivo (Play/Pause, Slider, Timer) con il {@link MediaPlayer} di JavaFX.
+ * - Comunica con {@link PrimaryViewController} tramite callback Runnable per mantenere l'UI coerente.
+ */
 public class PlayerController implements Observer {
 
+    /** Callback eseguita quando viene cliccato Play/Pause */
     private Runnable onPlayPauseClicked;
+    
+    /** Callback eseguita quando cambia lo stato interno del player (es. skip traccia) */
     private Runnable onPlayerStateChanged;
 
+    /**
+     * Metodo del pattern Observer.
+     * Chiamato quando il PlaybackManager notifica un cambiamento (es. nuova traccia caricata).
+     */
     @Override
     public void update() {
-        // Chiamato dal PlaybackManager quando cambia il MediaPlayer (nuova traccia)
+        // Riconfigura i listener sul nuovo oggetto MediaPlayer creato nel manager
         setupMediaPlayerListeners();
+        // Aggiorna i testi e lo stato dei pulsanti
         updatePlayerUI();
     }
 
-    // CONTROLLI BARRA DI RIPRODUZIONE
+    // --- Elementi UI iniettati da FXML ---
     @FXML
     private Label currentTimeLabel;
     @FXML
@@ -58,234 +76,173 @@ public class PlayerController implements Observer {
 
     /**
      * Imposta il callback per il click sul pulsante Play/Pause.
-     * Il PrimaryViewController fornisce la logica di riproduzione.
-     * @param callback
+     * @param callback Azione da eseguire.
      */
     public void setOnPlayPauseClicked(Runnable callback) {
         this.onPlayPauseClicked = callback;
     }
 
     /**
-     * Imposta il callback per notificare il cambio di stato del player
-     * (traccia precedente/successiva) al PrimaryViewController.
-     * @param callback
+     * Imposta il callback per notificare cambiamenti di stato (skip, stop).
+     * @param callback Azione da eseguire.
      */
     public void setOnPlayerStateChanged(Runnable callback) {
         this.onPlayerStateChanged = callback;
     }
 
-    // METODO DI INIZIALIZZAZIONE
+    /**
+     * Inizializzazione del controller.
+     * Configura i listener sugli slider di volume e progresso.
+     */
     @FXML
     public void initialize() {
         PlaybackManager.getInstance().attach(this);
 
-        // Inizializzazione tempi a zero
-        if (currentTimeLabel != null) {
-            currentTimeLabel.setText("00:00");
-        }
-        if (totalTimeLabel != null) {
-            totalTimeLabel.setText("00:00");
-        }
+        // Reset testi iniziali
+        if (currentTimeLabel != null) currentTimeLabel.setText("00:00");
+        if (totalTimeLabel != null) totalTimeLabel.setText("00:00");
+        if (currentTrackTitle != null) currentTrackTitle.setText("");
+        if (currentTrackDetails != null) currentTrackDetails.setText("");
 
-        // Inizializzazione metadati brano a vuoto
-        if (currentTrackTitle != null) {
-            currentTrackTitle.setText("");
-        }
-        if (currentTrackDetails != null) {
-            currentTrackDetails.setText("");
-        }
-
-        // Gestione Volume Slider
+        // Configurazione volume slider (Default 50%)
         if (volumeSlider != null) {
-            volumeSlider.setValue(50); // Default 50%
+            volumeSlider.setValue(50);
             volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-                if (mp != null) {
-                    mp.setVolume(newVal.doubleValue() / 100.0);
-                }
+                if (mp != null) mp.setVolume(newVal.doubleValue() / 100.0);
             });
         }
 
-        // Gestione Seeking tramite Slider
+        // Configurazione seeking manuale sulla barra di progresso
         if (progressSlider != null) {
             progressSlider.setOnMousePressed(e -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-                if (mp != null) {
-                    mp.pause();
-                }
+                if (mp != null) mp.pause(); // Pausa temporanea durante il trascinamento
             });
             progressSlider.setOnMouseReleased(e -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
                 if (mp != null) {
-                    double seekSeconds = progressSlider.getValue();
-                    mp.seek(Duration.seconds(seekSeconds));
+                    mp.seek(Duration.seconds(progressSlider.getValue()));
                     mp.play();
                 }
             });
         }
     }
 
+    /**
+     * Configura i listener sull'istanza corrente di MediaPlayer.
+     * Gestisce l'aggiornamento automatico dei timer e della barra di progresso durante la riproduzione.
+     */
     private void setupMediaPlayerListeners() {
         MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
         if (mp == null) return;
 
-        // Sincronizzazione Volume (se l'utente ha già mosso lo slider)
-        if (volumeSlider != null) {
-            mp.setVolume(volumeSlider.getValue() / 100.0);
-        }
+        // Sincronizza il volume del nuovo player con lo slider corrente
+        if (volumeSlider != null) mp.setVolume(volumeSlider.getValue() / 100.0);
 
-        // Quando la durata è pronta
+        // Quando il file audio è caricato e pronto
         mp.setOnReady(() -> {
             Duration totalDuration = mp.getTotalDuration();
-            if (totalTimeLabel != null) {
-                totalTimeLabel.setText(formatTime(totalDuration));
-            }
-            if (progressSlider != null) {
-                progressSlider.setMax(totalDuration.toSeconds());
-            }
+            if (totalTimeLabel != null) totalTimeLabel.setText(formatTime(totalDuration));
+            if (progressSlider != null) progressSlider.setMax(totalDuration.toSeconds());
         });
 
-        // Durante la riproduzione
+        // Aggiornamento continuo dei timer (ogni volta che il tempo di riproduzione avanza)
         mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
             if (progressSlider != null && !progressSlider.isValueChanging()) {
                 progressSlider.setValue(newTime.toSeconds());
             }
-            if (currentTimeLabel != null) {
-                currentTimeLabel.setText(formatTime(newTime));
-            }
+            if (currentTimeLabel != null) currentTimeLabel.setText(formatTime(newTime));
         });
     }
 
     private String formatTime(Duration duration) {
         int seconds = (int) duration.toSeconds();
-        int mins = seconds / 60;
-        int secs = seconds % 60;
-        return String.format("%02d:%02d", mins, secs);
+        return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
-    // GESTORI EVENTI BARRA DI RIPRODUZIONE (PLAYER)
+    // --- Gestori eventi UI ---
+
     @FXML
     private void handleShuffleToggle() {
-        System.out.println("Player: Toggle riproduzione casuale");
+        // Implementazione shuffle da coordinare col manager
     }
 
     @FXML
     private void handlePrevAction() {
-        System.out.println("Player: Richiesta traccia precedente.");
-        // Delega allo stato corrente tramite il manager
         PlaybackManager.getInstance().pressPrevious();
-        // Aggiorna i testi a schermo
         updatePlayerUI();
-        if (onPlayerStateChanged != null) {
-            onPlayerStateChanged.run();
-        }
+        if (onPlayerStateChanged != null) onPlayerStateChanged.run();
     }
 
     @FXML
     private void handlePreviousPlayableAction() {
-        System.out.println("Player: Click sul pulsante Elemento Precedente.");
         PlaybackManager.getInstance().pressPreviousPlayable();
         updatePlayerUI();
-        if (onPlayerStateChanged != null) {
-            onPlayerStateChanged.run();
-        }
+        if (onPlayerStateChanged != null) onPlayerStateChanged.run();
     }
 
     @FXML
     private void handlePlayPauseAction() {
-        if (onPlayPauseClicked != null) {
-            onPlayPauseClicked.run();
-        }
+        if (onPlayPauseClicked != null) onPlayPauseClicked.run();
     }
 
     @FXML
     private void handleNextAction() {
-        System.out.println("Player: Click sul pulsante Traccia Successiva.");
-        // Delega allo stato corrente tramite il manager
         PlaybackManager.getInstance().pressNext();
-        // Sincronizza l'interfaccia grafica
         updatePlayerUI();
-        if (onPlayerStateChanged != null) {
-            onPlayerStateChanged.run();
-        }
+        if (onPlayerStateChanged != null) onPlayerStateChanged.run();
     }
 
     @FXML
     private void handleNextPlayableAction() {
-        System.out.println("Player: Click sul pulsante Salta Intero Elemento.");
-        // Delega allo stato corrente tramite il manager
         PlaybackManager.getInstance().pressNextPlayable();
-        // Sincronizza l'interfaccia grafica
         updatePlayerUI();
-        if (onPlayerStateChanged != null) {
-            onPlayerStateChanged.run();
-        }
+        if (onPlayerStateChanged != null) onPlayerStateChanged.run();
     }
 
+    /**
+     * Alterna la strategia di riproduzione tra Sequenziale e Ripetizione.
+     * Utilizza il Pattern Strategy del Modello.
+     */
     @FXML
     private void handleRepeatToggle() {
         PlaybackManager manager = PlaybackManager.getInstance();
-        it.unisa.java_music_playlist_manager.model.PlaybackStrategy current = manager.getCurrentStrategy();
-
-        if (current instanceof it.unisa.java_music_playlist_manager.model.SequentialStrategy) {
+        if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.SequentialStrategy) {
             manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatStrategy());
-            repeatButton.setText("🔁");
-            repeatButton.setStyle("-fx-text-fill: #1DB954;"); // Verde per indicare stato attivo
-            System.out.println("Player: Toggle ripetizione (Attivo)");
+            repeatButton.setStyle("-fx-text-fill: #1DB954;"); // Verde (Attivo)
         } else {
             manager.setStrategy(new it.unisa.java_music_playlist_manager.model.SequentialStrategy());
-            repeatButton.setText("🔁");
-            repeatButton.setStyle("-fx-text-fill: black;"); // Colore default inattivo
-            System.out.println("Player: Toggle ripetizione (Disattivato)");
+            repeatButton.setStyle("-fx-text-fill: black;"); // Default (Disattivo)
         }
     }
 
     @FXML
     private void handleVolumeMuteToggle() {
-        System.out.println("Player: Muto / Attiva audio");
+        // Implementazione mute
     }
 
     /**
-     * Sincronizza le Label della barra di riproduzione inferiore
-     * e lo stato del bottone Play/Pause con il brano correntemente nel PlaybackManager.
+     * Sincronizza l'interfaccia del player con lo stato attuale del manager.
+     * Aggiorna titolo, autore e l'icona del pulsante Play/Pause.
      */
     public void updatePlayerUI() {
         PlaybackManager manager = PlaybackManager.getInstance();
         Track currentTrack = manager.getCurrentTrack();
 
         if (currentTrack != null) {
-            // Aggiorna i testi del player in basso
-            if (currentTrackTitle != null) {
-                currentTrackTitle.setText(currentTrack.getTitle());
-            }
-            if (currentTrackDetails != null) {
-                currentTrackDetails.setText(currentTrack.getAuthor());
-            }
+            if (currentTrackTitle != null) currentTrackTitle.setText(currentTrack.getTitle());
+            if (currentTrackDetails != null) currentTrackDetails.setText(currentTrack.getAuthor());
         } else {
-            // Se non c'è nessun brano in riproduzione
-            if (currentTrackTitle != null) {
-                currentTrackTitle.setText("Nessun brano in riproduzione");
-            }
-            if (currentTrackDetails != null) {
-                currentTrackDetails.setText("");
-            }
+            if (currentTrackTitle != null) currentTrackTitle.setText("Nessun brano in riproduzione");
+            if (currentTrackDetails != null) currentTrackDetails.setText("");
         }
 
-        // GESTIONE CAMBIO DINAMICO DEL TESTO DEL BOTTONE PLAY/PAUSA
-
+        // Cambio icona dinamico basato sullo stato corrente del Pattern State
         if (playPauseButton != null) {
-            // Recuperiamo il nome della classe dello stato attuale (played/paused/stopped)
-            String currentStateName = manager.getCurrentState().getClass().getSimpleName();
-
-            // Se lo stato contiene "Play" o "Playing", significa che la musica si sente.
-            // Il bottone deve quindi offrire l'azione di fermarsi -> Mostra "Pausa" o "Stop"
-            if (currentStateName.toLowerCase().contains("play")) {
-                playPauseButton.setText("||");
-            } else {
-                // Se siamo in StoppedState o PausedState, il brano è fermo.
-                // Il bottone deve offrire l'azione di ripartire -> Mostra "Play"
-                playPauseButton.setText("▶️");
-            }
+            String stateName = manager.getCurrentState().getClass().getSimpleName();
+            // Se siamo in uno stato di riproduzione (PlayingState), mostriamo l'icona Pausa
+            playPauseButton.setText(stateName.toLowerCase().contains("play") ? "||" : "▶️");
         }
     }
 }

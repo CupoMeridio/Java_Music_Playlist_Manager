@@ -5,36 +5,64 @@ import java.util.List;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
+/**
+ * La classe PlaybackManager è il cuore del sistema di riproduzione audio.
+ * Coordina la logica di riproduzione, la gestione della coda e l'integrazione con il player audio reale (MediaPlayer).
+ * 
+ * Pattern utilizzati:
+ * - Singleton: Garantisce un unico punto di controllo per la riproduzione in tutta l'applicazione.
+ * - State: Delega la logica dei comandi (play, stop, next, prev) a classi di stato specifiche 
+ *   (PlayingState, PausedState, StoppedState) per gestire comportamenti diversi in base al contesto.
+ * - Strategy: Utilizza diverse strategie di riproduzione (SequentialStrategy, RepeatStrategy)
+ *   per determinare l'ordine di avanzamento nella coda.
+ * - Observer (Subject): Notifica gli osservatori (UI) quando cambia la traccia corrente o lo stato del player.
+ * - Composite: Gestisce una coda di elementi {@link Playable}, che possono essere singole tracce o intere playlist.
+ */
 public class PlaybackManager implements Subject {
-    // Singleton
+    
+    /** Istanza unica del manager (Pattern Singleton) */
     private static PlaybackManager instance;
 
-    // Supporto per notificare il Controller quando il MediaPlayer cambia
+    /** Lista di osservatori per aggiornamenti in tempo reale (Pattern Observer) */
     private final List<Observer> observers = new ArrayList<>();
 
-    // Stato corrente del pattern State
+    /** Stato corrente della riproduzione (Pattern State) */
     private PlaybackState currentState;
 
-    // Player audio reale
+    /** Riferimento al player audio di JavaFX */
     private MediaPlayer mediaPlayer;
+    
+    /** Percorso dell'ultimo file riprodotto, usato per ottimizzare i caricamenti */
     private String lastPlayedFilePath;
+    
+    /** Flag per disabilitare l'audio reale (utile per i test unitari) */
     private boolean audioEnabled = true;
 
-    // Struttura dati della coda
+    /** Coda di riproduzione contenente elementi Playable (Pattern Composite) */
     private final List<Playable> queue = new ArrayList<>();
+    
+    /** Indice dell'elemento Playable attualmente selezionato nella coda */
     private int currentPlayableIndex = 0;
+    
+    /** Indice della traccia corrente all'interno del Playable selezionato (se è una Playlist) */
     private int currentTrackIndexInPlayable = 0;
 
-    // Riferimento alla strategia corrente (Pattern Strategy)
+    /** Strategia di navigazione della coda (Pattern Strategy) */
     private PlaybackStrategy currentStrategy;
 
-    // Costruttore privato
+    /**
+     * Costruttore privato. Inizializza il manager nello stato fermo e con strategia sequenziale.
+     */
     private PlaybackManager() {
-        this.currentState = new StoppedState(); // Stato iniziale di default
-        this.currentStrategy = new SequentialStrategy(); // di default parte con la riproduzione sequenziale
+        this.currentState = new StoppedState();
+        this.currentStrategy = new SequentialStrategy();
     }
 
-    // Accesso globale al Singleton
+    /**
+     * Punto di accesso al Singleton.
+     * 
+     * @return L'unica istanza di PlaybackManager.
+     */
     public static synchronized PlaybackManager getInstance() {
         if (instance == null) {
             instance = new PlaybackManager();
@@ -42,11 +70,20 @@ public class PlaybackManager implements Subject {
         return instance;
     }
 
-    // ---- GESTIONE DELLO STATO (Deleghe) ----
+    // ---- GESTIONE DELLO STATO (Pattern State - Deleghe) ----
+
+    /**
+     * Cambia lo stato corrente del manager.
+     * 
+     * @param state Il nuovo stato da assumere.
+     */
     public void changeState(PlaybackState state) {
         this.currentState = state;
     }
 
+    /**
+     * Esegue l'azione "Play" delegandola allo stato corrente.
+     */
     public void pressPlay() {
         if (queue.isEmpty()) {
             System.out.println("[MANAGER - ERROR] Impossibile avviare il player: nessuna canzone caricata nella coda.");
@@ -55,43 +92,71 @@ public class PlaybackManager implements Subject {
         currentState.play(this);
     }
 
+    /**
+     * Esegue l'azione "Stop" delegandola allo stato corrente.
+     */
     public void pressStop() {
         if (queue.isEmpty()) return;
         currentState.stop(this);
     }
 
+    /**
+     * Salta alla traccia successiva delegando allo stato corrente.
+     */
     public void pressNext() {
         if (queue.isEmpty()) return;
         currentState.next(this);
     }
 
+    /**
+     * Salta all'intero elemento Playable successivo delegando allo stato corrente.
+     */
     public void pressNextPlayable() {
         if (queue.isEmpty()) return;
         currentState.nextPlayable(this);
     }
 
+    /**
+     * Torna alla traccia precedente delegando allo stato corrente.
+     */
     public void pressPrevious() {
         if (queue.isEmpty()) return;
         currentState.previous(this);
     }
 
+    /**
+     * Torna all'elemento Playable precedente delegando allo stato corrente.
+     */
     public void pressPreviousPlayable() {
         if (queue.isEmpty()) return;
         currentState.previousPlayable(this);
     }
 
-    // ---- METODI PRATICI DI CODA ----
+    // ---- GESTIONE DELLA CODA (Pattern Composite) ----
+
+    /**
+     * Aggiunge un elemento alla fine della coda.
+     * 
+     * @param playable L'elemento da aggiungere.
+     */
     public void addToQueue(Playable playable) {
         if (playable == null) {
             throw new IllegalArgumentException("Impossibile aggiungere un elemento nullo alla coda.");
         }
         queue.add(playable);
+        // Se è il primo elemento, resetta gli indici per puntare all'inizio
         if (queue.size() == 1) {
             resetQueue();
             skipEmptyPlayablesForward();
         }
     }
 
+    /**
+     * Rimuove un elemento dalla coda in base all'indice.
+     * Gestisce il ricalcolo degli indici se viene rimosso l'elemento in riproduzione.
+     * 
+     * @param index L'indice dell'elemento da rimuovere.
+     */
     public void removeFromQueue(int index) {
         if (index < 0 || index >= queue.size()) return;
 
@@ -104,17 +169,16 @@ public class PlaybackManager implements Subject {
             resetQueue();
             changeState(new StoppedState());
         } else if (removingCurrent) {
-            // Se stiamo rimuovendo l'elemento corrente, resettiamo l'indice della traccia
+            // Se rimuoviamo ciò che stiamo ascoltando, passiamo all'elemento successivo disponibile
             currentTrackIndexInPlayable = 0;
             
-            // Se l'indice rimosso era l'ultimo, torniamo all'inizio o fermiamo
             if (currentPlayableIndex >= queue.size()) {
                 currentPlayableIndex = 0;
             }
             
             skipEmptyPlayablesForward();
 
-            // Se eravamo in riproduzione, aggiorniamo il playback reale
+            // Aggiorna la riproduzione se eravamo attivi
             if (currentState instanceof PlayingState) {
                 if (getCurrentTrack() != null) {
                     triggerRealPlayback();
@@ -124,13 +188,18 @@ public class PlaybackManager implements Subject {
                 }
             }
         } else if (index < currentPlayableIndex) {
-            // Se l'elemento rimosso era prima di quello corrente, scaliamo l'indice
+            // Se rimuoviamo un elemento precedente, scaliamo l'indice per mantenere il puntamento corretto
             currentPlayableIndex--;
         }
         
         System.out.println("[MANAGER] Elemento rimosso dalla coda all'indice: " + index);
     }
 
+    /**
+     * Sostituisce l'intera coda con una nuova lista di elementi.
+     * 
+     * @param newItems La nuova lista di elementi Playable.
+     */
     public void setQueue(List<? extends Playable> newItems) {
         if (newItems != null) {
             this.queue.clear();
@@ -142,6 +211,11 @@ public class PlaybackManager implements Subject {
         }
     }
 
+    /**
+     * Restituisce la traccia {@link Track} attualmente selezionata per la riproduzione.
+     * 
+     * @return La traccia corrente, o null se la coda è vuota o l'indice non è valido.
+     */
     public Track getCurrentTrack() {
         if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) {
             return null;
@@ -155,6 +229,9 @@ public class PlaybackManager implements Subject {
         return tracks.get(currentTrackIndexInPlayable);
     }
 
+    /**
+     * Restituisce l'elemento {@link Playable} (Playlist o Track) correntemente selezionato nella coda.
+     */
     public Playable getCurrentPlayable() {
         if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) {
             return null;
@@ -178,6 +255,12 @@ public class PlaybackManager implements Subject {
         return new ArrayList<>(queue);
     }
 
+    // ---- LOGICA DI NAVIGAZIONE INTERNA ----
+
+    /**
+     * Avanza alla traccia successiva. Se il Playable corrente è terminato, 
+     * passa al Playable successivo secondo la strategia impostata.
+     */
     public void advanceTrack() {
         if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) return;
 
@@ -185,7 +268,7 @@ public class PlaybackManager implements Subject {
         List<Track> tracks = currentPlayable.getTracks();
         currentTrackIndexInPlayable++;
 
-        // Se abbiamo finito le canzoni di questo Playable, passa al prossimo Playable della coda
+        // Se abbiamo esaurito le tracce nel Playable corrente, chiediamo alla strategia l'indice del prossimo Playable
         if (currentTrackIndexInPlayable >= tracks.size()) {
             currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
             currentTrackIndexInPlayable = 0;
@@ -193,6 +276,9 @@ public class PlaybackManager implements Subject {
         }
     }
 
+    /**
+     * Avanza direttamente al prossimo elemento Playable della coda.
+     */
     public void advancePlayable() {
         if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) return;
         currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
@@ -200,6 +286,9 @@ public class PlaybackManager implements Subject {
         skipEmptyPlayablesForward();
     }
 
+    /**
+     * Torna all'elemento Playable precedente.
+     */
     public void regressPlayable() {
         if (queue.isEmpty()) return;
 
@@ -212,6 +301,10 @@ public class PlaybackManager implements Subject {
         skipEmptyPlayablesBackwardToStart();
     }
 
+    /**
+     * Torna alla traccia precedente. Se siamo all'inizio di un Playable, 
+     * torna all'ultima traccia del Playable precedente.
+     */
     public void regressTrack() {
         if (queue.isEmpty()) return;
 
@@ -230,12 +323,18 @@ public class PlaybackManager implements Subject {
         moveToLastTrackOfCurrentPlayableOrPrevious();
     }
 
+    /**
+     * Resetta gli indici della coda alla posizione iniziale.
+     */
     public void resetQueue() {
         this.currentPlayableIndex = 0;
         this.currentTrackIndexInPlayable = 0;
         lastPlayedFilePath = null;
     }
 
+    /**
+     * Salta eventuali elementi Playable vuoti (es. playlist senza tracce) andando in avanti.
+     */
     private void skipEmptyPlayablesForward() {
         while (currentPlayableIndex < queue.size()
                 && queue.get(currentPlayableIndex).getTracks().isEmpty()) {
@@ -249,6 +348,9 @@ public class PlaybackManager implements Subject {
         currentTrackIndexInPlayable = 0;
     }
 
+    /**
+     * Posiziona l'indice sull'ultima traccia dell'elemento corrente o cerca all'indietro.
+     */
     private void moveToLastTrackOfCurrentPlayableOrPrevious() {
         while (currentPlayableIndex >= 0) {
             List<Track> tracks = queue.get(currentPlayableIndex).getTracks();
@@ -263,6 +365,9 @@ public class PlaybackManager implements Subject {
         currentTrackIndexInPlayable = 0;
     }
 
+    /**
+     * Salta elementi vuoti tornando all'indietro fino a trovarne uno valido o arrivare all'inizio.
+     */
     private void skipEmptyPlayablesBackwardToStart() {
         while (currentPlayableIndex >= 0) {
             if (!queue.get(currentPlayableIndex).getTracks().isEmpty()) {
@@ -276,7 +381,11 @@ public class PlaybackManager implements Subject {
         currentTrackIndexInPlayable = 0;
     }
 
-    // Metodo richiamato dal Controller per cambiare strategia a runtime
+    /**
+     * Imposta una nuova strategia di riproduzione (Pattern Strategy).
+     * 
+     * @param newStrategy La strategia (es. Sequential, Repeat).
+     */
     public void setStrategy(PlaybackStrategy newStrategy) {
         if (newStrategy != null) {
             this.currentStrategy = newStrategy;
@@ -289,8 +398,10 @@ public class PlaybackManager implements Subject {
     }
 
     /**
-     * Avvia la riproduzione di un singolo elemento Playable.
+     * Avvia immediatamente la riproduzione di un singolo elemento Playable (svuotando la coda precedente).
      * 
+     * @param playable L'elemento da riprodurre.
+     * @param shuffle (Non ancora implementato completamente nella logica di coda).
      */
     public void play(Playable playable, boolean shuffle) {
         if (playable != null) {
@@ -305,15 +416,17 @@ public class PlaybackManager implements Subject {
     }
 
     /**
-     * Carica nel player la lista di elementi Playable e imposta gli indici
-     * sulla traccia selezionata all'interno del Playable corrispondente.
+     * Carica un contesto di riproduzione e seleziona una traccia specifica al suo interno.
+     * 
+     * @param selectedTrack La traccia da cui iniziare.
+     * @param context La lista di elementi Playable che comporranno la coda.
      */
     public void selectAndLoadTrack(Track selectedTrack, List<? extends Playable> context) {
         if (context != null && !context.isEmpty() && selectedTrack != null) {
             this.queue.clear();
             this.queue.addAll(context);
 
-            // Cerchiamo il Playable che contiene la traccia selezionata
+            // Cerchiamo il Playable che contiene la traccia selezionata per impostare gli indici corretti
             for (int i = 0; i < queue.size(); i++) {
                 Playable p = queue.get(i);
                 List<Track> tracks = p.getTracks();
@@ -327,13 +440,17 @@ public class PlaybackManager implements Subject {
                 }
             }
 
-            // Fallback se non trovato
             this.currentPlayableIndex = 0;
             this.currentTrackIndexInPlayable = 0;
         }
     }
 
-    // ---- METODI PRATICI DI LOGICA AUDIO REALISTICA ----
+    // ---- LOGICA DI INTERAZIONE CON IL MEDIA PLAYER REALE ----
+
+    /**
+     * Gestisce l'avvio o la ripresa effettiva dell'audio tramite MediaPlayer.
+     * Si occupa di caricare il file, gestire i loop e le riprese dalla pausa.
+     */
     public void triggerRealPlayback() {
         if (!audioEnabled) {
             System.out.println("[MANAGER - TEST] Riproduzione audio simulata (audio disabilitato).");
@@ -348,7 +465,7 @@ public class PlaybackManager implements Subject {
 
         String filePath = current.getFilePath();
 
-        // Se è la stessa traccia, distinguiamo tra "ripresa dalla pausa" e "riavvio forzato" (es. skip o loop)
+        // Ottimizzazione: se è lo stesso file, gestiamo ripresa o riavvio senza ricreare il MediaPlayer
         if (mediaPlayer != null && filePath.equals(lastPlayedFilePath)) {
             if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                 mediaPlayer.play();
@@ -361,7 +478,7 @@ public class PlaybackManager implements Subject {
             return;
         }
 
-        // Altrimenti, ferma il player precedente e creane uno nuovo
+        // Se il file è diverso, fermiamo e distruggiamo il player precedente
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.dispose();
@@ -371,13 +488,14 @@ public class PlaybackManager implements Subject {
             File file = new File(filePath);
             if (!file.exists()) {
                 System.err.println("[AUDIO PLAYER - ERROR] File non trovato: " + filePath);
-                pressNext();
+                pressNext(); // Salta alla prossima se il file manca
                 return;
             }
             Media media = new Media(file.toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             lastPlayedFilePath = filePath;
 
+            // Al termine della canzone, avanziamo automaticamente (delega allo stato)
             mediaPlayer.setOnEndOfMedia(() -> {
                 System.out.println("[AUDIO PLAYER] Traccia terminata, passo alla prossima.");
                 pressNext();
@@ -385,13 +503,16 @@ public class PlaybackManager implements Subject {
 
             mediaPlayer.play();
             System.out.println("[AUDIO PLAYER] Avvio nuova riproduzione: " + current.getTitle());
-            notifyObservers();
+            notifyObservers(); // Avvisa la UI che la traccia è cambiata
         } catch (Exception e) {
             System.err.println("[AUDIO PLAYER - ERROR] Impossibile riprodurre il file: " + e.getMessage());
             pressNext();
         }
     }
 
+    /**
+     * Ferma fisicamente l'audio.
+     */
     public void triggerRealStop() {
         if (!audioEnabled) return;
         if (mediaPlayer != null) {
@@ -400,6 +521,9 @@ public class PlaybackManager implements Subject {
         }
     }
 
+    /**
+     * Mette fisicamente l'audio in pausa.
+     */
     public void triggerRealPause() {
         if (!audioEnabled) return;
         if (mediaPlayer != null) {
@@ -410,7 +534,8 @@ public class PlaybackManager implements Subject {
         }
     }
 
-    // ---- METODI PER INTERFACCIA GRAFICA ----
+    // ---- METODI DI SUPPORTO E OBSERVER ----
+
     public void setAudioEnabled(boolean enabled) {
         this.audioEnabled = enabled;
     }

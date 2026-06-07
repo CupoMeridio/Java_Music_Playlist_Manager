@@ -1,20 +1,22 @@
 package it.unisa.java_music_playlist_manager.model;
 
 /**
- * Rappresenta un tag associato a un brano musicale.
- * Ogni tag è identificato da un nome e da un'icona (es. un carattere Unicode o un'emoji).
+ * L'interfaccia Tag definisce il contratto per le etichette che possono essere associate alle tracce.
+ * Permette di classificare i brani oltre i metadati standard (genere, album, etc.).
+ * 
+ * In questo progetto, i tag sono composti da un nome descrittivo e da un'icona visuale.
  */
 public interface Tag {
     
     /**
      * Restituisce il nome identificativo del tag.
-     * * @return il nome del tag
+     * @return Il nome del tag.
      */
     public String getName();
     
     /**
-     * Restituisce la rappresentazione grafica o l'icona del tag.
-     * * @return l'icona del tag sotto forma di stringa
+     * Restituisce l'icona o il simbolo associato al tag.
+     * @return L'icona del tag come stringa (es. emoji).
      */
     public String getIcon();
 }

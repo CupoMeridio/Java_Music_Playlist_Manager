@@ -63,10 +63,10 @@ public class PlaylistTest {
         // Tentiamo di aggiungere nuovamente la traccia1 (stesso ID)
         playlist.addTrack(traccia1);
 
-        // La durata totale non deve considerare il duplicato.
-        int durataAttesa = traccia1.getDuration() + traccia2.getDuration(); 
+        // La durata totale DEVE considerare il duplicato secondo i nuovi requisiti.
+        int durataAttesa = traccia1.getDuration() * 2 + traccia2.getDuration(); 
         assertEquals(durataAttesa, playlist.getDuration(), 
-            "La playlist deve impedire l'inserimento di tracce duplicate.");
+            "La playlist deve permettere l'inserimento di tracce duplicate.");
     }
 
     @Test

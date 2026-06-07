@@ -10,11 +10,21 @@ import javafx.scene.control.TextField;
  * Estratto da PrimaryViewController per separare la responsabilità della
  * navigazione laterale dalla gestione della vista principale.
  */
+/**
+ * SidebarController gestisce l'interfaccia della barra di navigazione laterale.
+ * Permette all'utente di passare tra le diverse sezioni dell'applicazione:
+ * Libreria Musicale, Coda di riproduzione e Playlist.
+ * 
+ * Ruolo nel progetto:
+ * - Agisce come emettitore di eventi di navigazione.
+ * - Comunica con il {@link PrimaryViewController} tramite un {@link Consumer} di stringhe,
+ *   disaccoppiando la struttura della barra laterale dalla logica di visualizzazione centrale.
+ */
 public class SidebarController {
 
+    /** Callback per la notifica degli eventi di navigazione al controller principale */
     private Consumer<String> onNavigate;
 
-    // CONTROLLI BARRA LATERALE
     @FXML
     private TextField searchField;
     @FXML
@@ -25,15 +35,16 @@ public class SidebarController {
     private Button playlistButton;
 
     /**
-     * Imposta il callback di navigazione. Il Consumer riceve un identificativo
-     * della vista da attivare ("Musica", "Coda", "Playlist").
-     * @param callback
+     * Imposta il callback di navigazione.
+     * @param callback Un Consumer che accetta l'identificativo della vista ("Musica", "Coda", "Playlist").
      */
     public void setOnNavigate(Consumer<String> callback) {
         this.onNavigate = callback;
     }
 
-    // GESTORI EVENTI BARRA LATERALE
+    // --- Gestori eventi UI ---
+
+    /** Notifica la richiesta di visualizzazione della Libreria Musicale. */
     @FXML
     private void handleMusicLibraryAction() {
         if (onNavigate != null) {
@@ -41,6 +52,7 @@ public class SidebarController {
         }
     }
 
+    /** Notifica la richiesta di visualizzazione della Coda di Riproduzione. */
     @FXML
     private void handlePlayQueueAction() {
         if (onNavigate != null) {
@@ -48,6 +60,7 @@ public class SidebarController {
         }
     }
 
+    /** Notifica la richiesta di visualizzazione dell'elenco delle Playlist. */
     @FXML
     private void handlePlaylistAction() {
         if (onNavigate != null) {
