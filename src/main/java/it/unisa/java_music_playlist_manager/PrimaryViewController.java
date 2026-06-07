@@ -38,14 +38,12 @@ import it.unisa.java_music_playlist_manager.model.Tag;
 import java.util.Set;
 
 /**
- * Controller per la gestione della vista principale (primaryView.fxml).
- * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di gestione eventi
- * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e NetBeans.
- */
-/**
  * PrimaryViewController è il coordinatore principale dell'interfaccia utente.
  * Gestisce l'area centrale dell'applicazione, inclusa la visualizzazione delle tracce,
  * delle playlist e della coda di riproduzione.
+ * 
+ * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di gestione eventi
+ * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e NetBeans.
  * 
  * Ruolo nel progetto:
  * - Agisce come Controller principale che integra i sotto-controller (Sidebar e PlayerBar).
