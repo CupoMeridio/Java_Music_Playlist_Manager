@@ -463,9 +463,17 @@ public class PrimaryViewController implements Observer {
         albumCol.setPrefWidth(150);
         albumCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAlbum()));
 
-        TableColumn<Track, Integer> yearCol = new TableColumn<>("Anno");
+        TableColumn<Track, String> yearCol = new TableColumn<>("Anno");
         yearCol.setPrefWidth(80);
-        yearCol.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getYear()).asObject());
+        yearCol.setCellValueFactory(data -> {
+            Integer year = data.getValue().getYear();
+
+            if (year == null) {
+                return new SimpleStringProperty("");
+            }
+
+            return new SimpleStringProperty(String.valueOf(year));
+        });
 
         TableColumn<Track, String> genreCol = new TableColumn<>("Genere");
         genreCol.setPrefWidth(120);

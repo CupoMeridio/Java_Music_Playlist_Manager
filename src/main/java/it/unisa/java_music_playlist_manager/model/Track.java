@@ -35,12 +35,12 @@ public final class Track implements Playable, Subject {
     private String filePath;
     private int duration; // secondi
     private String genre;
-    private int year;
+    private Integer year;
     
     private Set<Tag> tags;
 
     // COSTRUTTORE CON CONTROLLI INTEGRITà
-    public Track(String title, String author, String album, int duration, String genre, int year, String filePath) {
+    public Track(String title, String author, String album, int duration, String genre, Integer year, String filePath) {
         this.id = UUID.randomUUID().toString();
         setTitle(title);
         setAuthor(author);
@@ -58,7 +58,7 @@ public final class Track implements Playable, Subject {
     public String getFilePath() { return filePath; }
     public int getDuration() { return duration; }
     public String getGenre() { return genre; }
-    public int getYear() { return year; }
+    public Integer getYear() { return year; }
 
 
     public void addTag( Tag tag){
@@ -126,13 +126,17 @@ public final class Track implements Playable, Subject {
         notifyObservers();
     }
 
-    public void setYear(int year) {
+    public void setYear(Integer year) {
         int thisYear = LocalDate.now().getYear();
-        if (year < 0 || year > thisYear) {
-            this.year = thisYear; // Fallback all'anno corrente o 0
+
+        if (year == null) {
+            this.year = null;
+        } else if (year > thisYear) {
+            throw new IllegalArgumentException("L'anno non può essere nel futuro.");
         } else {
             this.year = year;
         }
+
         notifyObservers();
     }
 

@@ -118,8 +118,12 @@ public class AddTrackController {
             addTrackTitleField.setText(currentEditingTrack.getTitle());
             addTrackAuthorField.setText(currentEditingTrack.getAuthor());
             addTrackAlbumField.setText(currentEditingTrack.getAlbum());
-            extractedDuration = currentEditingTrack.getDuration();
-            addTrackYearField.setText(String.valueOf(currentEditingTrack.getYear()));
+            extractedDuration = currentEditingTrack.getDuration(); 
+            if (currentEditingTrack.getYear() == null) {
+                addTrackYearField.setText("");
+            } else {
+                addTrackYearField.setText(String.valueOf(currentEditingTrack.getYear()));
+            }
             addTrackGenreComboBox.setValue(currentEditingTrack.getGenre());
             
             // Gestione file audio reale
@@ -190,7 +194,7 @@ public class AddTrackController {
                 return;
             }
 
-            int year = 0;
+            Integer year = null;
             if (!yearText.isEmpty()) {
                 try {
                     year = Integer.parseInt(yearText);
