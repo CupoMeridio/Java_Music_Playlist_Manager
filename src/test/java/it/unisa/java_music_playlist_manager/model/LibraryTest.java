@@ -165,7 +165,7 @@ public class LibraryTest {
         library.addTrack(track1);
         library.addTrack(track2);
 
-        Playlist playlist = new Playlist("Preferiti");
+        ManualPlaylist playlist = new ManualPlaylist("Preferiti");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
 
@@ -186,8 +186,8 @@ public class LibraryTest {
     // Test accesso sicuro alle playlist
     @Test
     public void testGetPlaylistsRitornaCopia() {
-        Playlist playlist1 = new Playlist("Rock");
-        Playlist playlist2 = new Playlist("Pop");
+        ManualPlaylist playlist1 = new ManualPlaylist("Rock");
+        ManualPlaylist playlist2 = new ManualPlaylist("Pop");
 
         library.addPlaylist(playlist1);
 

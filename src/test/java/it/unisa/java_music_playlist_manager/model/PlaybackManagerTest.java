@@ -53,7 +53,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testSkipForwardInsidePlaylistThenNextPlayable() {
-        Playlist playlist = new Playlist("Playlist A");
+        ManualPlaylist playlist = new ManualPlaylist("Playlist A");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
 
@@ -76,7 +76,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testPreviousPlayableReturnsToFirstTrackOfPreviousQueueElement() {
-        Playlist playlist = new Playlist("Playlist A");
+        ManualPlaylist playlist = new ManualPlaylist("Playlist A");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
 
@@ -92,7 +92,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testPreviousPlayableSkipsEmptyPlaylistBackward() {
-        Playlist emptyPlaylist = new Playlist("Vuota");
+        ManualPlaylist emptyPlaylist = new ManualPlaylist("Vuota");
 
         manager.setQueue(List.of(track1, emptyPlaylist, track2));
 
@@ -105,7 +105,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testAdvanceTrackAtEndOfPlaylistMovesToNextQueueElement() {
-        Playlist playlist = new Playlist("Playlist A");
+        ManualPlaylist playlist = new ManualPlaylist("Playlist A");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
 
@@ -142,7 +142,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testRegressTrackFromSingleTrackReturnsToLastTrackOfPreviousPlaylist() {
-        Playlist playlist = new Playlist("Playlist A");
+        ManualPlaylist playlist = new ManualPlaylist("Playlist A");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
 
@@ -171,7 +171,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testRegressTrackSkipsEmptyPlaylistBackward() {
-        Playlist emptyPlaylist = new Playlist("Vuota");
+        ManualPlaylist emptyPlaylist = new ManualPlaylist("Vuota");
 
         manager.setQueue(List.of(track1, emptyPlaylist, track2));
         manager.advanceTrack();
@@ -187,7 +187,7 @@ public class PlaybackManagerTest {
 
     @Test
     public void testEmptyPlaylistIsSkippedWhenQueueStarts() {
-        Playlist emptyPlaylist = new Playlist("Vuota");
+        ManualPlaylist emptyPlaylist = new ManualPlaylist("Vuota");
 
         manager.setQueue(List.of(emptyPlaylist, track1));
 

@@ -48,7 +48,7 @@ public class LibraryCascadeRemovalTest {
         assertEquals(0, conteggioIniziale, "La libreria deve essere inizialmente vuota per questo test.");
 
         // Creazione della playlist con dati conformi e validi (gli spazi laterali sono accettati dal dominio)
-        Playlist playlistValida = new Playlist("  I Miei Classici Rock  ");
+        ManualPlaylist playlistValida = new ManualPlaylist("  I Miei Classici Rock  ");
 
         // Azione: Registrazione della playlist all'interno del catalogo di sistema
         library.addPlaylist(playlistValida);
@@ -68,8 +68,8 @@ public class LibraryCascadeRemovalTest {
     @Test
     public void testRimozionePlaylistDiminuisceConteggioGlobale() {
         // Creazione e inserimento di due playlist distinte nel sistema
-        Playlist playlist1 = new Playlist("Playlist Rock");
-        Playlist playlist2 = new Playlist("Playlist Pop");
+        ManualPlaylist playlist1 = new ManualPlaylist("Playlist Rock");
+        ManualPlaylist playlist2 = new ManualPlaylist("Playlist Pop");
         library.addPlaylist(playlist1);
         library.addPlaylist(playlist2);
         
@@ -93,7 +93,7 @@ public class LibraryCascadeRemovalTest {
     public void testRimozioneVerificaLibrary() {
         // Preparazione dei dati di test in uno scenario isolato e controllato
         Track tracciaDaRimuovere = new Track("Anarchy in the U.K.", "Sex Pistols", "Never Mind the Bollocks, Here's the Sex Pistols", 212, "Punk", 1976, "path1.mp3");
-        Playlist playlistContenitore = new Playlist("Punk Rock Playlist");
+        ManualPlaylist playlistContenitore = new ManualPlaylist("Punk Rock Playlist");
 
         // Costruzione dei legami: la traccia fa parte sia del catalogo che della specifica playlist
         library.addTrack(tracciaDaRimuovere);
@@ -138,7 +138,7 @@ public class LibraryCascadeRemovalTest {
         library.addTrack(track2);
 
         // Creazione di una playlist che raggruppa queste due tracce
-        Playlist playlist = new Playlist("Rock Anthems");
+        ManualPlaylist playlist = new ManualPlaylist("Rock Anthems");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
         library.addPlaylist(playlist);

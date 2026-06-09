@@ -4,16 +4,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PlaylistTest {
+public class ManualPlaylistTest {
 
-    private Playlist playlist;
+    private ManualPlaylist playlist;
     private Track traccia1;
     private Track traccia2;
 
     @BeforeEach
     public void setUp() {
         // Inizializzazione pulita prima di ogni singolo test
-        playlist = new Playlist("Classici Rock");
+        playlist = new ManualPlaylist("Classici Rock");
         traccia1 = new Track("Whole Lotta Love", "Led Zeppelin", "Led Zeppelin II", 334, "Rock", 1969, "path1.mp3");
         traccia2 = new Track("Paranoid", "Black Sabbath", "Paranoid", 170, "Metal", 1970, "path2.mp3");
     }
@@ -25,7 +25,7 @@ public class PlaylistTest {
     @Test
     public void testCostruttoreEsetTitleConSpaziValidi() {
         // Testiamo che una playlist con spazi consentiti venga creata correttamente
-        Playlist plConSpazi = new Playlist("  Miei Brani Preferiti  ");
+        ManualPlaylist plConSpazi = new ManualPlaylist("  Miei Brani Preferiti  ");
         assertEquals("  Miei Brani Preferiti  ", plConSpazi.getTitle(), 
             "Gli spazi intenzionali all'inizio e alla fine devono essere preservati.");
     }
@@ -33,21 +33,21 @@ public class PlaylistTest {
     @Test
     public void testCostruttoreTitoloNulloLanciaEccezione() {
         assertThrows(IllegalArgumentException.class, () -> {
-            new Playlist(null);
+            new ManualPlaylist(null);
         }, "Il titolo nullo deve lanciare IllegalArgumentException.");
     }
 
     @Test
     public void testCostruttoreTitoloVuotoLanciaEccezione() {
         assertThrows(IllegalArgumentException.class, () -> {
-            new Playlist("");
+            new ManualPlaylist("");
         }, "Il titolo vuoto deve lanciare IllegalArgumentException.");
     }
 
     @Test
     public void testCostruttoreSoloSpaziLanciaEccezione() {
         assertThrows(IllegalArgumentException.class, () -> {
-            new Playlist("     ");
+            new ManualPlaylist("     ");
         }, "Un titolo di soli spazi deve essere rifiutato anche se non si usa il trim sul valore finale.");
     }
 
@@ -87,14 +87,14 @@ public class PlaylistTest {
 
     @Test
     public void testCalcoloDurataPlaylistVuota() {
-        Playlist playlistVuota = new Playlist("Vuota");
+        ManualPlaylist playlistVuota = new ManualPlaylist("Vuota");
         assertEquals(0, playlistVuota.getDuration(), 
             "Una playlist senza brani deve avere durata pari a 0 secondi.");
     }
 
     @Test
     public void testPlaylistAnnidataRestituisceTutteLeTracce() {
-        Playlist playlistAnnidata = new Playlist("Annidata");
+        ManualPlaylist playlistAnnidata = new ManualPlaylist("Annidata");
         playlistAnnidata.addTrack(traccia2);
         playlist.addTrack(traccia1);
         playlist.add(playlistAnnidata);
@@ -113,7 +113,7 @@ public class PlaylistTest {
 
     @Test
     public void testPlaylistNonPuoCreareCicliIndiretti() {
-        Playlist playlistAnnidata = new Playlist("Annidata");
+        ManualPlaylist playlistAnnidata = new ManualPlaylist("Annidata");
         playlist.add(playlistAnnidata);
 
         assertThrows(IllegalArgumentException.class, () -> playlistAnnidata.add(playlist),
