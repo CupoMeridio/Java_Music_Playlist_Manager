@@ -461,6 +461,24 @@ public class PlaybackManager implements Subject {
         }
     }
 
+    /**
+     * Forza l'avvio della riproduzione dal brano attualmente indicizzato nella coda.
+     * A differenza di {@link #pressPlay()}, ignora lo stato corrente e avvia sempre
+     * una nuova riproduzione dall'inizio del brano, resettando lo slider del tempo a zero.
+     *
+     * Usato quando l'utente seleziona esplicitamente un brano diverso (es. doppio click sulla coda).
+     * Chiamare {@link #setCurrentIndices(int, int)} prima di questo metodo per posizionare la coda.
+     */
+    public void forcePlayCurrent() {
+        if (queue.isEmpty()) return;
+        // Ferma l'audio corrente, forza lo stato su Playing e avvia la nuova traccia dall'inizio.
+        triggerRealStop();
+        // Forza il ricaricamento del MediaPlayer per garantire il reset completo (slider a 0 e avvio pulito)
+        lastPlayedFilePath = null;
+        changeState(new PlayingState());
+        triggerRealPlayback();
+    }
+
     // ---- LOGICA DI INTERAZIONE CON IL MEDIA PLAYER REALE ----
 
     /**
