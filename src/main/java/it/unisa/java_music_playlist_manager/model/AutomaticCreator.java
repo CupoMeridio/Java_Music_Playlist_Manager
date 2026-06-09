@@ -9,7 +9,7 @@ import java.util.Optional;
  * Per rispettare il Factory Method base, prende un parametro per decidere 
  * se usare Genre o Year (oppure offre due metodi factory distinti).
  */
-public class AutomaticGenerator implements PlaylistCreator {
+public class AutomaticCreator implements PlaylistCreator {
 
     public enum Type {
         GENRE,
@@ -18,7 +18,7 @@ public class AutomaticGenerator implements PlaylistCreator {
 
     private final Type type;
 
-    public AutomaticGenerator(Type type) {
+    public AutomaticCreator(Type type) {
         this.type = type;
     }
 

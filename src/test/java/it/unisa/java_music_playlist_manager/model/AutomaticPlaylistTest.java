@@ -13,8 +13,8 @@ public class AutomaticPlaylistTest {
     private Track trackRock;
     private Track track2020;
     private Track track2023;
-    private AutomaticGenerator generatorGenre;
-    private AutomaticGenerator generatorYear;
+    private AutomaticCreator generatorGenre;
+    private AutomaticCreator generatorYear;
 
     @BeforeEach
     public void setUp() {
@@ -25,8 +25,8 @@ public class AutomaticPlaylistTest {
         track2020 = new Track("Song 2020", "Artist", "Album", 180, "Pop", 2020, "path3.mp3");
         track2023 = new Track("Song 2023", "Artist", "Album", 190, "Pop", 2023, "path4.mp3");
 
-        generatorGenre = new AutomaticGenerator(AutomaticGenerator.Type.GENRE);
-        generatorYear = new AutomaticGenerator(AutomaticGenerator.Type.YEAR);
+        generatorGenre = new AutomaticCreator(AutomaticCreator.Type.GENRE);
+        generatorYear = new AutomaticCreator(AutomaticCreator.Type.YEAR);
     }
 
     @AfterEach

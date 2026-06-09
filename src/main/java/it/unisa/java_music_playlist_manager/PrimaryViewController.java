@@ -6,8 +6,8 @@ import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.ManualCreator;
-import it.unisa.java_music_playlist_manager.model.AutomaticGenerator;
-import it.unisa.java_music_playlist_manager.model.AutomaticPlaylist;
+import it.unisa.java_music_playlist_manager.model.AutomaticCreator;
+
 import java.util.ArrayList;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
@@ -879,7 +879,7 @@ public class PrimaryViewController implements Observer {
      * @param genre Genere scelto dall'utente.
      */
     private void generateAutomaticPlaylistByGenre(String genre) {
-        Optional<Playlist> result = new AutomaticGenerator(AutomaticGenerator.Type.GENRE).generateIfNotEmpty(
+        Optional<Playlist> result = new AutomaticCreator(AutomaticCreator.Type.GENRE).generateIfNotEmpty(
                 genre,
                 Library.getInstance()::getTracks
         );
@@ -904,7 +904,7 @@ public class PrimaryViewController implements Observer {
      * @param year Anno scelto dall'utente.
      */
     private void generateAutomaticPlaylistByYear(Integer year) {
-        Optional<Playlist> result = new AutomaticGenerator(AutomaticGenerator.Type.YEAR).generateIfNotEmpty(
+        Optional<Playlist> result = new AutomaticCreator(AutomaticCreator.Type.YEAR).generateIfNotEmpty(
                 String.valueOf(year),
                 Library.getInstance()::getTracks
         );
