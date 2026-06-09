@@ -183,8 +183,6 @@ public class PrimaryViewController implements Observer {
     @FXML
     private Button actionButton;
     @FXML
-    private Button shufflePlayButton;
-    @FXML
     private Button playPlaylistButton;
     @FXML
     private ComboBox<String> sortComboBox;
@@ -1032,11 +1030,6 @@ public class PrimaryViewController implements Observer {
             refreshTableData();
             updateTablePlaceholder();
         }
-    }
-
-    @FXML
-    private void handleShufflePlayAction() {
-        // Logica per lo shuffle (da implementare nel PlaybackManager)
     }
 
     /** Avvia la riproduzione immediata della playlist selezionata. */
