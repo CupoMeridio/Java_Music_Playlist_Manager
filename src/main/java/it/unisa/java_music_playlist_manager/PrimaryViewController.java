@@ -1070,14 +1070,20 @@ public class PrimaryViewController implements Observer {
             if (currentOpenedPlaylist != null && !currentOpenedPlaylist.getTracks().isEmpty()) {
                 manager.selectAndLoadTrack(currentOpenedPlaylist.getTracks().get(0), List.of(currentOpenedPlaylist));
             } else if (!Library.getInstance().getTracks().isEmpty()) {
-                manager.selectAndLoadTrack(Library.getInstance().getTracks().get(0), Library.getInstance().getTracks());
+               Track firstTrack = Library.getInstance().getTracks().get(0);
+               manager.selectAndLoadTrack(firstTrack,List.of(firstTrack));
             }
         }
 
         // Se c'è una selezione e non siamo nella coda, imposta il contesto di riproduzione
         if (selectedItem instanceof Track selectedTrack && !"Coda di riproduzione".equals(viewTitleLabel.getText())) {
-            if (currentOpenedPlaylist != null) manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
-            else manager.selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
+            if (currentOpenedPlaylist != null) {
+                // Da una playlist aperta: il contesto è l'intera playlist (comportamento corretto)
+                manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
+            } else {
+                // Dalla libreria: avvia SOLO il brano selezionato, non tutta la libreria
+                manager.selectAndLoadTrack(selectedTrack, List.of(selectedTrack));
+            }
         }
 
         manager.pressPlay();

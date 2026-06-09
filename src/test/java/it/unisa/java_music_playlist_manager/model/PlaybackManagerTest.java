@@ -303,4 +303,38 @@ public class PlaybackManagerTest {
         // Verifichiamo che gli indici siano rimasti coerenti
         assertEquals(1, manager.getCurrentPlayableIndex());
     }
+
+    @Test
+    public void testSelectAndLoadTrackFromLibraryEnqueuesSingleTrack() {
+        // Simula il nuovo comportamento: play dalla libreria carica SOLO il brano selezionato
+        manager.selectAndLoadTrack(track2, List.of(track2));
+
+        assertEquals(1, manager.getCurrentQueue().size(),
+                "La coda deve contenere esattamente 1 elemento quando si avvia un brano dalla libreria");
+        assertEquals(track2, manager.getCurrentTrack(),
+                "La traccia corrente deve essere quella selezionata");
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+    }
+
+    @Test
+    public void testSelectAndLoadTrackFromPlaylistEnqueuesFullPlaylist() {
+        // Simula il comportamento dalla playlist: il contesto è la playlist intera
+        ManualPlaylist playlist = new ManualPlaylist("Playlist Test");
+        playlist.addTrack(track1);
+        playlist.addTrack(track2);
+        playlist.addTrack(track3);
+
+        manager.selectAndLoadTrack(track2, List.of(playlist));
+
+        assertEquals(1, manager.getCurrentQueue().size(),
+                "La coda deve contenere 1 Playable (la playlist)");
+        assertEquals(track2, manager.getCurrentTrack(),
+                "La traccia corrente deve essere quella selezionata dentro la playlist");
+        assertEquals(0, manager.getCurrentPlayableIndex());
+        assertEquals(1, manager.getCurrentTrackIndexInPlayable(),
+                "L'indice della traccia dentro la playlist deve essere 1 (track2 è la seconda)");
+    }
+
+
 }
