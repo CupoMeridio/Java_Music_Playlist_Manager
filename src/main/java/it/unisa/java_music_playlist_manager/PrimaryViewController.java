@@ -905,19 +905,6 @@ public class PrimaryViewController implements Observer {
         );
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per genere: ");
-
-        if (result.isPresent()) {
-            saveGeneratedPlaylist(
-                    result.get(),
-                    "Playlist automatica creata per genere: "
-            );
-        } else {
-            showInfoAlert(
-                    "Nessun brano trovato",
-                    "Playlist automatica non creata",
-                    "Non ci sono brani con il genere selezionato."
-            );
-        }
     }
 
     /**
@@ -932,18 +919,7 @@ public class PrimaryViewController implements Observer {
         );
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per anno: ");
-        if (result.isPresent()) {
-            saveGeneratedPlaylist(
-                    result.get(),
-                    "Playlist automatica creata per anno: "
-            );
-        } else {
-            showInfoAlert(
-                    "Nessun brano trovato",
-                    "Playlist automatica non creata",
-                    "Non ci sono brani per l'anno selezionato."
-            );
-        }
+
     }
 
     /**
