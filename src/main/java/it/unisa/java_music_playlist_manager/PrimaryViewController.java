@@ -414,23 +414,6 @@ public class PrimaryViewController implements Observer {
             removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView || !isEditable);
             removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView && isEditable);
         });
-
-        songTableView.setOnMouseClicked(event -> {
-            Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-            if (event.getClickCount() == 2) {
-                if (currentOpenedPlaylist == null
-                        && "Playlist".equals(viewTitleLabel.getText())
-                        && selectedItem instanceof Playlist playlist) {
-                    openPlaylistDetail(playlist);
-                } else if (selectedItem instanceof Track track) {
-                    // Doppio click su una traccia: avvia la riproduzione di quel brano specifico
-                    handleStartTrackPlayback(track);
-                }
-            }
-        });
-
-        updatePlayerUI();
-        System.out.println("Interfaccia grafica inizializzata correttamente.");
     }
 
     @FXML
@@ -586,7 +569,6 @@ public class PrimaryViewController implements Observer {
 
     // --- Metodi per la configurazione dinamica delle colonne della TableView ---
 
-    @SuppressWarnings("unchecked")
     private void showQueueColumns() {
         songTableView.setVisible(false);
         songTableView.setManaged(false);
@@ -751,7 +733,7 @@ public class PrimaryViewController implements Observer {
     /**
      * Apre il dialogo per creare una playlist vuota.
      *
-     * La playlist vuota viene creata tramite ManualCreator
+     * La playlist vuota viene creata tramite ManualPlaylistGenerator
      * e può essere modificata manualmente dall'utente.
      */
     private void openCreateEmptyPlaylistDialog() {

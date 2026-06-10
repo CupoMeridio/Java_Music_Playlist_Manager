@@ -1,8 +1,5 @@
 package it.unisa.java_music_playlist_manager.model;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
  * Classe responsabile della creazione delle playlist.
  *

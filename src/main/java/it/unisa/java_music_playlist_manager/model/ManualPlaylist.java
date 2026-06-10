@@ -1,8 +1,6 @@
 package it.unisa.java_music_playlist_manager.model;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * La classe Playlist rappresenta una collezione di elementi riproducibili (Playable).

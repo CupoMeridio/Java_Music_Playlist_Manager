@@ -13,8 +13,6 @@ public class ManualPlaylistGeneratorTest {
 
     private Library library;
     private ManualPlaylistGenerator playlistGenerator;
-    private Track trackPop2020;
-    private Track trackRock1975;
 
     public ManualPlaylistGeneratorTest() {
     }
@@ -34,9 +32,6 @@ public class ManualPlaylistGeneratorTest {
 
         // essendo Library singleton, ottengo sempre la stessa istanza
         library = Library.getInstance();
-
-        trackPop2020 = new Track("Blinding Lights", "The Weeknd", "After Hours", 200, "Pop", 2020, "path1.mp3");
-        trackRock1975 = new Track("Bohemian Rhapsody", "Queen", "A Night at the Opera", 354, "Rock", 1975, "path2.mp3");
     }
 
     @AfterEach

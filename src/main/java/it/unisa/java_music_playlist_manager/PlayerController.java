@@ -3,7 +3,6 @@ package it.unisa.java_music_playlist_manager;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
-import it.unisa.java_music_playlist_manager.model.SequentialStrategy;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
