@@ -125,8 +125,14 @@ public class ManualPlaylist extends Playlist {
      * 
      * @param track La traccia da aggiungere.
      */
+    @Override
     public void addTrack(Track track) {
         add(track);
+    }
+
+    @Override
+    public boolean isManuallyEditable() {
+        return true;
     }
 
    

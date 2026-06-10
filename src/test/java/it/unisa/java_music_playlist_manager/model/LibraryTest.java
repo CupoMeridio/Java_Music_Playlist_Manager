@@ -49,8 +49,8 @@ public class LibraryTest {
             library.removeTrack(t);
         }
         
-        List<ManualPlaylist> currentPlaylists = library.getPlaylists();
-        for (ManualPlaylist p : currentPlaylists) {
+        List<Playlist> currentPlaylists = library.getPlaylists();
+        for (Playlist p : currentPlaylists) {
             library.removePlaylist(p);
         }
     }
@@ -187,12 +187,12 @@ public class LibraryTest {
     @Test
     public void testGetPlaylistsRitornaCopia() {
         ManualPlaylist playlist1 = new ManualPlaylist("Rock");
-        ManualPlaylist playlist2 = new ManualPlaylist("Pop");
+        Playlist playlist2 = new ManualPlaylist("Pop");
 
         library.addPlaylist(playlist1);
 
         // Ottengo la lista restituita dalla Library e provo a modificarla
-        List<ManualPlaylist> copiaPlaylists = library.getPlaylists();
+        List<Playlist> copiaPlaylists = library.getPlaylists();
         copiaPlaylists.add(playlist2);
 
         // Verifico che la lista interna della Library non sia stata modificata

@@ -61,6 +61,18 @@ public abstract class Playlist implements Playable {
         throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
     }
 
+    public void addTrack(Track track) {
+        throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
+    }
+
+    /**
+     * Indica se questa playlist supporta modifiche manuali (aggiunta/rimozione brani).
+     * @return true se è modificabile manualmente, false altrimenti
+     */
+    public boolean isManuallyEditable() {
+        return false;
+    }
+
     /**
      * Forza le sottoclassi a implementare la logica con cui espongono i brani,
      * rispettando il contratto dell'interfaccia Playable.

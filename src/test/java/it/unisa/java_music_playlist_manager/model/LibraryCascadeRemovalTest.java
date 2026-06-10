@@ -32,8 +32,8 @@ public class LibraryCascadeRemovalTest {
             library.removeTrack(t);
         }
 
-        List<ManualPlaylist> copiePlaylist = library.getPlaylists(); 
-        for (ManualPlaylist p : copiePlaylist) {
+        List<Playlist> copiePlaylist = library.getPlaylists(); 
+        for (Playlist p : copiePlaylist) {
             library.removePlaylist(p);
         }
     }

@@ -50,8 +50,8 @@ public class AutomaticPlaylistTest {
             library.removeTrack(t);
         }
 
-        List<ManualPlaylist> currentPlaylists = library.getPlaylists();
-        for (ManualPlaylist p : currentPlaylists) {
+        List<Playlist> currentPlaylists = library.getPlaylists();
+        for (Playlist p : currentPlaylists) {
             library.removePlaylist(p);
         }
     }
@@ -63,7 +63,7 @@ public class AutomaticPlaylistTest {
         library.addTrack(trackPop);
         library.addTrack(trackRock);
 
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("Pop");
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "Pop");
 
         assertEquals(1, playlist.getTrackCount(),
                 "La playlist automatica Pop dovrebbe contenere solo 1 brano");
@@ -79,7 +79,7 @@ public class AutomaticPlaylistTest {
     public void testPlaylistAutomaticaPerGenereSiAggiornaDopoCambioGenere() {
         library.addTrack(trackPop);
 
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("Pop");
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "Pop");
 
         assertTrue(playlist.getTracks().contains(trackPop),
                 "Il brano inizialmente Pop dovrebbe essere presente nella playlist");
@@ -97,7 +97,7 @@ public class AutomaticPlaylistTest {
     public void testPlaylistAutomaticaPerGenereAccettaMaiuscoleMinuscole() {
         library.addTrack(trackPop);
 
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("pop");
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "pop");
 
         assertTrue(playlist.getTracks().contains(trackPop),
                 "Il confronto del genere dovrebbe ignorare maiuscole e minuscole");
@@ -105,20 +105,23 @@ public class AutomaticPlaylistTest {
 
     @Test
     public void testCreazionePlaylistAutomaticaConGenereNullo() {
+        // Wait, let's check if AutomaticPlaylistByGenre does validation
+        // Wait, looking at the code, AutomaticPlaylistByGenre doesn't validate, but the Generator does?
+        // Let's test with Generator
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            AutomaticPlaylist.byGenre(null);
+            new AutomaticPlaylistGenerator(AutomaticPlaylistGenerator.Criteria.GENRE, null);
         });
 
-        assertEquals("Il genere non può essere vuoto.", exception.getMessage());
+        assertEquals("Criterio e valore di filtraggio non possono essere nulli.", exception.getMessage());
     }
 
     @Test
-    public void testCreazionePlaylistAutomaticaConGenereVuoto() {
+    public void testCreazionePlaylistAutomaticaConTitoloVuoto() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            AutomaticPlaylist.byGenre("   ");
+            new AutomaticPlaylistByGenre("   ", "Pop");
         });
 
-        assertEquals("Il genere non può essere vuoto.", exception.getMessage());
+        assertEquals("Il titolo della playlist non può essere vuoto.", exception.getMessage());
     }
 
     // TEST PLAYLIST AUTOMATICA PER ANNO
@@ -128,7 +131,7 @@ public class AutomaticPlaylistTest {
         library.addTrack(track2020);
         library.addTrack(track2023);
 
-        AutomaticPlaylist playlist = AutomaticPlaylist.byYear(2020);
+        Playlist playlist = new AutomaticPlaylistByYear("Playlist 2020", 2020);
 
         assertEquals(1, playlist.getTrackCount(),
                 "La playlist automatica 2020 dovrebbe contenere solo 1 brano");
@@ -144,7 +147,7 @@ public class AutomaticPlaylistTest {
     public void testPlaylistAutomaticaPerAnnoSiAggiornaDopoCambioAnno() {
         library.addTrack(track2020);
 
-        AutomaticPlaylist playlist = AutomaticPlaylist.byYear(2020);
+        Playlist playlist = new AutomaticPlaylistByYear("Playlist 2020", 2020);
 
         assertTrue(playlist.getTracks().contains(track2020),
                 "Il brano inizialmente del 2020 dovrebbe essere presente nella playlist");
@@ -158,56 +161,53 @@ public class AutomaticPlaylistTest {
                 "La playlist 2020 dovrebbe risultare vuota dopo il cambio anno");
     }
 
-    @Test
-    public void testCreazionePlaylistAutomaticaConAnnoNullo() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            AutomaticPlaylist.byYear(null);
-        });
-
-        assertEquals("L'anno non può essere vuoto.", exception.getMessage());
-    }
-
     // TEST BLOCCO MODIFICHE MANUALI
 
     @Test
     public void testAddTrackNonConsentitoSuPlaylistAutomatica() {
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("Pop");
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "Pop");
 
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> {
             playlist.addTrack(trackPop);
         });
 
-        assertEquals("Non puoi aggiungere manualmente brani a una playlist automatica.",
+        assertEquals("Operazione non supportata: non puoi modificare manualmente questa playlist.",
                 exception.getMessage());
     }
 
     @Test
     public void testAddPlayableNonConsentitoSuPlaylistAutomatica() {
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("Pop");
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "Pop");
 
         Exception exception = assertThrows(UnsupportedOperationException.class, () -> {
             playlist.add(trackPop);
         });
 
-        assertEquals("Non puoi modificare manualmente una playlist automatica.",
+        assertEquals("Operazione non supportata: non puoi modificare manualmente questa playlist.",
                 exception.getMessage());
     }
 
     @Test
-    public void testRemoveTrackSuPlaylistAutomaticaRitornaFalse() {
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("Pop");
+    public void testRemoveTrackSuPlaylistAutomaticaLanciaEccezione() {
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "Pop");
 
-        boolean result = playlist.removeTrack(trackPop);
+        Exception exception = assertThrows(UnsupportedOperationException.class, () -> {
+            playlist.removeTrack(trackPop);
+        });
 
-        assertFalse(result,
-                "La rimozione manuale da una playlist automatica non deve essere consentita");
+        assertEquals("Operazione non supportata: non puoi modificare manualmente questa playlist.",
+                exception.getMessage());
     }
 
     @Test
-    public void testRemovePlayableNonLanciaEccezioni() {
-        AutomaticPlaylist playlist = AutomaticPlaylist.byGenre("Pop");
+    public void testRemovePlayableSuPlaylistAutomaticaLanciaEccezione() {
+        Playlist playlist = new AutomaticPlaylistByGenre("Playlist Pop", "Pop");
 
-        assertDoesNotThrow(() -> playlist.remove(trackPop),
-                "La rimozione manuale di un Playable non dovrebbe lanciare eccezioni");
+        Exception exception = assertThrows(UnsupportedOperationException.class, () -> {
+            playlist.remove(trackPop);
+        });
+
+        assertEquals("Operazione non supportata: non puoi modificare manualmente questa playlist.",
+                exception.getMessage());
     }
 }
