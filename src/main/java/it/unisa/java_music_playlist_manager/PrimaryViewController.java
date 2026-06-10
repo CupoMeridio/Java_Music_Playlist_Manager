@@ -182,8 +182,6 @@ public class PrimaryViewController implements Observer {
     @FXML
     private Button actionButton;
     @FXML
-    private Button shufflePlayButton;
-    @FXML
     private Button playPlaylistButton;
     @FXML
     private ComboBox<String> sortComboBox;
@@ -222,6 +220,8 @@ public class PrimaryViewController implements Observer {
 
         // Collegamento delle callback per la comunicazione tra controller (Mediator-like)
         sidebarController.setOnNavigate(this::handleNavigate);
+        // BUG-FIX: il pulsante Play/Pause deve SOLO alternare pausa/ripresa,
+        // senza considerare l'elemento selezionato nella lista/tabella.
         playerBarController.setOnPlayPauseClicked(() -> handlePlayPauseAction());
         playerBarController.setOnPlayerStateChanged(() -> syncTableSelection());
 
@@ -255,7 +255,8 @@ public class PrimaryViewController implements Observer {
         // Configurazione del menu contestuale dinamico
         setupContextMenu();
 
-        // Gestione del doppio click per navigazione o riproduzione
+        // Gestione del doppio click per navigazione o riproduzione.
+        // Il singolo click seleziona solo visivamente; il doppio click avvia la riproduzione.
         songTableView.setOnMouseClicked(event -> {
             Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
             if (event.getClickCount() == 2) {
@@ -263,8 +264,9 @@ public class PrimaryViewController implements Observer {
                         && "Playlist".equals(viewTitleLabel.getText())
                         && selectedItem instanceof Playlist playlist) {
                     openPlaylistDetail(playlist);
-                } else if (selectedItem instanceof Track) {
-                    handlePlayPauseAction();
+                } else if (selectedItem instanceof Track track) {
+                    // Doppio click su una traccia: avvia la riproduzione di quel brano specifico
+                    handleStartTrackPlayback(track);
                 }
             }
         });
@@ -327,11 +329,12 @@ public class PrimaryViewController implements Observer {
                 if (selected.track != null) {
                     int trackIdx = selected.parentPlayable.getTracks().indexOf(selected.track);
                     PlaybackManager.getInstance().setCurrentIndices(selected.queueIndex, trackIdx);
-                    PlaybackManager.getInstance().pressPlay();
+                    // forcePlayCurrent: ferma l'audio corrente e avvia il brano dall'inizio (slider a 0)
+                    PlaybackManager.getInstance().forcePlayCurrent();
                     updatePlayerUI();
                 } else if (selected.parentPlayable instanceof Playlist && !selected.parentPlayable.getTracks().isEmpty()) {
                     PlaybackManager.getInstance().setCurrentIndices(selected.queueIndex, 0);
-                    PlaybackManager.getInstance().pressPlay();
+                    PlaybackManager.getInstance().forcePlayCurrent();
                     updatePlayerUI();
                 }
             }
@@ -419,8 +422,9 @@ public class PrimaryViewController implements Observer {
                         && "Playlist".equals(viewTitleLabel.getText())
                         && selectedItem instanceof Playlist playlist) {
                     openPlaylistDetail(playlist);
-                } else if (selectedItem instanceof Track) {
-                    handlePlayPauseAction();
+                } else if (selectedItem instanceof Track track) {
+                    // Doppio click su una traccia: avvia la riproduzione di quel brano specifico
+                    handleStartTrackPlayback(track);
                 }
             }
         });
@@ -747,7 +751,7 @@ public class PrimaryViewController implements Observer {
     /**
      * Apre il dialogo per creare una playlist vuota.
      *
-     * La playlist vuota viene creata tramite PlaylistGenerator
+     * La playlist vuota viene creata tramite ManualCreator
      * e può essere modificata manualmente dall'utente.
      */
     private void openCreateEmptyPlaylistDialog() {
@@ -915,6 +919,7 @@ public class PrimaryViewController implements Observer {
         );
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per anno: ");
+
     }
 
     /**
@@ -1022,11 +1027,6 @@ public class PrimaryViewController implements Observer {
         }
     }
 
-    @FXML
-    private void handleShufflePlayAction() {
-        // Logica per lo shuffle (da implementare nel PlaybackManager)
-    }
-
     /** Avvia la riproduzione immediata della playlist selezionata. */
     @FXML
     private void handlePlayPlaylistAction() {
@@ -1038,43 +1038,52 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
-     * Gestisce la logica di avvio riproduzione quando viene cliccato Play o fatto doppio click.
-     * Si occupa di caricare il contesto corretto (tutta la libreria o la playlist corrente).
+     * Gestisce ESCLUSIVAMENTE il toggle Play/Pausa sul brano attualmente in riproduzione.
+     * NON tiene conto dell'elemento selezionato nella tabella o nella lista della coda:
+     * la selezione visiva è indipendente dallo stato di riproduzione.
+     *
+     * Se la coda è vuota e non c'è nessun brano in riproduzione, tenta di caricare
+     * il primo brano disponibile dalla vista corrente come comportamento di fallback.
      */
     private void handlePlayPauseAction() {
         PlaybackManager manager = PlaybackManager.getInstance();
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        
-        if ("Coda di riproduzione".equals(viewTitleLabel.getText()) && queueListView != null) {
-            QueueItem qItem = queueListView.getSelectionModel().getSelectedItem();
-            if (qItem != null && qItem.track != null) {
-                selectedItem = qItem.track;
-                int trackIdx = qItem.parentPlayable.getTracks().indexOf(qItem.track);
-                manager.setCurrentIndices(qItem.queueIndex, trackIdx);
-            } else if (qItem != null && qItem.parentPlayable != null && !qItem.parentPlayable.getTracks().isEmpty()) {
-                selectedItem = qItem.parentPlayable.getTracks().get(0);
-                manager.setCurrentIndices(qItem.queueIndex, 0);
-            } else {
-                selectedItem = null;
-            }
-        }
 
-        // Se non c'è selezione, carica il primo brano della vista corrente
-        if (selectedItem == null && manager.getCurrentQueue().isEmpty()) {
+        // Fallback: se la coda è completamente vuota, carica il primo brano disponibile
+        // dalla vista corrente per consentire l'avvio iniziale della riproduzione.
+        if (manager.getCurrentQueue().isEmpty()) {
             if (currentOpenedPlaylist != null && !currentOpenedPlaylist.getTracks().isEmpty()) {
                 manager.selectAndLoadTrack(currentOpenedPlaylist.getTracks().get(0), List.of(currentOpenedPlaylist));
             } else if (!Library.getInstance().getTracks().isEmpty()) {
-                manager.selectAndLoadTrack(Library.getInstance().getTracks().get(0), Library.getInstance().getTracks());
+                Track firstTrack = Library.getInstance().getTracks().get(0);
+                manager.selectAndLoadTrack(firstTrack, List.of(firstTrack));
             }
         }
 
-        // Se c'è una selezione e non siamo nella coda, imposta il contesto di riproduzione
-        if (selectedItem instanceof Track selectedTrack && !"Coda di riproduzione".equals(viewTitleLabel.getText())) {
-            if (currentOpenedPlaylist != null) manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
-            else manager.selectAndLoadTrack(selectedTrack, Library.getInstance().getTracks());
+        // Delega allo State pattern: PlayingState → pausa, PausedState → riprendi, StoppedState → avvia.
+        // L'elemento selezionato nella UI non influisce su questa azione.
+        manager.pressPlay();
+        updatePlayerUI();
+    }
+
+    /**
+     * Avvia la riproduzione di una traccia specifica scelta dall'utente (es. doppio click sulla tabella).
+     * A differenza di {@link #handlePlayPauseAction()}, questo metodo imposta
+     * il contesto di riproduzione basandosi sulla traccia selezionata.
+     *
+     * @param selectedTrack La traccia da riprodurre immediatamente.
+     */
+    private void handleStartTrackPlayback(Track selectedTrack) {
+        PlaybackManager manager = PlaybackManager.getInstance();
+
+        if (currentOpenedPlaylist != null) {
+            // Da una playlist aperta: il contesto è l'intera playlist
+            manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
+        } else {
+            // Dalla libreria: avvia solo il brano selezionato
+            manager.selectAndLoadTrack(selectedTrack, List.of(selectedTrack));
         }
 
-        manager.pressPlay();
+        manager.forcePlayCurrent();
         updatePlayerUI();
     }
 

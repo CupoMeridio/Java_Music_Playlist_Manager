@@ -104,7 +104,9 @@ public class Library implements Subject{
         if (isRemoved) {
 
             for (Playlist playlist : this.playlists) {
-                playlist.removeTrack(track);
+                if (playlist instanceof ManualPlaylist manualPlaylist) {
+                    manualPlaylist.removeTrack(track);
+                }
             }
 
             notifyObservers(); // Notifica il cambiamento dopo la pulizia a cascata
