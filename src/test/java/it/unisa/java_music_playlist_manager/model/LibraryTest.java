@@ -187,7 +187,7 @@ public class LibraryTest {
     @Test
     public void testGetPlaylistsRitornaCopia() {
         ManualPlaylist playlist1 = new ManualPlaylist("Rock");
-        ManualPlaylist playlist2 = new ManualPlaylist("Pop");
+        Playlist playlist2 = new ManualPlaylist("Pop");
 
         library.addPlaylist(playlist1);
 

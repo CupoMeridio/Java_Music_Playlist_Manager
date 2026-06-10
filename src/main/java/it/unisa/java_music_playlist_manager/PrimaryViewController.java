@@ -5,9 +5,9 @@ import it.unisa.java_music_playlist_manager.model.Playable;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
-import it.unisa.java_music_playlist_manager.model.ManualCreator;
-import it.unisa.java_music_playlist_manager.model.AutomaticCreator;
-
+import it.unisa.java_music_playlist_manager.model.PlaylistGenerator;
+import it.unisa.java_music_playlist_manager.model.ManualPlaylistGenerator;
+import it.unisa.java_music_playlist_manager.model.AutomaticPlaylistGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
@@ -52,8 +52,8 @@ import java.util.HashSet;
  * Ruolo nel progetto:
  * - Agisce come Controller principale che integra i sotto-controller (Sidebar e PlayerBar).
  * - Implementa l'interfaccia {@link Observer} per reagire ai cambiamenti nel Modello (Library e PlaybackManager).
- * - Gestisce la logica di navigazione tra le diverse viste (Musica, Playlist, Coda).
- * - Coordina le operazioni CRUD su tracce e playlist tramite menu contestuali e dialoghi.
+- Gestisce la logica di navigazione tra le diverse viste (Musica, Playlist, Coda).
+- Coordina le operazioni CRUD su tracce e playlist tramite menu contestuali e dialoghi.
  */
 public class PrimaryViewController implements Observer {
 
@@ -62,7 +62,6 @@ public class PrimaryViewController implements Observer {
     
     /** Playlist attualmente aperta nella vista dettaglio */
     private Playlist currentOpenedPlaylist = null;
-    // rimosso playlistGenerator
 
     @FXML
     private ListView<QueueItem> queueListView;
@@ -411,27 +410,10 @@ public class PrimaryViewController implements Observer {
 
             // Logica per la rimozione dalla playlist (solo se siamo in una playlist manuale)
             boolean isPlaylistDetailView = (currentOpenedPlaylist != null);
-            boolean isManualPlaylist = currentOpenedPlaylist instanceof it.unisa.java_music_playlist_manager.model.ManualPlaylist;
-            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView || !isManualPlaylist);
-            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView && isManualPlaylist);
+            boolean isEditable = currentOpenedPlaylist != null && currentOpenedPlaylist.isManuallyEditable();
+            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView || !isEditable);
+            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView && isEditable);
         });
-
-        songTableView.setOnMouseClicked(event -> {
-            Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-            if (event.getClickCount() == 2) {
-                if (currentOpenedPlaylist == null
-                        && "Playlist".equals(viewTitleLabel.getText())
-                        && selectedItem instanceof Playlist playlist) {
-                    openPlaylistDetail(playlist);
-                } else if (selectedItem instanceof Track track) {
-                    // Doppio click su una traccia: avvia la riproduzione di quel brano specifico
-                    handleStartTrackPlayback(track);
-                }
-            }
-        });
-
-        updatePlayerUI();
-        System.out.println("Interfaccia grafica inizializzata correttamente.");
     }
 
     @FXML
@@ -477,8 +459,8 @@ public class PrimaryViewController implements Observer {
     private void handleRemoveFromPlaylist() {
         Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
 
-        if (selectedItem instanceof Track selectedTrack && currentOpenedPlaylist instanceof it.unisa.java_music_playlist_manager.model.ManualPlaylist mp) {
-            mp.removeTrack(selectedTrack);
+        if (selectedItem instanceof Track selectedTrack && currentOpenedPlaylist != null && currentOpenedPlaylist.isManuallyEditable()) {
+            currentOpenedPlaylist.removeTrack(selectedTrack);
             System.out.println("Brano rimosso dalla playlist: " + selectedTrack.getTitle());
             refreshTableData();
             updateTablePlaceholder();
@@ -587,7 +569,6 @@ public class PrimaryViewController implements Observer {
 
     // --- Metodi per la configurazione dinamica delle colonne della TableView ---
 
-    @SuppressWarnings("unchecked")
     private void showQueueColumns() {
         songTableView.setVisible(false);
         songTableView.setManaged(false);
@@ -752,7 +733,7 @@ public class PrimaryViewController implements Observer {
     /**
      * Apre il dialogo per creare una playlist vuota.
      *
-     * La playlist vuota viene creata tramite ManualCreator
+     * La playlist vuota viene creata tramite ManualPlaylistGenerator
      * e può essere modificata manualmente dall'utente.
      */
     private void openCreateEmptyPlaylistDialog() {
@@ -764,7 +745,8 @@ public class PrimaryViewController implements Observer {
 
         dialog.showAndWait().ifPresent(name -> {
             try {
-                Playlist playlist = new ManualCreator().createPlaylist(name, null);
+                PlaylistGenerator generator = new ManualPlaylistGenerator();
+                Playlist playlist = (Playlist) generator.createPlaylist(name);
                 Library.getInstance().addPlaylist(playlist);
                 showPlaylistColumns();
             } catch (IllegalArgumentException e) {
@@ -835,9 +817,17 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Genere:");
         dialog.setGraphic(null);
 
-        Optional<String> result = dialog.showAndWait();
-
-        result.ifPresent(this::generateAutomaticPlaylistByGenre);
+        Optional<String> genreResult = dialog.showAndWait();
+        genreResult.ifPresent(genre -> {
+            TextInputDialog titleDialog = new TextInputDialog("Playlist per " + genre);
+            titleDialog.setTitle("Nome playlist");
+            titleDialog.setHeaderText("Inserisci il nome della playlist");
+            titleDialog.setContentText("Nome:");
+            titleDialog.setGraphic(null);
+            
+            Optional<String> titleResult = titleDialog.showAndWait();
+            titleResult.ifPresent(title -> generateAutomaticPlaylistByGenre(genre, title));
+        });
     }
 
     /**
@@ -872,9 +862,17 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Anno:");
         dialog.setGraphic(null);
 
-        Optional<Integer> result = dialog.showAndWait();
-
-        result.ifPresent(this::generateAutomaticPlaylistByYear);
+        Optional<Integer> yearResult = dialog.showAndWait();
+        yearResult.ifPresent(year -> {
+            TextInputDialog titleDialog = new TextInputDialog("Playlist del " + year);
+            titleDialog.setTitle("Nome playlist");
+            titleDialog.setHeaderText("Inserisci il nome della playlist");
+            titleDialog.setContentText("Nome:");
+            titleDialog.setGraphic(null);
+            
+            Optional<String> titleResult = titleDialog.showAndWait();
+            titleResult.ifPresent(title -> generateAutomaticPlaylistByYear(year, title));
+        });
     }
 
     /**
@@ -882,24 +880,13 @@ public class PrimaryViewController implements Observer {
      *
      * @param genre Genere scelto dall'utente.
      */
-    private void generateAutomaticPlaylistByGenre(String genre) {
-        Optional<Playlist> result = new AutomaticCreator(AutomaticCreator.Type.GENRE).generateIfNotEmpty(
-                genre,
-                Library.getInstance()::getTracks
+    private void generateAutomaticPlaylistByGenre(String genre, String title) {
+        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
+                AutomaticPlaylistGenerator.Criteria.GENRE,
+                genre
         );
-
-        if (result.isPresent()) {
-            saveGeneratedPlaylist(
-                    result.get(),
-                    "Playlist automatica creata per genere: "
-            );
-        } else {
-            showInfoAlert(
-                    "Nessun brano trovato",
-                    "Playlist automatica non creata",
-                    "Non ci sono brani con il genere selezionato."
-            );
-        }
+        Playlist playlist = (Playlist) generator.createPlaylist(title);
+        saveGeneratedPlaylist(playlist, "Playlist automatica creata per genere: ");
     }
 
     /**
@@ -907,24 +894,14 @@ public class PrimaryViewController implements Observer {
      *
      * @param year Anno scelto dall'utente.
      */
-    private void generateAutomaticPlaylistByYear(Integer year) {
-        Optional<Playlist> result = new AutomaticCreator(AutomaticCreator.Type.YEAR).generateIfNotEmpty(
-                String.valueOf(year),
-                Library.getInstance()::getTracks
+    private void generateAutomaticPlaylistByYear(Integer year, String title) {
+        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
+                AutomaticPlaylistGenerator.Criteria.YEAR,
+                year
         );
+        Playlist playlist = (Playlist) generator.createPlaylist(title);
+        saveGeneratedPlaylist(playlist, "Playlist automatica creata per anno: ");
 
-        if (result.isPresent()) {
-            saveGeneratedPlaylist(
-                    result.get(),
-                    "Playlist automatica creata per anno: "
-            );
-        } else {
-            showInfoAlert(
-                    "Nessun brano trovato",
-                    "Playlist automatica non creata",
-                    "Non ci sono brani per l'anno selezionato."
-            );
-        }
     }
 
     /**
@@ -979,7 +956,7 @@ public class PrimaryViewController implements Observer {
         List<Playlist> playlists = new ArrayList<>();
 
         for (Playlist playlist : Library.getInstance().getPlaylists()) {
-            if (playlist instanceof it.unisa.java_music_playlist_manager.model.ManualPlaylist) {
+            if (playlist.isManuallyEditable()) {
                 playlists.add(playlist);
             }
         }
@@ -1000,8 +977,8 @@ public class PrimaryViewController implements Observer {
 
         Optional<Playlist> result = dialog.showAndWait();
         result.ifPresent(playlist -> {
-            if (playlist instanceof it.unisa.java_music_playlist_manager.model.ManualPlaylist mp) {
-                mp.addTrack(selectedTrack);
+            if (playlist.isManuallyEditable()) {
+                playlist.addTrack(selectedTrack);
                 Library.getInstance().notifyObservers();
             }
         });

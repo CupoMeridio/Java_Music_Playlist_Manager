@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * Suite di test unitari automatizzati per verificare l'integrità del modello
- * Library, la gestione dei contatori globali e le relazioni a cascata (Composite)
- * con le classi Playlist e Track.
+Library, la gestione dei contatori globali e le relazioni a cascata (Composite)
+con le classi ManualPlaylist e Track.
  */
 public class LibraryCascadeRemovalTest {
 
@@ -39,7 +39,7 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 1: Inserimento Playlist e Incremento Contatore Globale (Dati Validi)
+    // TEST 1: Inserimento ManualPlaylist e Incremento Contatore Globale (Dati Validi)
     // ====================================================================================
     @Test
     public void testInserimentoEIncrementoConteggioGlobalePlaylist() {
@@ -63,7 +63,7 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 2: Diminuzione del Numero di Playlist Totali alla Rimozione
+    // TEST 2: Diminuzione del Numero di ManualPlaylist Totali alla Rimozione
     // ====================================================================================
     @Test
     public void testRimozionePlaylistDiminuisceConteggioGlobale() {
@@ -87,7 +87,7 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 3: Effetto a Cascata - La Rimozione del Brano Ripulisce le Playlist (Cascade Removal)
+    // TEST 3: Effetto a Cascata - La Rimozione del Brano Ripulisce le ManualPlaylist (Cascade Removal)
     // ====================================================================================
     @Test
     public void testRimozioneVerificaLibrary() {
@@ -118,7 +118,7 @@ public class LibraryCascadeRemovalTest {
         assertFalse(library.getTracks().contains(tracciaDaRimuovere), 
             "La traccia deve essere stata eliminata definitivamente dalla Library.");
 
-        // Proprietà B (Effetto a cascata): La Library ha ripulito autonomamente la Playlist.
+        // Proprietà B (Effetto a cascata): La Library ha ripulito autonomamente la ManualPlaylist.
         // Il brano non deve più risultare associato alla playlist e la durata deve ricalcolarsi a zero.
         assertFalse(playlistContenitore.contains(tracciaDaRimuovere),
             "La traccia deve essere stata eliminata a cascata dall'interno della playlist.");
@@ -127,7 +127,7 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 4: Isolamento dei Cicli di Vita - La Cancellazione della Playlist Preserva i Brani
+    // TEST 4: Isolamento dei Cicli di Vita - La Cancellazione della ManualPlaylist Preserva i Brani
     // ====================================================================================
     @Test
     public void testEliminazionePlaylistPreservaBraniInLibreria() {

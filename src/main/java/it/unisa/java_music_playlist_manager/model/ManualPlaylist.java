@@ -1,8 +1,6 @@
 package it.unisa.java_music_playlist_manager.model;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 /**
  * La classe Playlist rappresenta una collezione di elementi riproducibili (Playable).
@@ -13,49 +11,30 @@ import java.util.UUID;
  * - Composite (Composite): Playlist funge da contenitore che può ospitare altri
  *   oggetti Playable. Implementa i metodi della componente per gestire i figli.
  */
-public class ManualPlaylist implements Playlist {
-    
-    /** Titolo della playlist */
-    private String title; 
-    
+public class ManualPlaylist extends Playlist {
     /** Lista degli elementi contenuti (tracce o altre playlist) */
     private final List<Playable> elements;
     
-    /** Identificativo univoco della playlist */
-    private final String id;
 
     /**
-     * Costruttore della classe ManualPlaylist.
+     * Costruttore della classe Playlist.
      * 
      * @param title Il nome da assegnare alla playlist.
      */
     public ManualPlaylist(String title) {
-        this.id = UUID.randomUUID().toString();
-        this.setTitle(title);
+        super(title);
         this.elements = new ArrayList<>();
-    }
-
-    /**
-     * Imposta il titolo della playlist.
-     * 
-     * @param title Il nuovo titolo.
-     * @throws IllegalArgumentException Se il titolo è nullo o vuoto.
-     */
-    public void setTitle(String title) {
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Il nome della playlist non può essere vuoto o nullo.");
-        }
-        this.title = title;
     }
 
     /**
      * Aggiunge un elemento Playable alla playlist.
      * Gestisce i controlli per evitare ricorsioni infinite o auto-contenimento.
      * 
-     * @param element L'elemento (Track o Playlist) da aggiungere.
+     * @param element L'elemento (Track o ManualPlaylist) da aggiungere.
      * @throws IllegalArgumentException Se l'elemento è nullo, se è la playlist stessa,
      *                                  o se creerebbe un ciclo di dipendenze.
      */
+    @Override
     public void add(Playable element) {
         if (element == null) {
             throw new IllegalArgumentException("Impossibile aggiungere un componente nullo.");
@@ -77,11 +56,20 @@ public class ManualPlaylist implements Playlist {
      * 
      * @param element L'elemento da rimuovere.
      */
+    @Override
     public void remove(Playable element) {
         if (element == null) {
-            return;
+            return ;
         }
         elements.remove(element);
+    }
+    
+    @Override
+    public void removeTrack(Track track){
+        if (track == null) {
+            return ;
+        }
+        elements.remove(track);
     }
 
     /**
@@ -113,15 +101,7 @@ public class ManualPlaylist implements Playlist {
         return false;
     }
 
-    /**
-     * Restituisce il numero totale di tracce contenute, includendo quelle nelle sottoplaylist.
-     * 
-     * @return Il conteggio totale delle tracce.
-     */
-    public int getTrackCount() {
-        return getTracks().size();
-    }
-
+    
     /**
      * Implementazione del metodo dell'interfaccia Playable (Pattern Composite).
      * Raccoglie ricorsivamente tutte le tracce presenti nella playlist e nelle sue sottoplaylist.
@@ -143,60 +123,15 @@ public class ManualPlaylist implements Playlist {
      * 
      * @param track La traccia da aggiungere.
      */
+    @Override
     public void addTrack(Track track) {
         add(track);
     }
 
-    /**
-     * Metodo di utilità per rimuovere specificamente una Track.
-     * 
-     * @param track La traccia da rimuovere.
-     * @return true se la traccia è stata rimossa, false altrimenti.
-     */
-    public boolean removeTrack(Track track) {
-        if (track == null) return false;
-        return elements.remove(track);
+    @Override
+    public boolean isManuallyEditable() {
+        return true;
     }
 
-    @Override
-    public String getTitle() {
-        return this.title;
-    }
-
-    /**
-     * Calcola la durata totale della playlist sommando le durate di tutte le tracce contenute.
-     * 
-     * @return La durata totale in secondi.
-     */
-    public int getDuration() {
-        int duration = 0;
-        for (Track t : getTracks()) {
-            duration += t.getDuration();
-        }
-        return duration;
-    }
-    
-    /**
-     * Verifica l'uguaglianza tra due playlist basandosi sull'identificativo univoco (id).
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ManualPlaylist playlist = (ManualPlaylist) o;
-        return Objects.equals(id, playlist.id);
-    }
-
-    /**
-     * Genera l'hashcode basandosi sull'id univoco della playlist.
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return title;
-    }
+   
 }

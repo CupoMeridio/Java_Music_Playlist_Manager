@@ -24,10 +24,10 @@ public class ManualPlaylistTest {
 
     @Test
     public void testCostruttoreEsetTitleConSpaziValidi() {
-        // Testiamo che una playlist con spazi consentiti venga creata correttamente
+        // Testiamo che il costruttore trimmi gli spazi vuoti
         ManualPlaylist plConSpazi = new ManualPlaylist("  Miei Brani Preferiti  ");
-        assertEquals("  Miei Brani Preferiti  ", plConSpazi.getTitle(), 
-            "Gli spazi intenzionali all'inizio e alla fine devono essere preservati.");
+        assertEquals("Miei Brani Preferiti", plConSpazi.getTitle(), 
+            "Gli spazi all'inizio e alla fine devono essere rimossi (trimmed).");
     }
 
     @Test
@@ -74,11 +74,15 @@ public class ManualPlaylistTest {
         playlist.addTrack(traccia1);
         playlist.addTrack(traccia2);
         
-        boolean rimosso = playlist.removeTrack(traccia1);
+        assertEquals(2, playlist.getTrackCount(), "La playlist dovrebbe avere 2 tracce prima della rimozione");
         
-        assertTrue(rimosso, "La rimozione di un elemento esistente deve restituire true.");
+        playlist.removeTrack(traccia1);
+        
+        assertEquals(1, playlist.getTrackCount(), "La playlist dovrebbe avere 1 traccia dopo la rimozione");
+        assertFalse(playlist.getTracks().contains(traccia1), "La traccia rimossa non dovrebbe essere più presente");
+        assertTrue(playlist.getTracks().contains(traccia2), "L'altra traccia dovrebbe essere ancora presente");
         assertEquals(traccia2.getDuration(), playlist.getDuration(), 
-            "Dopo la rimozione, la durata deve aggiornarsi dinamicamente.");
+                "Dopo la rimozione, la durata dovrebbe aggiornarsi dinamicamente");
     }
 
     // ==========================================
