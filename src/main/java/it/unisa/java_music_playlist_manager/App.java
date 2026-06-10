@@ -28,8 +28,6 @@ public class App extends Application {
         // Il sistema operativo sceglierà automaticamente la dimensione più adatta.
         loadAppIcons(stage);
         
-        // Caricamento dati di test (silenzioso se il file non esiste)
-        it.unisa.java_music_playlist_manager.model.TestDataLoader.loadTestData("test_tracks.json");
         
         stage.setScene(scene);
         stage.show();
