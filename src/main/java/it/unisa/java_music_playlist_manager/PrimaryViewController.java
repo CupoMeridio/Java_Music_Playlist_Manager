@@ -40,6 +40,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import it.unisa.java_music_playlist_manager.model.Tag;
 import java.util.Set;
 import java.util.HashSet;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.Tooltip;
 
 /**
  * PrimaryViewController è il coordinatore principale dell'interfaccia utente.
@@ -670,31 +673,58 @@ public class PrimaryViewController implements Observer {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
-    private javafx.scene.control.TableCell<Track, Set<Tag>> createTagCellFactory() {
-        return new javafx.scene.control.TableCell<>() {
-            @Override
-            protected void updateItem(Set<Tag> tags, boolean empty) {
-                super.updateItem(tags, empty);
-                if (empty || tags == null || tags.isEmpty()) {
-                    setGraphic(null);
-                } else {
-                    javafx.scene.layout.FlowPane flowPane = new javafx.scene.layout.FlowPane(5, 4);
-                    tags.forEach(tag -> {
-                        if (tag == null) return;
-                        Label badge = new Label(tag.getIcon());
-                        badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
-                        
-                        // Aggiunge un tooltip per mostrare il nome del tag al passaggio del mouse
-                        javafx.scene.control.Tooltip tooltip = new javafx.scene.control.Tooltip("Tag: " + tag.getName());
-                        javafx.scene.control.Tooltip.install(badge, tooltip);
-                        
-                        flowPane.getChildren().add(badge);
-                    });
-                    setGraphic(flowPane);
-                }
-            }
-        };
+  private TableCell<Track, Set<Tag>> createTagCellFactory() {
+    return new TableCell<>() {
+        
+        // 1. Dichiariamo i componenti UI fuori dall'updateItem per ottimizzare le prestazioni
+        private final HBox container = new HBox(5);
+        private final ScrollPane scrollPane = new ScrollPane(container);
+
+        // Blocco di inizializzazione della cella
+        {
+            // Impostiamo l'allineamento del contenitore
+            container.setStyle("-fx-alignment: center-left; -fx-padding: 2 0;");
+            
+            // Configuriamo lo ScrollPane per scorrere solo in orizzontale
+            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Niente barra verticale
+            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Niente barra verticale
+            scrollPane.setPannable(true);
+            scrollPane.setFitToHeight(true);
+            scrollPane.setPannable(true); // Permette di scorrere trascinando con il mouse
+            
+            // Rimuoviamo i bordi e lo sfondo di default dello ScrollPane per farlo integrare nella cella
+            scrollPane.setStyle("-fx-background-color: transparent; -fx-control-inner-background: transparent; -fx-background-insets: 0; -fx-padding: 0;");
+            
     }
+
+        @Override
+        protected void updateItem(Set<Tag> tags, boolean empty) {
+            super.updateItem(tags, empty);
+            
+            if (empty || tags == null || tags.isEmpty()) {
+                setGraphic(null);
+            } else {
+                // 2. Svuotiamo i vecchi tag invece di creare un nuovo contenitore
+                container.getChildren().clear();
+                
+                tags.forEach(tag -> {
+                    if (tag == null) return;
+                    
+                    Label badge = new Label(tag.getIcon());
+                    badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
+                    
+                    Tooltip tooltip = new Tooltip("Tag: " + tag.getName());
+                    Tooltip.install(badge, tooltip);
+                    
+                    container.getChildren().add(badge);
+                });
+                
+                // 3. Impostiamo lo ScrollPane come grafica della cella
+                setGraphic(scrollPane);
+            }
+        }
+    };
+}
 
     /**
      * Naviga all'interno di una playlist specifica per mostrarne il contenuto.
