@@ -41,8 +41,6 @@
             <!-- Barra di Controllo Playlist / Ordinamento -->
             <HBox alignment="CENTER_LEFT" spacing="15.0">
                <children>
-                  <!-- Pulsante Riproduzione Casuale Completa -->
-                  <Button fx:id="shufflePlayButton" onAction="#handleShufflePlayAction" style="-fx-font-weight: bold;" text="Riproduzione casuale" />
                   <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" style="-fx-font-weight: bold;" text="Riproduci Playlist" />
                   
                   <!-- Spaziatore per spingere gli ordinamenti a destra -->
