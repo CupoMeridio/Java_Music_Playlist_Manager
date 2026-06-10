@@ -7,6 +7,7 @@ import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.PlaylistGenerator;
 import it.unisa.java_music_playlist_manager.model.AutomaticPlaylist;
+import it.unisa.java_music_playlist_manager.model.ManualPlaylistGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import javafx.fxml.FXMLLoader;
@@ -51,8 +52,8 @@ import java.util.HashSet;
  * Ruolo nel progetto:
  * - Agisce come Controller principale che integra i sotto-controller (Sidebar e PlayerBar).
  * - Implementa l'interfaccia {@link Observer} per reagire ai cambiamenti nel Modello (Library e PlaybackManager).
- * - Gestisce la logica di navigazione tra le diverse viste (Musica, Playlist, Coda).
- * - Coordina le operazioni CRUD su tracce e playlist tramite menu contestuali e dialoghi.
+- Gestisce la logica di navigazione tra le diverse viste (Musica, Playlist, Coda).
+- Coordina le operazioni CRUD su tracce e playlist tramite menu contestuali e dialoghi.
  */
 public class PrimaryViewController implements Observer {
 
@@ -61,7 +62,7 @@ public class PrimaryViewController implements Observer {
     
     /** Playlist attualmente aperta nella vista dettaglio */
     private Playlist currentOpenedPlaylist = null;
-    private final PlaylistGenerator playlistGenerator = new PlaylistGenerator();
+    private final PlaylistGenerator playlistGenerator = new ManualPlaylistGenerator();
 
     @FXML
     private ListView<QueueItem> queueListView;

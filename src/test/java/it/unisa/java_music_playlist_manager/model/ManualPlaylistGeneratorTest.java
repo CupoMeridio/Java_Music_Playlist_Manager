@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class PlaylistGeneratorTest {
+public class ManualPlaylistGeneratorTest {
 
     private Library library;
-    private PlaylistGenerator playlistGenerator;
+    private ManualPlaylistGenerator playlistGenerator;
     private Track trackPop2020;
     private Track trackRock1975;
 
-    public PlaylistGeneratorTest() {
+    public ManualPlaylistGeneratorTest() {
     }
 
     @BeforeAll
@@ -31,7 +31,7 @@ public class PlaylistGeneratorTest {
     @BeforeEach
     public void setUp() {
         // creo il generator da testare
-        playlistGenerator = new PlaylistGenerator();
+        playlistGenerator = new ManualPlaylistGenerator();
 
         // essendo Library singleton, ottengo sempre la stessa istanza
         library = Library.getInstance();
@@ -50,8 +50,8 @@ public class PlaylistGeneratorTest {
             library.removeTrack(t);
         }
 
-        List<Playlist> currentPlaylists = library.getPlaylists();
-        for (Playlist p : currentPlaylists) {
+        List<ManualPlaylist> currentPlaylists = library.getPlaylists();
+        for (ManualPlaylist p : currentPlaylists) {
             library.removePlaylist(p);
         }
     }
@@ -60,7 +60,7 @@ public class PlaylistGeneratorTest {
 
     @Test
     public void testCreateEmptyPlaylistValida() {
-        Playlist playlist = playlistGenerator.createEmptyPlaylist("Preferiti");
+        ManualPlaylist playlist = playlistGenerator.createEmptyPlaylist("Preferiti");
 
         assertNotNull(playlist, "La playlist creata non dovrebbe essere nulla");
         assertEquals("Preferiti", playlist.getTitle(), "La playlist dovrebbe avere il titolo indicato");
@@ -92,7 +92,7 @@ public class PlaylistGeneratorTest {
         library.addTrack(trackPop2020);
         library.addTrack(trackRock1975);
 
-        Optional<Playlist> result = playlistGenerator.createPlaylistByGenre("Pop", library.getTracks());
+        Optional<ManualPlaylist> result = playlistGenerator.createPlaylistByGenre("Pop", library.getTracks());
 
         assertTrue(result.isPresent(), "La playlist automatica Pop dovrebbe essere creata");
         assertTrue(result.get() instanceof AutomaticPlaylist,
@@ -115,7 +115,7 @@ public class PlaylistGeneratorTest {
     public void testCreatePlaylistByGenreSenzaBraniCompatibili() {
         library.addTrack(trackRock1975);
 
-        Optional<Playlist> result = playlistGenerator.createPlaylistByGenre("Pop", library.getTracks());
+        Optional<ManualPlaylist> result = playlistGenerator.createPlaylistByGenre("Pop", library.getTracks());
 
         assertTrue(result.isEmpty(),
                 "Se non ci sono brani del genere scelto, il risultato dovrebbe essere Optional.empty");
@@ -155,7 +155,7 @@ public class PlaylistGeneratorTest {
         library.addTrack(trackPop2020);
         library.addTrack(trackRock1975);
 
-        Optional<Playlist> result = playlistGenerator.createPlaylistByYear(2020, library.getTracks());
+        Optional<ManualPlaylist> result = playlistGenerator.createPlaylistByYear(2020, library.getTracks());
 
         assertTrue(result.isPresent(), "La playlist automatica 2020 dovrebbe essere creata");
         assertTrue(result.get() instanceof AutomaticPlaylist,
@@ -178,7 +178,7 @@ public class PlaylistGeneratorTest {
     public void testCreatePlaylistByYearSenzaBraniCompatibili() {
         library.addTrack(trackRock1975);
 
-        Optional<Playlist> result = playlistGenerator.createPlaylistByYear(2020, library.getTracks());
+        Optional<ManualPlaylist> result = playlistGenerator.createPlaylistByYear(2020, library.getTracks());
 
         assertTrue(result.isEmpty(),
                 "Se non ci sono brani dell'anno scelto, il risultato dovrebbe essere Optional.empty");
@@ -208,11 +208,11 @@ public class PlaylistGeneratorTest {
     public void testPlaylistGenerataPerGenereSiAggiornaDinamicamente() {
         library.addTrack(trackPop2020);
 
-        Optional<Playlist> result = playlistGenerator.createPlaylistByGenre("Pop", library.getTracks());
+        Optional<ManualPlaylist> result = playlistGenerator.createPlaylistByGenre("Pop", library.getTracks());
 
         assertTrue(result.isPresent(), "La playlist Pop dovrebbe essere creata");
 
-        Playlist playlist = result.get();
+        ManualPlaylist playlist = result.get();
 
         assertTrue(playlist.getTracks().contains(trackPop2020),
                 "Il brano Pop dovrebbe essere inizialmente presente");
@@ -227,11 +227,11 @@ public class PlaylistGeneratorTest {
     public void testPlaylistGenerataPerAnnoSiAggiornaDinamicamente() {
         library.addTrack(trackPop2020);
 
-        Optional<Playlist> result = playlistGenerator.createPlaylistByYear(2020, library.getTracks());
+        Optional<ManualPlaylist> result = playlistGenerator.createPlaylistByYear(2020, library.getTracks());
 
         assertTrue(result.isPresent(), "La playlist 2020 dovrebbe essere creata");
 
-        Playlist playlist = result.get();
+        ManualPlaylist playlist = result.get();
 
         assertTrue(playlist.getTracks().contains(trackPop2020),
                 "Il brano del 2020 dovrebbe essere inizialmente presente");

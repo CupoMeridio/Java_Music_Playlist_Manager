@@ -50,8 +50,8 @@ public class AutomaticPlaylistTest {
             library.removeTrack(t);
         }
 
-        List<Playlist> currentPlaylists = library.getPlaylists();
-        for (Playlist p : currentPlaylists) {
+        List<ManualPlaylist> currentPlaylists = library.getPlaylists();
+        for (ManualPlaylist p : currentPlaylists) {
             library.removePlaylist(p);
         }
     }

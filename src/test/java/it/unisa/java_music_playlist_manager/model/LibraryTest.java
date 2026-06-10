@@ -49,8 +49,8 @@ public class LibraryTest {
             library.removeTrack(t);
         }
         
-        List<Playlist> currentPlaylists = library.getPlaylists();
-        for (Playlist p : currentPlaylists) {
+        List<ManualPlaylist> currentPlaylists = library.getPlaylists();
+        for (ManualPlaylist p : currentPlaylists) {
             library.removePlaylist(p);
         }
     }
@@ -165,7 +165,7 @@ public class LibraryTest {
         library.addTrack(track1);
         library.addTrack(track2);
 
-        Playlist playlist = new Playlist("Preferiti");
+        ManualPlaylist playlist = new ManualPlaylist("Preferiti");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
 
@@ -186,13 +186,13 @@ public class LibraryTest {
     // Test accesso sicuro alle playlist
     @Test
     public void testGetPlaylistsRitornaCopia() {
-        Playlist playlist1 = new Playlist("Rock");
-        Playlist playlist2 = new Playlist("Pop");
+        ManualPlaylist playlist1 = new ManualPlaylist("Rock");
+        ManualPlaylist playlist2 = new ManualPlaylist("Pop");
 
         library.addPlaylist(playlist1);
 
         // Ottengo la lista restituita dalla Library e provo a modificarla
-        List<Playlist> copiaPlaylists = library.getPlaylists();
+        List<ManualPlaylist> copiaPlaylists = library.getPlaylists();
         copiaPlaylists.add(playlist2);
 
         // Verifico che la lista interna della Library non sia stata modificata

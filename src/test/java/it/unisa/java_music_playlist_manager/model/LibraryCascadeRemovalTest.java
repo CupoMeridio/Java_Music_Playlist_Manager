@@ -7,8 +7,8 @@ import java.util.List;
 
 /**
  * Suite di test unitari automatizzati per verificare l'integrità del modello
- * Library, la gestione dei contatori globali e le relazioni a cascata (Composite)
- * con le classi Playlist e Track.
+Library, la gestione dei contatori globali e le relazioni a cascata (Composite)
+con le classi ManualPlaylist e Track.
  */
 public class LibraryCascadeRemovalTest {
 
@@ -32,14 +32,14 @@ public class LibraryCascadeRemovalTest {
             library.removeTrack(t);
         }
 
-        List<Playlist> copiePlaylist = library.getPlaylists(); 
-        for (Playlist p : copiePlaylist) {
+        List<ManualPlaylist> copiePlaylist = library.getPlaylists(); 
+        for (ManualPlaylist p : copiePlaylist) {
             library.removePlaylist(p);
         }
     }
 
     // ====================================================================================
-    // TEST 1: Inserimento Playlist e Incremento Contatore Globale (Dati Validi)
+    // TEST 1: Inserimento ManualPlaylist e Incremento Contatore Globale (Dati Validi)
     // ====================================================================================
     @Test
     public void testInserimentoEIncrementoConteggioGlobalePlaylist() {
@@ -48,7 +48,7 @@ public class LibraryCascadeRemovalTest {
         assertEquals(0, conteggioIniziale, "La libreria deve essere inizialmente vuota per questo test.");
 
         // Creazione della playlist con dati conformi e validi (gli spazi laterali sono accettati dal dominio)
-        Playlist playlistValida = new Playlist("  I Miei Classici Rock  ");
+        ManualPlaylist playlistValida = new ManualPlaylist("  I Miei Classici Rock  ");
 
         // Azione: Registrazione della playlist all'interno del catalogo di sistema
         library.addPlaylist(playlistValida);
@@ -63,13 +63,13 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 2: Diminuzione del Numero di Playlist Totali alla Rimozione
+    // TEST 2: Diminuzione del Numero di ManualPlaylist Totali alla Rimozione
     // ====================================================================================
     @Test
     public void testRimozionePlaylistDiminuisceConteggioGlobale() {
         // Creazione e inserimento di due playlist distinte nel sistema
-        Playlist playlist1 = new Playlist("Playlist Rock");
-        Playlist playlist2 = new Playlist("Playlist Pop");
+        ManualPlaylist playlist1 = new ManualPlaylist("Playlist Rock");
+        ManualPlaylist playlist2 = new ManualPlaylist("Playlist Pop");
         library.addPlaylist(playlist1);
         library.addPlaylist(playlist2);
         
@@ -87,13 +87,13 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 3: Effetto a Cascata - La Rimozione del Brano Ripulisce le Playlist (Cascade Removal)
+    // TEST 3: Effetto a Cascata - La Rimozione del Brano Ripulisce le ManualPlaylist (Cascade Removal)
     // ====================================================================================
     @Test
     public void testRimozioneVerificaLibrary() {
         // Preparazione dei dati di test in uno scenario isolato e controllato
         Track tracciaDaRimuovere = new Track("Anarchy in the U.K.", "Sex Pistols", "Never Mind the Bollocks, Here's the Sex Pistols", 212, "Punk", 1976, "path1.mp3");
-        Playlist playlistContenitore = new Playlist("Punk Rock Playlist");
+        ManualPlaylist playlistContenitore = new ManualPlaylist("Punk Rock Playlist");
 
         // Costruzione dei legami: la traccia fa parte sia del catalogo che della specifica playlist
         library.addTrack(tracciaDaRimuovere);
@@ -118,7 +118,7 @@ public class LibraryCascadeRemovalTest {
         assertFalse(library.getTracks().contains(tracciaDaRimuovere), 
             "La traccia deve essere stata eliminata definitivamente dalla Library.");
 
-        // Proprietà B (Effetto a cascata): La Library ha ripulito autonomamente la Playlist.
+        // Proprietà B (Effetto a cascata): La Library ha ripulito autonomamente la ManualPlaylist.
         // Il brano non deve più risultare associato alla playlist e la durata deve ricalcolarsi a zero.
         assertFalse(playlistContenitore.contains(tracciaDaRimuovere),
             "La traccia deve essere stata eliminata a cascata dall'interno della playlist.");
@@ -127,7 +127,7 @@ public class LibraryCascadeRemovalTest {
     }
 
     // ====================================================================================
-    // TEST 4: Isolamento dei Cicli di Vita - La Cancellazione della Playlist Preserva i Brani
+    // TEST 4: Isolamento dei Cicli di Vita - La Cancellazione della ManualPlaylist Preserva i Brani
     // ====================================================================================
     @Test
     public void testEliminazionePlaylistPreservaBraniInLibreria() {
@@ -138,7 +138,7 @@ public class LibraryCascadeRemovalTest {
         library.addTrack(track2);
 
         // Creazione di una playlist che raggruppa queste due tracce
-        Playlist playlist = new Playlist("Rock Anthems");
+        ManualPlaylist playlist = new ManualPlaylist("Rock Anthems");
         playlist.addTrack(track1);
         playlist.addTrack(track2);
         library.addPlaylist(playlist);
