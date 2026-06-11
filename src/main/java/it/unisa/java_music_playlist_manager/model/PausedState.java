@@ -17,9 +17,11 @@ public class PausedState implements PlaybackState {
             // Torna allo stato PlayingState e riavvia l'audio reale
             context.changeState(new PlayingState());
             context.triggerRealPlayback();
+            context.notifyObservers();
         } else {
             // Se per qualche motivo la traccia non è più valida, torna in STOP
             context.changeState(new StoppedState());
+            context.notifyObservers();
         }
     }
 
@@ -29,6 +31,7 @@ public class PausedState implements PlaybackState {
         context.triggerRealStop();
         context.resetQueue();
         context.changeState(new StoppedState());
+        context.notifyObservers();
     }
 
     @Override
@@ -39,11 +42,13 @@ public class PausedState implements PlaybackState {
         Track nextTrack = context.getCurrentTrack();
         if (nextTrack != null) {
             System.out.println("[STATO: PAUSED] Coda agganciata su: " + nextTrack.getTitle());
+            context.notifyObservers();
         } else {
             // Se la coda finisce, il lettore si resetta e passa in STOP
             System.out.println("[STATO: PAUSED] Fine coda raggiunta. Spengo.");
             context.resetQueue();
             context.changeState(new StoppedState());
+            context.notifyObservers();
         }
     }
 
@@ -55,10 +60,12 @@ public class PausedState implements PlaybackState {
         Track nextTrack = context.getCurrentTrack();
         if (nextTrack != null) {
             System.out.println("[STATO: PAUSED] Coda agganciata sul nuovo blocco: " + nextTrack.getTitle());
+            context.notifyObservers();
         } else {
             System.out.println("[STATO: PAUSED] Fine coda raggiunta. Spengo.");
             context.resetQueue();
             context.changeState(new StoppedState());
+            context.notifyObservers();
         }
     }
 
@@ -70,6 +77,7 @@ public class PausedState implements PlaybackState {
         Track prevTrack = context.getCurrentTrack();
         if (prevTrack != null) {
             System.out.println("[STATO: PAUSED] Coda agganciata su: " + prevTrack.getTitle());
+            context.notifyObservers();
         }
     }
 
@@ -81,6 +89,7 @@ public class PausedState implements PlaybackState {
         Track prevTrack = context.getCurrentTrack();
         if (prevTrack != null) {
             System.out.println("[STATO: PAUSED] Coda agganciata sul blocco precedente: " + prevTrack.getTitle());
+            context.notifyObservers(); 
         }
     }
 }

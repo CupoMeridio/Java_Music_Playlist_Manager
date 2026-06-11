@@ -15,6 +15,7 @@ public class PlayingState implements PlaybackState {
         // Passaggio allo stato PausedState e sospensione dell'audio reale
         context.changeState(new PausedState());
         context.triggerRealPause();
+        context.notifyObservers();
     }
 
     @Override
@@ -24,6 +25,7 @@ public class PlayingState implements PlaybackState {
         context.triggerRealStop();
         context.resetQueue();
         context.changeState(new StoppedState());
+        context.notifyObservers(); 
     }
 
     @Override
@@ -41,6 +43,7 @@ public class PlayingState implements PlaybackState {
             context.triggerRealStop();
             context.resetQueue();
             context.changeState(new StoppedState());
+            context.notifyObservers();
         }
     }
 
@@ -61,6 +64,7 @@ public class PlayingState implements PlaybackState {
             context.triggerRealStop();
             context.resetQueue();
             context.changeState(new StoppedState());
+            context.notifyObservers(); // ← AGGIUNGI ANCHE QUA!
         }
     }
 
