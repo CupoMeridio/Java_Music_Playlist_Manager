@@ -33,6 +33,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Optional;
+import java.util.Locale;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import java.io.IOException;
 import javafx.beans.property.SimpleStringProperty;
@@ -66,6 +67,8 @@ public class PrimaryViewController implements Observer {
     
     /** Playlist attualmente aperta nella vista dettaglio */
     private Playlist currentOpenedPlaylist = null;
+
+    private String searchQuery = "";
 
     @FXML
     private ListView<QueueItem> queueListView;
@@ -107,7 +110,7 @@ public class PrimaryViewController implements Observer {
 
         if (currentOpenedPlaylist != null) {
             // Mostra i brani della playlist attualmente selezionata
-            ObservableList<Track> trackList = FXCollections.observableArrayList(currentOpenedPlaylist.getTracks());
+            ObservableList<Track> trackList = filteredTracks(currentOpenedPlaylist.getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         } else if ("Coda di riproduzione".equals(currentView)) {
             List<QueueItem> items = new ArrayList<>();
@@ -130,7 +133,7 @@ public class PrimaryViewController implements Observer {
             }
         } else if ("Musica".equals(currentView)) {
             // Mostra l'intera libreria musicale
-            ObservableList<Track> trackList = FXCollections.observableArrayList(Library.getInstance().getTracks());
+            ObservableList<Track> trackList = filteredTracks(Library.getInstance().getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         }
     }
@@ -147,7 +150,9 @@ public class PrimaryViewController implements Observer {
         String currentView = viewTitleLabel != null ? viewTitleLabel.getText() : "";
         String placeholderText;
 
-        if ("Playlist".equals(currentView)) {
+        if (!searchQuery.isBlank()) {
+            placeholderText = "Nessun risultato per \"" + searchQuery.trim() + "\".";
+        } else if ("Playlist".equals(currentView)) {
             placeholderText = "Non ci sono playlist. Clicca \"Nuova playlist\" per crearne una.";
         } else if (currentOpenedPlaylist != null) {
             placeholderText = "Questa playlist non contiene brani. Clicca \"Aggiungi brano\" per inserirne uno.";
@@ -236,6 +241,7 @@ public class PrimaryViewController implements Observer {
 
         // Collegamento delle callback per la comunicazione tra controller (Mediator-like)
         sidebarController.setOnNavigate(this::handleNavigate);
+        sidebarController.setOnSearchQueryChange(this::handleSearchQueryChange);
         // BUG-FIX: il pulsante Play/Pause deve SOLO alternare pausa/ripresa,
         // senza considerare l'elemento selezionato nella lista/tabella.
         playerBarController.setOnPlayPauseClicked(() -> handlePlayPauseAction());
@@ -553,6 +559,12 @@ public class PrimaryViewController implements Observer {
     private void handleUndoAction() {
     }
 
+    private void handleSearchQueryChange(String query) {
+        searchQuery = query == null ? "" : query;
+        refreshTableData();
+        updateTablePlaceholder();
+    }
+
     /** Configura la vista per mostrare la schermata Home con le statistiche. */
     private void handleHomeAction() {
         currentOpenedPlaylist = null;
@@ -727,7 +739,7 @@ public class PrimaryViewController implements Observer {
         TableColumn<Playlist, String> durationCol = createColumn("Durata Totale", 150, p -> formatDuration(p.getDuration()));
 
         ((TableView<Playlist>) songTableView).getColumns().addAll(nameCol, countCol, durationCol);
-        ((TableView<Playlist>) songTableView).setItems(FXCollections.observableArrayList(Library.getInstance().getPlaylists()));
+        ((TableView<Playlist>) songTableView).setItems(filteredPlaylists(Library.getInstance().getPlaylists()));
         updateTablePlaceholder();
     }
 
@@ -742,6 +754,69 @@ public class PrimaryViewController implements Observer {
 
     private String formatDuration(int seconds) {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
+    }
+
+    private ObservableList<Track> filteredTracks(List<Track> tracks) {
+        if (searchQuery == null || searchQuery.isBlank()) {
+            return FXCollections.observableArrayList(tracks);
+        }
+
+        return FXCollections.observableArrayList(
+                tracks.stream()
+                        .filter(this::matchesTrackSearch)
+                        .toList()
+        );
+    }
+
+    private ObservableList<Playlist> filteredPlaylists(List<Playlist> playlists) {
+        if (searchQuery == null || searchQuery.isBlank()) {
+            return FXCollections.observableArrayList(playlists);
+        }
+
+        return FXCollections.observableArrayList(
+                playlists.stream()
+                        .filter(this::matchesPlaylistSearch)
+                        .toList()
+        );
+    }
+
+    private boolean matchesTrackSearch(Track track) {
+        String query = normalizedSearchQuery();
+        if (query.isBlank()) {
+            return true;
+        }
+
+        return containsSearch(track.getTitle(), query)
+                || containsSearch(track.getAuthor(), query)
+                || containsSearch(track.getAlbum(), query)
+                || containsSearch(track.getGenre(), query)
+                || containsAnyTag(track, query);
+    }
+
+    private boolean matchesPlaylistSearch(Playlist playlist) {
+        String query = normalizedSearchQuery();
+        return query.isBlank() || containsSearch(playlist.getTitle(), query);
+    }
+
+    private boolean containsAnyTag(Track track, String query) {
+        if (track.getTags() == null) {
+            return false;
+        }
+
+        for (Tag tag : track.getTags()) {
+            if (tag != null && containsSearch(tag.getName(), query)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean containsSearch(String value, String query) {
+        return value != null && value.toLowerCase(Locale.ROOT).contains(query);
+    }
+
+    private String normalizedSearchQuery() {
+        return searchQuery == null ? "" : searchQuery.trim().toLowerCase(Locale.ROOT);
     }
 
   private TableCell<Track, Set<Tag>> createTagCellFactory() {

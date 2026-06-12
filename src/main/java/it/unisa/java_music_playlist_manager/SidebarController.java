@@ -24,6 +24,7 @@ public class SidebarController {
 
     /** Callback per la notifica degli eventi di navigazione al controller principale */
     private Consumer<String> onNavigate;
+    private Consumer<String> onSearchQueryChange;
 
     @FXML
     private TextField searchField;
@@ -42,6 +43,21 @@ public class SidebarController {
      */
     public void setOnNavigate(Consumer<String> callback) {
         this.onNavigate = callback;
+    }
+
+    public void setOnSearchQueryChange(Consumer<String> callback) {
+        this.onSearchQueryChange = callback;
+    }
+
+    @FXML
+    private void initialize() {
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldValue, newValue) -> {
+                if (onSearchQueryChange != null) {
+                    onSearchQueryChange.accept(newValue);
+                }
+            });
+        }
     }
 
     // --- Gestori eventi UI ---
