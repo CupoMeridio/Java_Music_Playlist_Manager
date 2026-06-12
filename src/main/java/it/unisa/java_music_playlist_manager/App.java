@@ -22,31 +22,31 @@ public class App extends Application {
     private static Scene scene;
     private static LibraryDAO saveDAO;
     
-    
+    private static final String CARTELLA_FILE_PATH = "salvataggio/";
+    private static final String SAVE_FILE_PATH = CARTELLA_FILE_PATH+"library.json";
     @Override
     public void init(){
-         saveDAO = new JsonLibraryDAO("salvataggio\\ library.json");
+         saveDAO = new JsonLibraryDAO(SAVE_FILE_PATH);
     }
     
     @Override
     public void start(Stage stage) throws IOException {
+        
+         //Carico il salvataggio vecchio
+        try{
+            saveDAO.load();
+        }catch(Exception e){
+            // Alert
+            gestisciFileCorrotto(e);
+        }
+        System.out.print("Caricamento persistenza andato bene");
         // Caricamento della vista principale tramite il percorso relativo alle risorse.
         // La configurazione utilizza percorsi assoluti rispetto alla root delle risorse
         // per garantire la compatibilità con SceneBuilder e diversi IDE.
         scene = new Scene(loadFXML("/fxml/primaryView"), 1024, 700);
         stage.setTitle("Java Music Playlist Manager");
         
-        //Carico il salvataggio vecchio
-        try{
-            saveDAO.load();
-        }catch(Exception e){
-            // aggiungere alla scena un popUp che scrive l
-            Alert alert = new Alert(Alert.AlertType.ERROR, 
-                "Impossibile caricare la libreria precedente.\nDettagli: " + e.getMessage(), 
-                ButtonType.OK);
-            alert.showAndWait();
-        }
-        
+       
         // Caricamento delle icone dell'applicazione in diverse dimensioni.
         // Il sistema operativo sceglierà automaticamente la dimensione più adatta.
         loadAppIcons(stage);
@@ -94,7 +94,31 @@ public class App extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
+    
+    
+    private void gestisciFileCorrotto(Exception e) {
+        // Puoi usare una costante di classe per "library.json" se vuoi fare un lavoro ancora più pulito
+        java.io.File corruptedFile = new java.io.File(SAVE_FILE_PATH); 
+        
+        if (corruptedFile.exists()) {
+            String backupName = CARTELLA_FILE_PATH+"library_corrupted_" + System.currentTimeMillis() + ".json";
+            java.io.File backupFile = new java.io.File(backupName);
+            
+            // Rinomina il file (sposta i dati rotti al sicuro)
+            corruptedFile.renameTo(backupFile);
+            System.err.println("File corrotto rinominato in: " + backupName); // Log per debug
+        }
 
+        // Mostra l'avviso all'utente
+        Alert alert = new Alert(Alert.AlertType.WARNING, 
+            "Il file di salvataggio precedente risulta danneggiato o illeggibile.\n" +
+            "Per sicurezza, è stata creata una copia di backup del file corrotto.\n" +
+            "L'applicazione verrà avviata con una nuova libreria vuota.\n\n" +
+            "Dettagli errore: " + e.getMessage(), 
+            ButtonType.OK);
+        alert.showAndWait();
+    }
+    
     public static void main(String[] args) {
         launch();
     }

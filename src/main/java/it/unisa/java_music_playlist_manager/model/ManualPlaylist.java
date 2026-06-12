@@ -1,39 +1,30 @@
+
 package it.unisa.java_music_playlist_manager.model;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * La classe Playlist rappresenta una collezione di elementi riproducibili (Playable).
- * Implementa il pattern Composite, permettendo a una playlist di contenere sia
- * singole tracce (Track) che altre playlist, trattandole in modo uniforme.
- * 
- * Pattern utilizzati:
- * - Composite (Composite): Playlist funge da contenitore che può ospitare altri
- *   oggetti Playable. Implementa i metodi della componente per gestire i figli.
- */
 public class ManualPlaylist extends Playlist {
-    /** Lista degli elementi contenuti (tracce o altre playlist) */
+
     private final List<Playable> elements;
     
-
-    /**
-     * Costruttore della classe Playlist.
-     * 
-     * @param title Il nome da assegnare alla playlist.
-     */
-    public ManualPlaylist(String title) {
-        super(title);
-        this.elements = new ArrayList<>();
+    @JsonCreator
+    public ManualPlaylist(
+            @JsonProperty("id") String id,
+            @JsonProperty("title") String title,
+            @JsonProperty("playCount") int playCount,
+            @JsonProperty("elements") List<Playable> elements) {
+        super(id, title, playCount);
+        this.elements = (elements != null) ? elements : new ArrayList<>();
     }
 
-    /**
-     * Aggiunge un elemento Playable alla playlist.
-     * Gestisce i controlli per evitare ricorsioni infinite o auto-contenimento.
-     * 
-     * @param element L'elemento (Track o ManualPlaylist) da aggiungere.
-     * @throws IllegalArgumentException Se l'elemento è nullo, se è la playlist stessa,
-     *                                  o se creerebbe un ciclo di dipendenze.
-     */
+    public ManualPlaylist(String title) {
+        this(null, title, 0, new ArrayList<>());
+    }
+
     @Override
     public void add(Playable element) {
         if (element == null) {
@@ -42,8 +33,6 @@ public class ManualPlaylist extends Playlist {
         if (element == this) {
             throw new IllegalArgumentException("Una playlist non può contenere se stessa.");
         }
-        // Controllo ricorsivo per evitare che la playlist A venga aggiunta alla playlist B
-        // se B è già contenuta in A (direttamente o indirettamente).
         if (element instanceof ManualPlaylist playlist && playlist.containsRecursive(this)) {
             throw new IllegalArgumentException("Impossibile creare una dipendenza ciclica tra playlist.");
         }
@@ -51,11 +40,6 @@ public class ManualPlaylist extends Playlist {
         elements.add(element);
     }
 
-    /**
-     * Rimuove un elemento Playable dalla playlist.
-     * 
-     * @param element L'elemento da rimuovere.
-     */
     @Override
     public void remove(Playable element) {
         if (element == null) {
@@ -82,28 +66,15 @@ public class ManualPlaylist extends Playlist {
         }
         Playable element = elements.remove(fromIndex);
         if (toIndex > fromIndex) {
-            toIndex--; // Adatta l'indice dopo la rimozione se si sposta in avanti
+            toIndex--; 
         }
         elements.add(toIndex, element);
     }
 
-    /**
-     * Verifica se un elemento è contenuto direttamente nella playlist.
-     * 
-     * @param element L'elemento da cercare.
-     * @return true se presente, false altrimenti.
-     */
     public boolean contains(Playable element) {
         return elements.contains(element);
     }
 
-    /**
-     * Verifica ricorsivamente se un elemento è contenuto nella playlist o nelle sue sottoplaylist.
-     * Utilizzato internamente per il controllo dei cicli.
-     * 
-     * @param target L'elemento da cercare.
-     * @return true se trovato in qualsiasi livello della gerarchia, false altrimenti.
-     */
     private boolean containsRecursive(Playable target) {
         for (Playable element : elements) {
             if (element.equals(target)) {
@@ -116,28 +87,15 @@ public class ManualPlaylist extends Playlist {
         return false;
     }
 
-    
-    /**
-     * Implementazione del metodo dell'interfaccia Playable (Pattern Composite).
-     * Raccoglie ricorsivamente tutte le tracce presenti nella playlist e nelle sue sottoplaylist.
-     * 
-     * @return Una lista "appiattita" di tutte le tracce contenute.
-     */
     @Override
     public List<Track> getTracks() {
         List<Track> allTracks = new ArrayList<>();
-        // Sfrutta la ricorsione del Composite per raccogliere tutte le tracce
         for (Playable element : elements) {
             allTracks.addAll(element.getTracks());
         }
         return allTracks;
     }
 
-    /**
-     * Metodo di utilità per aggiungere specificamente una Track.
-     * 
-     * @param track La traccia da aggiungere.
-     */
     @Override
     public void addTrack(Track track) {
         add(track);
@@ -147,6 +105,8 @@ public class ManualPlaylist extends Playlist {
     public boolean isManuallyEditable() {
         return true;
     }
-
-   
+    
+    public List<Playable> getElements() {
+        return elements;
+    }
 }

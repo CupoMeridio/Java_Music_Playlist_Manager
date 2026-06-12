@@ -1,21 +1,30 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package it.unisa.java_music_playlist_manager.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- *
- * @author Mattia Sanzari
- */
 public class AutomaticPlaylistByTag extends Playlist {
-    Tag filterTag;
-    public AutomaticPlaylistByTag(String title, Tag filterTag) {
-        super(title);
+    private Tag filterTag;
+    
+    @JsonCreator
+    public AutomaticPlaylistByTag(
+            @JsonProperty("id") 
+                    String id,
+            @JsonProperty("title") 
+                    String title,
+            @JsonProperty("playCount") 
+                    int playCount,
+            @JsonProperty("filterTag") 
+                    Tag filterTag) {
+        super(id, title, playCount);
         this.filterTag = filterTag;
+    }
+    
+    public AutomaticPlaylistByTag(String title, Tag filterTag) {
+        this(null, title, 0, filterTag);
     }
 
    @Override
@@ -30,4 +39,7 @@ public class AutomaticPlaylistByTag extends Playlist {
                 .collect(Collectors.toList());
     }
     
+    public Tag getFilterTag() {
+        return filterTag;
+    }
 }
