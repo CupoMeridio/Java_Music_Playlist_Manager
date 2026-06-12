@@ -12,5 +12,7 @@ module it.unisa.java_music_playlist_manager {
     opens it.unisa.java_music_playlist_manager.model to javafx.base;
     exports it.unisa.java_music_playlist_manager;
     exports it.unisa.java_music_playlist_manager.model;
+    requires com.fasterxml.jackson.databind;
+    requires com.fasterxml.jackson.datatype.jsr310;
     
 }

@@ -25,7 +25,19 @@
 
     <!-- Librerie utilizzate dal progetto -->
     <dependencies>
+        
+        <!-- Utili per il salvataggio sul file JSON -->
+       <dependency>
+               <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.18.2</version>
+        </dependency>
 
+        <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>2.18.2</version>
+        </dependency>
         <!-- Componenti grafici JavaFX -->
         <dependency>
             <groupId>org.openjfx</groupId>
