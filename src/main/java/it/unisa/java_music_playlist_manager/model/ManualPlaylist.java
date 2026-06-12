@@ -72,6 +72,21 @@ public class ManualPlaylist extends Playlist {
         elements.remove(track);
     }
 
+    @Override
+    public void moveElement(int fromIndex, int toIndex) {
+        if (fromIndex < 0 || fromIndex >= elements.size() || toIndex < 0 || toIndex > elements.size()) {
+            throw new IndexOutOfBoundsException("Indici di spostamento non validi.");
+        }
+        if (fromIndex == toIndex) {
+            return;
+        }
+        Playable element = elements.remove(fromIndex);
+        if (toIndex > fromIndex) {
+            toIndex--; // Adatta l'indice dopo la rimozione se si sposta in avanti
+        }
+        elements.add(toIndex, element);
+    }
+
     /**
      * Verifica se un elemento è contenuto direttamente nella playlist.
      * 

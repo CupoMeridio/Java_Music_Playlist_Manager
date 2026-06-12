@@ -45,6 +45,7 @@
             <HBox fx:id="controlsBar" alignment="CENTER_LEFT" spacing="15.0">
                <children>
                   <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" style="-fx-font-weight: bold;" text="Riproduci Playlist" />
+                  <ToggleButton fx:id="reorderButton" managed="false" text="Riordina" visible="false" />
                   
                   <!-- Spaziatore per spingere gli ordinamenti a destra -->
                   <Region HBox.hgrow="ALWAYS" />

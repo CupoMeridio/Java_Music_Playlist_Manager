@@ -36,6 +36,12 @@ import java.util.Optional;
 import java.util.Locale;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import java.io.IOException;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.TableRow;
+import javafx.scene.input.TransferMode;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import it.unisa.java_music_playlist_manager.model.Tag;
@@ -204,6 +210,8 @@ public class PrimaryViewController implements Observer {
     private HBox controlsBar;
     @FXML
     private Button playPlaylistButton;
+    @FXML
+    private ToggleButton reorderButton;
     @FXML
     private ComboBox<String> sortComboBox;
     @FXML
@@ -574,6 +582,11 @@ public class PrimaryViewController implements Observer {
         controlsBar.setVisible(false);
         controlsBar.setManaged(false);
         playPlaylistButton.setDisable(true);
+        if (reorderButton != null) {
+            reorderButton.setVisible(false);
+            reorderButton.setManaged(false);
+            reorderButton.setSelected(false);
+        }
         genreFilterContainer.setVisible(false);
         genreFilterContainer.setManaged(false);
 
@@ -642,6 +655,11 @@ public class PrimaryViewController implements Observer {
      * Da chiamare all'inizio di ogni metodo di navigazione che non sia la Home.
      */
     private void hideHomePanel() {
+        if (reorderButton != null) {
+            reorderButton.setVisible(false);
+            reorderButton.setManaged(false);
+            reorderButton.setSelected(false);
+        }
         if (homeView != null) {
             homeView.setVisible(false);
             homeView.setManaged(false);
@@ -718,6 +736,61 @@ public class PrimaryViewController implements Observer {
         tagCol.setCellFactory(column -> createTagCellFactory());
 
         ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
+        
+        ((TableView<Track>) songTableView).setRowFactory(tv -> {
+            TableRow<Track> row = new TableRow<>();
+
+            row.setOnDragDetected(event -> {
+                if (!row.isEmpty() && reorderButton != null && reorderButton.isSelected()) {
+                    Integer index = row.getIndex();
+                    Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
+                    db.setDragView(row.snapshot(null, null));
+                    ClipboardContent cc = new ClipboardContent();
+                    cc.putString(String.valueOf(index));
+                    db.setContent(cc);
+                    event.consume();
+                }
+            });
+
+            row.setOnDragOver(event -> {
+                if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
+                    if (row.getIndex() != Integer.parseInt(event.getDragboard().getString())) {
+                        event.acceptTransferModes(TransferMode.MOVE);
+                        event.consume();
+                    }
+                }
+            });
+
+            row.setOnDragEntered(event -> {
+                if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
+                    if (row.getIndex() != Integer.parseInt(event.getDragboard().getString())) {
+                        row.setStyle("-fx-background-color: #dcdcdc;");
+                    }
+                }
+            });
+
+            row.setOnDragExited(event -> {
+                if (reorderButton != null && reorderButton.isSelected()) {
+                    row.setStyle("");
+                }
+            });
+
+            row.setOnDragDropped(event -> {
+                if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
+                    int draggedIndex = Integer.parseInt(event.getDragboard().getString());
+                    int dropIndex = row.isEmpty() ? tv.getItems().size() : row.getIndex();
+
+                    if (currentOpenedPlaylist instanceof ManualPlaylist) {
+                        ((ManualPlaylist) currentOpenedPlaylist).moveElement(draggedIndex, dropIndex);
+                        Library.getInstance().notifyObservers();
+                    }
+                    event.setDropCompleted(true);
+                    event.consume();
+                }
+            });
+
+            return row;
+        });
         
         updateTablePlaceholder();
         refreshTableData();
@@ -882,6 +955,15 @@ public class PrimaryViewController implements Observer {
         actionButton.setManaged(false);
         genreFilterContainer.setVisible(true);
         genreFilterContainer.setManaged(true);
+        if (playlist.isManuallyEditable() && reorderButton != null) {
+            reorderButton.setVisible(true);
+            reorderButton.setManaged(true);
+            reorderButton.setSelected(false);
+        } else if (reorderButton != null) {
+            reorderButton.setVisible(false);
+            reorderButton.setManaged(false);
+            reorderButton.setSelected(false);
+        }
         showSongsColumns();
     }
 
