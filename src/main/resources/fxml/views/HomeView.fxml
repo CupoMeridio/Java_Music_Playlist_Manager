@@ -28,7 +28,7 @@
          <children>
 
             <!-- Card: Totale brani -->
-            <VBox fx:id="cardTotalTracks" spacing="6.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-padding: 20 24;">
+            <VBox fx:id="cardTotalTracks" maxWidth="Infinity" spacing="6.0" style="-fx-padding: 20 24;" HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Brani in libreria" />
                   <Label fx:id="totalTracksLabel" text="0" />
@@ -36,7 +36,7 @@
             </VBox>
 
             <!-- Card: Totale playlist -->
-            <VBox fx:id="cardTotalPlaylists" spacing="6.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-padding: 20 24;">
+            <VBox fx:id="cardTotalPlaylists" maxWidth="Infinity" spacing="6.0" style="-fx-padding: 20 24;" HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Playlist create" />
                   <Label fx:id="totalPlaylistsLabel" text="0" />
@@ -44,7 +44,7 @@
             </VBox>
 
             <!-- Card: Brani riprodotti -->
-            <VBox fx:id="cardTotalPlays" spacing="6.0" maxWidth="Infinity" HBox.hgrow="ALWAYS" style="-fx-padding: 20 24;">
+            <VBox fx:id="cardTotalPlays" maxWidth="Infinity" spacing="6.0" style="-fx-padding: 20 24;" HBox.hgrow="ALWAYS">
                <children>
                   <Label text="Riproduzioni totali" />
                   <Label fx:id="totalPlaysLabel" text="0" />
@@ -64,7 +64,7 @@
                   <TableColumn fx:id="topTrackRankColumn" prefWidth="45.0" text="#" />
                   <TableColumn fx:id="topTrackTitleColumn" prefWidth="220.0" text="Titolo" />
                   <TableColumn fx:id="topTrackArtistColumn" prefWidth="180.0" text="Artista" />
-                  <TableColumn fx:id="topTrackCountColumn" prefWidth="110.0" text="▶ Ascolti" />
+                  <TableColumn fx:id="topTrackCountColumn" prefWidth="110.0" text="Ascolti" />
                </columns>
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -82,7 +82,7 @@
                <columns>
                   <TableColumn fx:id="topPlayedPlaylistRankColumn" prefWidth="45.0" text="#" />
                   <TableColumn fx:id="topPlayedPlaylistNameColumn" prefWidth="250.0" text="Nome Playlist" />
-                  <TableColumn fx:id="topPlayedPlaylistPlayCountColumn" prefWidth="120.0" text="▶ Riproduzioni" />
+                  <TableColumn fx:id="topPlayedPlaylistPlayCountColumn" prefWidth="120.0" text="Riproduzioni" />
                   <TableColumn fx:id="topPlayedPlaylistTrackCountColumn" prefWidth="100.0" text="Brani" />
                </columns>
                <columnResizePolicy>
