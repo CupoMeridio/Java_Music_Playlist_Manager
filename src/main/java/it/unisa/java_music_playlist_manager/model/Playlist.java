@@ -120,4 +120,9 @@ public abstract class Playlist implements Playable {
     public int getTrackCount() {
         return getTracks().size();
     }
+
+    @Override
+    public String toString() {
+        return title;
+    }
 }

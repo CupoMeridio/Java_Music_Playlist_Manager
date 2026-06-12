@@ -865,7 +865,7 @@ public class PrimaryViewController implements Observer {
      * I criteri disponibili sono genere musicale e anno di uscita.
      */
     private void openCreateAutomaticPlaylistDialog() {
-        List<String> options = List.of("Genere", "Anno");
+        List<String> options = List.of("Genere", "Anno", "Tag");
 
         ChoiceDialog<String> dialog = new ChoiceDialog<>("Genere", options);
         dialog.setTitle("Playlist automatica");
@@ -883,6 +883,8 @@ public class PrimaryViewController implements Observer {
             openAutomaticPlaylistByGenreDialog();
         } else if ("Anno".equals(result.get())) {
             openAutomaticPlaylistByYearDialog();
+        } else if ("Tag".equals(result.get())) {
+            openAutomaticPlaylistByTagDialog();
         }
     }
 
@@ -991,6 +993,57 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
+     * Apre il dialogo per scegliere il tag
+     * su cui basare la playlist automatica.
+     */
+    private void openAutomaticPlaylistByTagDialog() {
+        List<Tag> tags = new ArrayList<>();
+
+        // Estrazione dei tag univoci attualmente in uso nella libreria
+        for (Track track : Library.getInstance().getTracks()) {
+            Set<Tag> trackTags = track.getTags();
+            if (trackTags != null) {
+                for (Tag tag : trackTags) {
+                    if (!tags.contains(tag)) {
+                        tags.add(tag);
+                    }
+                }
+            }
+        }
+
+        // Ordinamento alfabetico basato sul nome del tag
+        tags.sort((t1, t2) -> t1.getName().compareToIgnoreCase(t2.getName()));
+
+        if (tags.isEmpty()) {
+            showInfoAlert(
+                    "Nessun tag disponibile",
+                    "Playlist automatica non creata",
+                    "Non ci sono tag associati ai brani nella libreria."
+            );
+            return;
+        }
+
+        // Il ChoiceDialog utilizzerà automaticamente il metodo toString() di TagPredefined
+        ChoiceDialog<Tag> dialog = new ChoiceDialog<>(tags.get(0), tags);
+        dialog.setTitle("Playlist automatica per tag");
+        dialog.setHeaderText("Scegli il tag");
+        dialog.setContentText("Tag:");
+        dialog.setGraphic(null);
+
+        Optional<Tag> tagResult = dialog.showAndWait();
+        tagResult.ifPresent(tag -> {
+            TextInputDialog titleDialog = new TextInputDialog("Playlist " + tag.getName());
+            titleDialog.setTitle("Nome playlist");
+            titleDialog.setHeaderText("Inserisci il nome della playlist");
+            titleDialog.setContentText("Nome:");
+            titleDialog.setGraphic(null);
+
+            Optional<String> titleResult = titleDialog.showAndWait();
+            titleResult.ifPresent(title -> generateAutomaticPlaylistByTag(tag, title));
+        });
+    }
+
+    /**
      * Genera una playlist automatica filtrata per anno di uscita.
      *
      * @param year Anno scelto dall'utente.
@@ -1003,6 +1056,21 @@ public class PrimaryViewController implements Observer {
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per anno: ");
 
+    }
+
+    /**
+     * Genera una playlist automatica filtrata per tag.
+     *
+     * @param tag Tag scelto dall'utente.
+     * @param title Titolo della playlist.
+     */
+    private void generateAutomaticPlaylistByTag(Tag tag, String title) {
+        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
+                AutomaticPlaylistGenerator.Criteria.TAG,
+                tag
+        );
+        Playlist playlist = (Playlist) generator.createPlaylist(title);
+        saveGeneratedPlaylist(playlist, "Playlist automatica creata per tag: ");
     }
 
     /**
