@@ -38,9 +38,13 @@ public class JsonLibraryDAO implements LibraryDAO{
     
     @Override
     public void save(Library lib) throws IOException {
-
-       //salvo la libreria nel path
-       mapper.writeValue(new File(path), lib);
+        File path_file = new File(path);
+       // Crea le cartelle genitore se non esistono
+        File parent = path_file.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+       mapper.writeValue(path_file, lib);
     }
 
     @Override
