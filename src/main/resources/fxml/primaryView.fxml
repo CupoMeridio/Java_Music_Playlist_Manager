@@ -35,11 +35,14 @@
                   
                   <!-- Bottone d'azione dinamico (Aggiungi brano / Nuova playlist) -->
                   <Button fx:id="actionButton" onAction="#handleActionBtnClick" text="Aggiungi brano" />
+                  
+                  <!-- Bottone Undo sempre raggiungibile -->
+                  <Button fx:id="undoButton" onAction="#handleUndoAction" text="Undo" />
                </children>
             </HBox>
             
             <!-- Barra di Controllo Playlist / Ordinamento -->
-            <HBox alignment="CENTER_LEFT" spacing="15.0">
+            <HBox fx:id="controlsBar" alignment="CENTER_LEFT" spacing="15.0">
                <children>
                   <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" style="-fx-font-weight: bold;" text="Riproduci Playlist" />
                   
@@ -81,6 +84,9 @@
             
             <!-- Lista per la Coda di Riproduzione (ListView) -->
             <javafx.scene.control.ListView fx:id="queueListView" VBox.vgrow="ALWAYS" visible="false" managed="false" />
+
+            <!-- Pannello Home / Statistiche (nascosto di default) -->
+            <fx:include fx:id="homeView" source="views/HomeView.fxml" VBox.vgrow="ALWAYS" visible="false" managed="false" />
          </children>
       </VBox>
    </center>

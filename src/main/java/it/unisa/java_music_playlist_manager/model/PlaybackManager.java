@@ -41,6 +41,9 @@ public class PlaybackManager implements Subject {
     /** Coda di riproduzione contenente elementi Playable (Pattern Composite) */
     private final List<Playable> queue = new ArrayList<>();
     
+    /** Playlist attualmente in riproduzione il cui contatore è già stato incrementato */
+    private Playlist currentPlaylistCounted;
+    
     /** Indice dell'elemento Playable attualmente selezionato nella coda */
     private int currentPlayableIndex = 0;
     
@@ -171,6 +174,7 @@ public class PlaybackManager implements Subject {
         } else if (removingCurrent) {
             // Se rimuoviamo ciò che stiamo ascoltando, passiamo all'elemento successivo disponibile
             currentTrackIndexInPlayable = 0;
+            currentPlaylistCounted = null;
             
             if (currentPlayableIndex >= queue.size()) {
                 currentPlayableIndex = 0;
@@ -206,6 +210,7 @@ public class PlaybackManager implements Subject {
             this.queue.addAll(newItems);
             this.currentPlayableIndex = 0;
             this.currentTrackIndexInPlayable = 0;
+            this.currentPlaylistCounted = null;
             skipEmptyPlayablesForward();
             System.out.println("[MANAGER] Coda aggiornata con " + newItems.size() + " elementi Playable.");
         }
@@ -283,6 +288,7 @@ public class PlaybackManager implements Subject {
         if (queue.isEmpty() || currentPlayableIndex >= queue.size() || currentPlayableIndex < 0) return;
         currentPlayableIndex = currentStrategy.getNextIndex(currentPlayableIndex, queue.size());
         currentTrackIndexInPlayable = 0;
+        currentPlaylistCounted = null;
         skipEmptyPlayablesForward();
     }
 
@@ -329,6 +335,7 @@ public class PlaybackManager implements Subject {
     public void resetQueue() {
         this.currentPlayableIndex = 0;
         this.currentTrackIndexInPlayable = 0;
+        this.currentPlaylistCounted = null;
         lastPlayedFilePath = null;
     }
 
@@ -409,6 +416,7 @@ public class PlaybackManager implements Subject {
             this.queue.add(playable);
             this.currentPlayableIndex = 0;
             this.currentTrackIndexInPlayable = 0;
+            this.currentPlaylistCounted = null;
             skipEmptyPlayablesForward();
             System.out.println("[MANAGER] Avvio riproduzione da Playable: " + playable.getTitle());
             pressPlay();
@@ -425,6 +433,9 @@ public class PlaybackManager implements Subject {
         if (context != null && !context.isEmpty() && selectedTrack != null) {
             this.queue.clear();
             this.queue.addAll(context);
+            this.currentPlayableIndex = 0;
+            this.currentTrackIndexInPlayable = 0;
+            this.currentPlaylistCounted = null;
 
             // Cerchiamo il Playable che contiene la traccia selezionata per impostare gli indici corretti
             for (int i = 0; i < queue.size(); i++) {
@@ -479,6 +490,15 @@ public class PlaybackManager implements Subject {
         triggerRealPlayback();
     }
 
+    private void countCurrentPlaylistIfPresent() {
+        Playable currentPlayable = getCurrentPlayable();
+        if (currentPlayable instanceof Playlist playlist
+                && currentPlaylistCounted != playlist) {
+            playlist.incrementPlayCount();
+            currentPlaylistCounted = playlist;
+        }
+    }
+
     // ---- LOGICA DI INTERAZIONE CON IL MEDIA PLAYER REALE ----
 
     /**
@@ -528,6 +548,10 @@ public class PlaybackManager implements Subject {
             Media media = new Media(file.toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             lastPlayedFilePath = filePath;
+
+            // Incrementa il contatore di riproduzioni per le statistiche
+            countCurrentPlaylistIfPresent();
+            current.incrementPlayCount();
 
             // Al termine della canzone, avanziamo automaticamente (delega allo stato)
             mediaPlayer.setOnEndOfMedia(() -> {

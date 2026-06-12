@@ -12,6 +12,7 @@ public abstract class Playlist implements Playable {
     
     private final String id;
     private String title;
+    private int playCount = 0;
 
     /**
      * Costruttore comune a tutte le playlist. Garantisce che ogni playlist
@@ -40,6 +41,14 @@ public abstract class Playlist implements Playable {
 
     public String getId() {
         return this.id;
+    }
+
+    public int getPlayCount() {
+        return this.playCount;
+    }
+
+    public void incrementPlayCount() {
+        this.playCount++;
     }
 
     /* 

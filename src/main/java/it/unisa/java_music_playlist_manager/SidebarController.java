@@ -28,6 +28,8 @@ public class SidebarController {
     @FXML
     private TextField searchField;
     @FXML
+    private Button homeButton;
+    @FXML
     private Button musicLibraryButton;
     @FXML
     private Button playQueueButton;
@@ -43,6 +45,14 @@ public class SidebarController {
     }
 
     // --- Gestori eventi UI ---
+
+    /** Notifica la richiesta di visualizzazione della Home (statistiche). */
+    @FXML
+    private void handleHomeAction() {
+        if (onNavigate != null) {
+            onNavigate.accept("Home");
+        }
+    }
 
     /** Notifica la richiesta di visualizzazione della Libreria Musicale. */
     @FXML

@@ -43,6 +43,7 @@ import java.util.HashSet;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.Tooltip;
+import javafx.scene.Node;
 
 /**
  * PrimaryViewController è il coordinatore principale dell'interfaccia utente.
@@ -180,10 +181,22 @@ public class PrimaryViewController implements Observer {
     @FXML
     private PlayerController playerBarController;
 
+    /** Nodo radice della vista Home (iniettato tramite fx:include) */
+    @FXML
+    private Node homeView;
+
+    /** Controller della vista Home (iniettato tramite fx:include) */
+    @FXML
+    private HomeController homeViewController;
+
     @FXML
     private Label viewTitleLabel;
     @FXML
     private Button actionButton;
+    @FXML
+    private Button undoButton;
+    @FXML
+    private HBox controlsBar;
     @FXML
     private Button playPlaylistButton;
     @FXML
@@ -528,20 +541,56 @@ public class PrimaryViewController implements Observer {
      */
     private void handleNavigate(String viewId) {
         if (null != viewId) switch (viewId) {
-            case "Musica" -> handleMusicLibraryAction();
-            case "Coda" -> handlePlayQueueAction();
+            case "Home"     -> handleHomeAction();
+            case "Musica"   -> handleMusicLibraryAction();
+            case "Coda"     -> handlePlayQueueAction();
             case "Playlist" -> handlePlaylistAction();
             default -> { }
         }
     }
 
+    @FXML
+    private void handleUndoAction() {
+    }
+
+    /** Configura la vista per mostrare la schermata Home con le statistiche. */
+    private void handleHomeAction() {
+        currentOpenedPlaylist = null;
+        viewTitleLabel.setText("Home");
+        actionButton.setVisible(false);
+        actionButton.setManaged(false);
+        controlsBar.setVisible(false);
+        controlsBar.setManaged(false);
+        playPlaylistButton.setDisable(true);
+        genreFilterContainer.setVisible(false);
+        genreFilterContainer.setManaged(false);
+
+        // Nascondi tabella e coda, mostra pannello Home
+        songTableView.setVisible(false);
+        songTableView.setManaged(false);
+        if (queueListView != null) {
+            queueListView.setVisible(false);
+            queueListView.setManaged(false);
+        }
+        if (homeView != null) {
+            homeView.setVisible(true);
+            homeView.setManaged(true);
+        }
+        if (homeViewController != null) {
+            homeViewController.refreshStats();
+        }
+    }
+
     /** Configura la vista per mostrare la libreria musicale completa. */
     private void handleMusicLibraryAction() {
+        hideHomePanel();
         currentOpenedPlaylist = null;
         viewTitleLabel.setText("Musica");
         actionButton.setText("Aggiungi brano");
         actionButton.setVisible(true);
         actionButton.setManaged(true);
+        controlsBar.setVisible(true);
+        controlsBar.setManaged(true);
         genreFilterContainer.setVisible(true);
         genreFilterContainer.setManaged(true);
         showSongsColumns();
@@ -549,10 +598,13 @@ public class PrimaryViewController implements Observer {
 
     /** Configura la vista per mostrare la coda di riproduzione. */
     private void handlePlayQueueAction() {
+        hideHomePanel();
         currentOpenedPlaylist = null;
         viewTitleLabel.setText("Coda di riproduzione");
         actionButton.setVisible(false);
         actionButton.setManaged(false);
+        controlsBar.setVisible(true);
+        controlsBar.setManaged(true);
         genreFilterContainer.setVisible(true);
         genreFilterContainer.setManaged(true);
         showQueueColumns();
@@ -560,14 +612,33 @@ public class PrimaryViewController implements Observer {
 
     /** Configura la vista per mostrare l'elenco delle playlist (Master View). */
     private void handlePlaylistAction() {
+        hideHomePanel();
         currentOpenedPlaylist = null;
         viewTitleLabel.setText("Playlist");
         actionButton.setText("Nuova playlist");
         actionButton.setVisible(true);
         actionButton.setManaged(true);
+        controlsBar.setVisible(true);
+        controlsBar.setManaged(true);
         genreFilterContainer.setVisible(false);
         genreFilterContainer.setManaged(false);
         showPlaylistColumns();
+    }
+
+    /**
+     * Nasconde il pannello Home e ripristina la visibilità della TableView principale.
+     * Da chiamare all'inizio di ogni metodo di navigazione che non sia la Home.
+     */
+    private void hideHomePanel() {
+        if (homeView != null) {
+            homeView.setVisible(false);
+            homeView.setManaged(false);
+        }
+        // Ripristina la visibilità della tabella principale se non era già visibile
+        if (songTableView != null && !songTableView.isVisible()) {
+            songTableView.setVisible(true);
+            songTableView.setManaged(true);
+        }
     }
 
     // --- Metodi per la configurazione dinamica delle colonne della TableView ---

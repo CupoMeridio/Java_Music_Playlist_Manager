@@ -11,9 +11,7 @@
     Collegata al controller SidebarController.
 -->
 
-<VBox prefWidth="220.0" spacing="15.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;"
-      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.unisa.java_music_playlist_manager.SidebarController">
+<VBox prefWidth="220.0" spacing="15.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.SidebarController">
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="20.0" />
    </padding>
@@ -27,9 +25,10 @@
       <!-- Pulsanti Principali Sidebar -->
       <VBox spacing="8.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="musicLibraryButton" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Libreria musicale" onAction="#handleMusicLibraryAction" />
-            <Button fx:id="playQueueButton" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Coda di riproduzione" onAction="#handlePlayQueueAction" />
-            <Button fx:id="playlistButton" maxWidth="Infinity" alignment="BASELINE_LEFT" text="Playlist" onAction="#handlePlaylistAction" />
+            <Button fx:id="homeButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleHomeAction" text="Home" />
+            <Button fx:id="musicLibraryButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleMusicLibraryAction" text="Libreria musicale" />
+            <Button fx:id="playQueueButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlayQueueAction" text="Coda di riproduzione" />
+            <Button fx:id="playlistButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlaylistAction" text="Playlist" />
          </children>
       </VBox>
    </children>

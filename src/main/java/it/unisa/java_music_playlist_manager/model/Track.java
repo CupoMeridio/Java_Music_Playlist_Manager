@@ -52,6 +52,9 @@ public final class Track implements Playable, Subject {
     /** Insieme di tag personalizzati associati alla traccia */
     private Set<Tag> tags;
 
+    /** Numero di volte che la traccia è stata riprodotta */
+    private int playCount = 0;
+
     /**
      * Costruttore della classe Track.
      * Inizializza un nuovo brano musicale validando tutti i parametri tramite i setter.
@@ -83,6 +86,14 @@ public final class Track implements Playable, Subject {
     public int getDuration() { return duration; }
     public String getGenre() { return genre; }
     public Integer getYear() { return year; }
+    public int getPlayCount() { return playCount; }
+
+    /**
+     * Incrementa il contatore di riproduzioni della traccia.
+     */
+    public void incrementPlayCount() {
+        this.playCount++;
+    }
 
     /**
      * Aggiunge un tag alla traccia e notifica gli osservatori.
