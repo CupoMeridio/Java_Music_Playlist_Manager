@@ -781,8 +781,16 @@ public class PrimaryViewController implements Observer {
                     int dropIndex = row.isEmpty() ? tv.getItems().size() : row.getIndex();
 
                     if (currentOpenedPlaylist instanceof ManualPlaylist) {
+                        Track oldTrack = PlaybackManager.getInstance().getCurrentTrack();
+
                         ((ManualPlaylist) currentOpenedPlaylist).moveElement(draggedIndex, dropIndex);
                         Library.getInstance().notifyObservers();
+
+                        Track newTrack = PlaybackManager.getInstance().getCurrentTrack();
+                        if (oldTrack != null && newTrack != null && !oldTrack.equals(newTrack)) {
+                            PlaybackManager.getInstance().forcePlayCurrent();
+                            updatePlayerUI();
+                        }
                     }
                     event.setDropCompleted(true);
                     event.consume();
