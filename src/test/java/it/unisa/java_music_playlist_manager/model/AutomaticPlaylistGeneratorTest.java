@@ -157,4 +157,86 @@ public class AutomaticPlaylistGeneratorTest {
         assertFalse(playlist.getTracks().contains(trackPop2020),
                 "Dopo il cambio anno, il brano non dovrebbe più essere nella playlist 2020");
     }
+
+    // TEST CREAZIONE PLAYLIST AUTOMATICA PER TAG
+
+    @Test
+    public void testCreatePlaylistByTagValida() {
+        // Configurazione dei tag sui brani
+        trackPop2020.addTag(TagPredefined.PARTY);
+        trackRock1975.addTag(TagPredefined.ROCK);
+
+        library.addTrack(trackPop2020);
+        library.addTrack(trackRock1975);
+
+        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
+                AutomaticPlaylistGenerator.Criteria.TAG,
+                TagPredefined.PARTY
+        );
+        Playable playable = generator.createPlaylist("Playlist Party");
+        assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
+        Playlist playlist = (Playlist) playable;
+
+        assertNotNull(playlist, "La playlist creata non dovrebbe essere nulla");
+        assertTrue(playlist instanceof AutomaticPlaylistByTag,
+                "La playlist generata per tag dovrebbe essere una AutomaticPlaylistByTag");
+        assertEquals("Playlist Party", playlist.getTitle(),
+                "La playlist dovrebbe avere il titolo corretto");
+        assertEquals(1, playlist.getTrackCount(),
+                "La playlist Party dovrebbe contenere solo i brani con il tag PARTY");
+        assertTrue(playlist.getTracks().contains(trackPop2020),
+                "La playlist Party dovrebbe contenere il brano Pop");
+        assertFalse(playlist.getTracks().contains(trackRock1975),
+                "La playlist Party non dovrebbe contenere il brano Rock");
+    }
+
+    @Test
+    public void testCreatePlaylistByTagConTagNullo() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            new AutomaticPlaylistGenerator(AutomaticPlaylistGenerator.Criteria.TAG, null);
+        });
+
+        assertEquals("Criterio e valore di filtraggio non possono essere nulli.", exception.getMessage());
+    }
+
+    @Test
+    public void testPlaylistGenerataPerTagSiAggiornaDinamicamente() {
+        trackPop2020.addTag(TagPredefined.PARTY);
+        library.addTrack(trackPop2020);
+
+        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
+                AutomaticPlaylistGenerator.Criteria.TAG,
+                TagPredefined.PARTY
+        );
+        Playable playable = generator.createPlaylist("Playlist Party Dinamica");
+        assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
+        Playlist playlist = (Playlist) playable;
+
+        assertTrue(playlist.getTracks().contains(trackPop2020),
+                "Il brano con il tag PARTY dovrebbe essere inizialmente presente");
+
+        // Rimozione del tag per verificare l'aggiornamento dinamico
+        trackPop2020.removeTag(TagPredefined.PARTY);
+
+        assertFalse(playlist.getTracks().contains(trackPop2020),
+                "Dopo la rimozione del tag, il brano non dovrebbe più essere nella playlist");
+    }
+
+    @Test
+    public void testCreatePlaylistByTagNessunRisultato() {
+        // Nessun brano possiede il tag LOFI
+        library.addTrack(trackPop2020);
+        library.addTrack(trackRock1975);
+
+        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
+                AutomaticPlaylistGenerator.Criteria.TAG,
+                TagPredefined.LOFI
+        );
+        Playlist playlist = (Playlist) generator.createPlaylist("Playlist Vuota");
+
+        assertNotNull(playlist, "La playlist creata non dovrebbe essere nulla");
+        assertEquals(0, playlist.getTrackCount(),
+                "La playlist dovrebbe essere vuota se nessun brano corrisponde al tag");
+    }
+
 }
