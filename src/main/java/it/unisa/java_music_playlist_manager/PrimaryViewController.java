@@ -100,11 +100,13 @@ public class PrimaryViewController implements Observer {
      */
     @Override
     public void update() {
-        if (songTableView != null) {
-            refreshTableData();
-            songTableView.refresh();
-            syncTableSelection();
-        }
+        javafx.application.Platform.runLater(() -> {
+            if (songTableView != null) {
+                refreshTableData();
+                songTableView.refresh();
+                syncTableSelection();
+            }
+        });
     }
 
     /**

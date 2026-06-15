@@ -1,9 +1,7 @@
 package it.unisa.java_music_playlist_manager;
 
-import it.unisa.java_music_playlist_manager.model.Library;
-import it.unisa.java_music_playlist_manager.model.Playlist;
-import it.unisa.java_music_playlist_manager.model.Track;
-import it.unisa.java_music_playlist_manager.model.Observer;
+import it.unisa.java_music_playlist_manager.model.*;
+
 import java.util.Comparator;
 import java.util.List;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -61,6 +59,7 @@ public class HomeController implements Observer {
     public void initialize() {
         setupColumns();
         Library.getInstance().attach(this);
+        PlaybackManager.getInstance().attach(this);
         refreshStats();
     }
 
@@ -132,6 +131,7 @@ public class HomeController implements Observer {
                         .toList()
         );
         topTracksTable.setItems(topTracks);
+        topTracksTable.refresh();
         setTablePlaceholder(topTracksTable,
                 allTracks.isEmpty()
                         ? "Non ci sono brani in libreria."
@@ -145,6 +145,7 @@ public class HomeController implements Observer {
                         .toList()
         );
         topPlaylistsTable.setItems(topPlaylists);
+        topPlaylistsTable.refresh();
         setTablePlaceholder(topPlaylistsTable, "Non ci sono playlist. Creane una dalla sezione Playlist.");
 
         // Top 10 playlist per riproduzioni (decrescente)
@@ -155,6 +156,7 @@ public class HomeController implements Observer {
                         .toList()
         );
         topPlayedPlaylistsTable.setItems(topPlayedPlaylists);
+        topPlayedPlaylistsTable.refresh();
         setTablePlaceholder(topPlayedPlaylistsTable, "Non ci sono playlist. Creane una dalla sezione Playlist.");
     }
 
@@ -163,7 +165,9 @@ public class HomeController implements Observer {
      */
     @Override
     public void update() {
-        refreshStats();
+        javafx.application.Platform.runLater(() -> {
+            refreshStats();
+        });
     }
 
     // --- Utilità ---

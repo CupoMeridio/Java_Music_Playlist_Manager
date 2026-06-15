@@ -1,0 +1,47 @@
+{
+  "tracks" : [ {
+    "@class" : "Track",
+    "id" : "7ce8bf40-6ffd-46b6-a1b7-5ce5e48ad89b",
+    "title" : "Tamlin - Alive [NCS Release]",
+    "author" : "Sconosciuto",
+    "album" : "Sconosciuto",
+    "duration" : 223,
+    "genre" : "Pop",
+    "year" : null,
+    "filePath" : "/Users/deboravillano/IdeaProjects/Java_Music_Playlist_Manager/brani di prova/Tamlin - Alive [NCS Release].mp3",
+    "tags" : [ ],
+    "playCount" : 8
+  }, {
+    "@class" : "Track",
+    "id" : "44406d6d-8aaf-4652-ad12-52d8482ac918",
+    "title" : "Anesthesia",
+    "author" : "Oxlo",
+    "album" : "Anesthesia",
+    "duration" : 86,
+    "genre" : "Generico",
+    "year" : null,
+    "filePath" : "/Users/deboravillano/IdeaProjects/Java_Music_Playlist_Manager/brani di prova/Oxlo - Anesthesia [NCS Release].mp3",
+    "tags" : [ ],
+    "playCount" : 11
+  } ],
+  "playlists" : [ {
+    "@class" : "AutomaticPlaylistByGenre",
+    "id" : "dd09b8e8-6e3b-493a-8bb6-ce6926bf7246",
+    "title" : "Playlist per Pop",
+    "playCount" : 2,
+    "genreFilter" : "Pop",
+    "tracks" : [ {
+      "@class" : "Track",
+      "id" : "7ce8bf40-6ffd-46b6-a1b7-5ce5e48ad89b",
+      "title" : "Tamlin - Alive [NCS Release]",
+      "author" : "Sconosciuto",
+      "album" : "Sconosciuto",
+      "duration" : 223,
+      "genre" : "Pop",
+      "year" : null,
+      "filePath" : "/Users/deboravillano/IdeaProjects/Java_Music_Playlist_Manager/brani di prova/Tamlin - Alive [NCS Release].mp3",
+      "tags" : [ ],
+      "playCount" : 8
+    } ]
+  } ]
+}

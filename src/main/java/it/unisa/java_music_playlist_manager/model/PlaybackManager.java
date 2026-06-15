@@ -553,6 +553,8 @@ public class PlaybackManager implements Subject {
             countCurrentPlaylistIfPresent();
             current.incrementPlayCount();
 
+            // FORCE REFRESH: Notifica immediatamente i controller (incluso HomeController)
+            // notifyObservers();
             // Al termine della canzone, avanziamo automaticamente (delega allo stato)
             mediaPlayer.setOnEndOfMedia(() -> {
                 System.out.println("[AUDIO PLAYER] Traccia terminata, passo alla prossima.");

@@ -77,6 +77,7 @@ public final class Track implements Playable, Subject {
 
     public void incrementPlayCount() {
         this.playCount++;
+        notifyObservers();
     }
 
     public void addTag(Tag tag) {
