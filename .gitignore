@@ -28,3 +28,6 @@ nbdist/
 Thumbs.db
 .DS_Store
 /nbproject/
+
+# Salvataggio personale (non versionare)
+salvataggio/
