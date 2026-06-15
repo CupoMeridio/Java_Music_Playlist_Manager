@@ -4,6 +4,7 @@ import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
 import it.unisa.java_music_playlist_manager.model.Observer;
+import it.unisa.java_music_playlist_manager.model.Library;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -21,7 +22,7 @@ import javafx.util.Duration;
  * PlayerController gestisce l'interfaccia della barra di riproduzione inferiore.
  * Si occupa di visualizzare i metadati del brano corrente, controllare il volume,
  * gestire la barra di avanzamento e inviare comandi al {@link PlaybackManager}.
- * 
+ *
  * Ruolo nel progetto:
  * - Implementa {@link Observer} per aggiornare la barra quando il player cambia traccia.
  * - Sincronizza lo stato visivo (Play/Pause, Slider, Timer) con il {@link MediaPlayer} di JavaFX.
@@ -31,7 +32,7 @@ public class PlayerController implements Observer {
 
     /** Callback eseguita quando viene cliccato Play/Pause */
     private Runnable onPlayPauseClicked;
-    
+
     /** Callback eseguita quando cambia lo stato interno del player (es. skip traccia) */
     private Runnable onPlayerStateChanged;
 
@@ -41,6 +42,7 @@ public class PlayerController implements Observer {
      */
     @Override
     public void update() {
+        checkCurrentTrackValidity();
         // Riconfigura i listener sul nuovo oggetto MediaPlayer creato nel manager
         setupMediaPlayerListeners();
         // Aggiorna i testi e lo stato dei pulsanti
@@ -76,6 +78,25 @@ public class PlayerController implements Observer {
     private Slider volumeSlider;
 
     /**
+     * per l'undo:
+     * Se l'utente annulla l'inserimento del brano attualmente in riproduzione,
+     * il player deve fermarsi per evitare di riprodurre un file rimosso.
+     */
+    private void checkCurrentTrackValidity() {
+        PlaybackManager manager = PlaybackManager.getInstance();
+        Track currentTrack = manager.getCurrentTrack();
+
+        // Se c'è un brano in riproduzione, verifichiamo che esista ancora nella Library
+        if (currentTrack != null && !Library.getInstance().getTracks().contains(currentTrack)) {
+            System.out.println("[PLAYER] Il brano in riproduzione è stato rimosso (Undo). Stop forzato.");
+            manager.pressNext(); // Oppure implementa un metodo manager.stop() se preferisci azzerarlo
+        }
+    }
+
+
+
+
+    /**
      * Imposta il callback per il click sul pulsante Play/Pause.
      * @param callback Azione da eseguire.
      */
@@ -98,6 +119,7 @@ public class PlayerController implements Observer {
     @FXML
     public void initialize() {
         PlaybackManager.getInstance().attach(this);
+        Library.getInstance().attach(this);
 
         // Reset testi iniziali
         if (currentTimeLabel != null) currentTimeLabel.setText("00:00");
@@ -241,7 +263,11 @@ public class PlayerController implements Observer {
 
     @FXML
     private void handleVolumeMuteToggle() {
-        // Implementazione mute
+        MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
+        if (mp != null) {
+            mp.setMute(!mp.isMute());
+            volumeButton.setStyle(mp.isMute() ? "-fx-text-fill: red;" : "-fx-text-fill: black;");
+        }
     }
 
     /**

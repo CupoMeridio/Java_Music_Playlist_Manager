@@ -3,6 +3,7 @@ package it.unisa.java_music_playlist_manager;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.LibraryDAO;
 import it.unisa.java_music_playlist_manager.model.JsonLibraryDAO;
+import it.unisa.java_music_playlist_manager.model.UndoManager;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -59,6 +60,8 @@ public class App extends Application {
     @Override
     public void stop(){
         try {
+            // Svuota la cronologia dell'undo prima di chiudere il programma per liberare memoria
+            UndoManager.getInstance().clearHistory();
             saveDAO.save(Library.getInstance());
         } catch (IOException ex) {
              Alert alert = new Alert(Alert.AlertType.ERROR, 
@@ -108,7 +111,7 @@ public class App extends Application {
             corruptedFile.renameTo(backupFile);
             System.err.println("File corrotto rinominato in: " + backupName); // Log per debug
         }
-
+        UndoManager.getInstance().clearHistory();
         // Mostra l'avviso all'utente
         Alert alert = new Alert(Alert.AlertType.WARNING, 
             "Il file di salvataggio precedente risulta danneggiato o illeggibile.\n" +

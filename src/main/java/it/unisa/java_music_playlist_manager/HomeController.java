@@ -12,7 +12,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-
+import javafx.scene.control.TableCell;
 /**
  * HomeController gestisce la schermata principale dell'applicazione.
  * Mostra le statistiche di riproduzione: brani più ascoltati, playlist più popolari
@@ -62,15 +62,21 @@ public class HomeController implements Observer {
         PlaybackManager.getInstance().attach(this);
         refreshStats();
     }
-
     /**
-     * Configura le cell-value-factory delle colonne delle tre tabelle.
+     * Configura le cell-value-factory e le cell-factory delle colonne delle tre tabelle.
      */
     private void setupColumns() {
         // -- Tabella brani --
-        topTrackRankColumn.setCellValueFactory(data -> {
-            int idx = topTracksTable.getItems().indexOf(data.getValue()) + 1;
-            return new SimpleIntegerProperty(idx).asObject();
+        topTrackRankColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(getTableRow().getIndex() + 1));
+                }
+            }
         });
         topTrackTitleColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().getTitle()));
@@ -80,9 +86,16 @@ public class HomeController implements Observer {
                 data -> new SimpleIntegerProperty(data.getValue().getPlayCount()).asObject());
 
         // -- Tabella playlist --
-        topPlaylistRankColumn.setCellValueFactory(data -> {
-            int idx = topPlaylistsTable.getItems().indexOf(data.getValue()) + 1;
-            return new SimpleIntegerProperty(idx).asObject();
+        topPlaylistRankColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(getTableRow().getIndex() + 1));
+                }
+            }
         });
         topPlaylistNameColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().getTitle()));
@@ -92,9 +105,16 @@ public class HomeController implements Observer {
                 data -> new SimpleStringProperty(formatDuration(data.getValue().getDuration())));
 
         // -- Tabella playlist più riprodotte --
-        topPlayedPlaylistRankColumn.setCellValueFactory(data -> {
-            int idx = topPlayedPlaylistsTable.getItems().indexOf(data.getValue()) + 1;
-            return new SimpleIntegerProperty(idx).asObject();
+        topPlayedPlaylistRankColumn.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null) {
+                    setText(null);
+                } else {
+                    setText(String.valueOf(getTableRow().getIndex() + 1));
+                }
+            }
         });
         topPlayedPlaylistNameColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(data.getValue().getTitle()));

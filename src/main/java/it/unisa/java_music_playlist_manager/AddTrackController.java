@@ -23,6 +23,13 @@ import javafx.application.Platform;
 import org.controlsfx.control.CheckComboBox;
 
 import it.unisa.java_music_playlist_manager.model.Tag;
+import it.unisa.java_music_playlist_manager.model.Command;
+import it.unisa.java_music_playlist_manager.model.UndoManager;
+import it.unisa.java_music_playlist_manager.model.UpdateTrackCommand;
+import it.unisa.java_music_playlist_manager.model.AddTrackCommand;
+
+
+
 
 /**
  * Controller per la gestione della vista di inserimento/modifica brano (addTrackView.fxml).
@@ -168,7 +175,6 @@ public class AddTrackController {
             String yearText = addTrackYearField.getText().trim();
             List<Tag> selectedTags = addTrackTagComboBox != null ? addTrackTagComboBox.getCheckModel().getCheckedItems() : null;
 
-            // Validazione requisiti minimi
             if (title.isEmpty()) {
                 addTrackErrorLabel.setText("Il titolo è obbligatorio.");
                 return;
@@ -189,42 +195,24 @@ public class AddTrackController {
             }
 
             if (currentEditingTrack != null) {
-                // AGGIORNAMENTO TRACCIA ESISTENTE
-                updateExistingTrack(title, author, album, genre, year, selectedTags);
+                // MODIFICA TRAMITE COMMAND
+                Command updateCmd = new UpdateTrackCommand(currentEditingTrack, title, author, album, genre, year, selectedFilePath, selectedTags);
+                UndoManager.getInstance().executeCommand(updateCmd);
             } else {
-                // CREAZIONE NUOVA TRACCIA
-                createNewTrack(title, author, album, genre, year, selectedTags);
+                // CREAZIONE TRAMITE COMMAND
+                Track track = new Track(title, author, album, extractedDuration, genre, year, selectedFilePath);
+                if (selectedTags != null) selectedTags.forEach(t -> { if (t != null) track.addTag(t); });
+                if (trackObserver != null) track.attach(trackObserver);
+
+                Command addCmd = new AddTrackCommand(Library.getInstance(), track);
+                UndoManager.getInstance().executeCommand(addCmd);
             }
 
-            // Chiusura della finestra modale
             ((Stage) addTrackTitleField.getScene().getWindow()).close();
 
         } catch (IllegalArgumentException e) {
             addTrackErrorLabel.setText(e.getMessage());
         }
-    }
-
-    private void updateExistingTrack(String title, String author, String album, String genre, Integer year, List<Tag> tags) {
-        currentEditingTrack.setTitle(title);
-        currentEditingTrack.setAuthor(author);
-        currentEditingTrack.setAlbum(album);
-        currentEditingTrack.setDuration(extractedDuration);
-        currentEditingTrack.setGenre(genre);
-        currentEditingTrack.setYear(year);
-        currentEditingTrack.setFilePath(selectedFilePath);
-        
-        currentEditingTrack.removeAllTags();
-        if (tags != null) tags.forEach(tag -> { if (tag != null) currentEditingTrack.addTag(tag); });
-        
-        Library.getInstance().notifyObservers();
-    }
-
-    private void createNewTrack(String title, String author, String album, String genre, Integer year, List<Tag> tags) {
-        Track track = new Track(title, author, album, extractedDuration, genre, year, selectedFilePath);
-        if (tags != null) tags.forEach(t -> { if (t != null) track.addTag(t); });
-        
-        Library.getInstance().addTrack(track);
-        if (trackObserver != null) track.attach(trackObserver);
     }
 
     @FXML
