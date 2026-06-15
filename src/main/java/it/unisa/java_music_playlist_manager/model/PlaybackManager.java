@@ -506,14 +506,20 @@ public class PlaybackManager implements Subject {
      * Si occupa di caricare il file, gestire i loop e le riprese dalla pausa.
      */
     public void triggerRealPlayback() {
-        if (!audioEnabled) {
-            System.out.println("[MANAGER - TEST] Riproduzione audio simulata (audio disabilitato).");
-            return;
-        }
-        
         Track current = getCurrentTrack();
         if (current == null || current.getFilePath() == null) {
             System.out.println("[MANAGER - ERROR] Nessuna traccia o percorso file non valido.");
+            return;
+        }
+
+        // --- GESTIONE ANALYTICS & NOTIFICHE
+        // Incrementa il contatore di riproduzioni per le statistiche
+        countCurrentPlaylistIfPresent();
+        current.incrementPlayCount();
+
+        if (!audioEnabled) {
+            System.out.println("[MANAGER - TEST] Riproduzione audio simulata (audio disabilitato).");
+            notifyObservers();
             return;
         }
 
@@ -549,10 +555,6 @@ public class PlaybackManager implements Subject {
             mediaPlayer = new MediaPlayer(media);
             lastPlayedFilePath = filePath;
 
-            // Incrementa il contatore di riproduzioni per le statistiche
-            countCurrentPlaylistIfPresent();
-            current.incrementPlayCount();
-
             // FORCE REFRESH: Notifica immediatamente i controller (incluso HomeController)
             // notifyObservers();
             // Al termine della canzone, avanziamo automaticamente (delega allo stato)
@@ -563,7 +565,7 @@ public class PlaybackManager implements Subject {
 
             mediaPlayer.play();
             System.out.println("[AUDIO PLAYER] Avvio nuova riproduzione: " + current.getTitle());
-            notifyObservers(); // Avvisa la UI che la traccia è cambiata
+            notifyObservers(); // Avvisa la UI che la traccia è cambiata e aggiorna i contatori in tempo reale
         } catch (Exception e) {
             System.err.println("[AUDIO PLAYER - ERROR] Impossibile riprodurre il file: " + e.getMessage());
             pressNext();
