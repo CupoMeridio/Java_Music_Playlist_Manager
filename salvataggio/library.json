@@ -10,7 +10,7 @@
     "year" : null,
     "filePath" : "/Users/deboravillano/IdeaProjects/Java_Music_Playlist_Manager/brani di prova/Tamlin - Alive [NCS Release].mp3",
     "tags" : [ ],
-    "playCount" : 8
+    "playCount" : 14
   }, {
     "@class" : "Track",
     "id" : "44406d6d-8aaf-4652-ad12-52d8482ac918",
@@ -18,17 +18,17 @@
     "author" : "Oxlo",
     "album" : "Anesthesia",
     "duration" : 86,
-    "genre" : "Generico",
+    "genre" : "Classica",
     "year" : null,
     "filePath" : "/Users/deboravillano/IdeaProjects/Java_Music_Playlist_Manager/brani di prova/Oxlo - Anesthesia [NCS Release].mp3",
     "tags" : [ ],
-    "playCount" : 11
+    "playCount" : 13
   } ],
   "playlists" : [ {
     "@class" : "AutomaticPlaylistByGenre",
     "id" : "dd09b8e8-6e3b-493a-8bb6-ce6926bf7246",
     "title" : "Playlist per Pop",
-    "playCount" : 2,
+    "playCount" : 3,
     "genreFilter" : "Pop",
     "tracks" : [ {
       "@class" : "Track",
@@ -41,7 +41,7 @@
       "year" : null,
       "filePath" : "/Users/deboravillano/IdeaProjects/Java_Music_Playlist_Manager/brani di prova/Tamlin - Alive [NCS Release].mp3",
       "tags" : [ ],
-      "playCount" : 8
+      "playCount" : 14
     } ]
   } ]
 }
