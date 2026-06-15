@@ -4,7 +4,23 @@ import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import it.unisa.java_music_playlist_manager.model.TagPredefined;
+import it.unisa.java_music_playlist_manager.model.Tag;
+import it.unisa.java_music_playlist_manager.model.Command;
+import it.unisa.java_music_playlist_manager.model.UndoManager;
+import it.unisa.java_music_playlist_manager.model.UpdateTrackCommand;
+import it.unisa.java_music_playlist_manager.model.AddTrackCommand;
+
 import java.util.List;
+import java.util.TreeSet;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+// IMPORTAZIONI JAUDIOTAGGER per lettura affidabile dei tag ID3
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.FieldKey;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -15,34 +31,22 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import java.io.File;
-import javafx.collections.MapChangeListener;
 import javafx.application.Platform;
 
 // IMPORTAZIONE PER CONTROLSFX
 import org.controlsfx.control.CheckComboBox;
 
-import it.unisa.java_music_playlist_manager.model.Tag;
-import it.unisa.java_music_playlist_manager.model.Command;
-import it.unisa.java_music_playlist_manager.model.UndoManager;
-import it.unisa.java_music_playlist_manager.model.UpdateTrackCommand;
-import it.unisa.java_music_playlist_manager.model.AddTrackCommand;
 
 
 
-
-/**
- * Controller per la gestione della vista di inserimento/modifica brano (addTrackView.fxml).
- * Estratto da PrimaryViewController per separare la responsabilità del form
- * dalla gestione della vista principale.
- */
 /**
  * AddTrackController gestisce la finestra di dialogo per l'inserimento o la modifica di una traccia.
  * Si occupa della validazione dell'input utente e dell'estrazione automatica dei metadati dai file audio.
  * 
  * Ruolo nel progetto:
  * - Fornisce un'interfaccia form per popolare gli oggetti {@link Track}.
- * - Utilizza {@link MediaPlayer} in modalità "silente" per estrarre durata e metadati (ID3) all'atto della selezione del file.
+ * - Utilizza jaudiotagger per estrarre in modo affidabile i tag ID3 (titolo, artista, album, anno, genere).
+ * - Utilizza {@link MediaPlayer} esclusivamente per calcolare la durata del brano.
  * - Integra {@link org.controlsfx.control.CheckComboBox} per permettere l'assegnazione multipla di {@link Tag} ai brani.
  * - Gestisce sia la creazione di nuovi brani che l'aggiornamento di brani esistenti.
  */
@@ -110,14 +114,24 @@ public class AddTrackController {
             formTitleLabel.setText(currentEditingTrack != null ? "Modifica brano" : "Aggiungi nuovo brano");
         }
 
-        // Popolamento lista generi predefiniti
+        // Popolamento lista generi predefiniti + custom dalla libreria, in ordine alfabetico
         if (addTrackGenreComboBox != null) {
-            addTrackGenreComboBox.getItems().setAll(
-                "Rock", "Pop", "Jazz", "Classica", "Hip Hop", "R&B", "Metal", 
-                "Blues", "Country", "Electronic", "Reggae", "Folk", "Punk", 
-                "Soul", "Disco", "Funk", "Techno", "House", "Ambient", "Indie",
-                "Alternative", "Lo-Fi", "Trap", "Latin", "Generico"
-            );
+            TreeSet<String> allGenres = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+            allGenres.addAll(java.util.Arrays.asList(
+                "Alternative", "Ambient", "Blues", "Classica", "Country",
+                "Disco", "Electronic", "Folk", "Funk", "Generico",
+                "Hip Hop", "House", "Indie", "Jazz", "Latin",
+                "Lo-Fi", "Metal", "Pop", "Punk", "R&B",
+                "Reggae", "Rock", "Soul", "Techno", "Trap"
+            ));
+            // Aggiunge i generi custom già presenti in libreria
+            Library.getInstance().getTracks().forEach(t -> {
+                String g = t.getGenre();
+                if (g != null && !g.isBlank()) allGenres.add(g);
+            });
+            // setItems(null) + setItems(nuova lista) forza il refresh visivo della skin JavaFX
+            addTrackGenreComboBox.setItems(null);
+            addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList(allGenres));
         }
 
         if (currentEditingTrack != null) {
@@ -242,78 +256,128 @@ public class AddTrackController {
             setFieldsDisable(false);
             setLoading(true);
 
+            // Reset dei campi prima di analizzare il nuovo file,
+            // per evitare che i metadati del file precedente rimangano visibili
+            addTrackTitleField.setText("");
+            addTrackAuthorField.setText("");
+            addTrackAlbumField.setText("");
+            addTrackYearField.setText("");
+            addTrackGenreComboBox.setValue(null);
+            extractedDuration = 0;
+
             analyzeFileMetadata(file);
         }
     }
 
     /**
-     * Analizza il file audio per estrarre metadati ID3 e durata.
+     * Analizza il file audio per estrarre metadati e durata.
+     * - jaudiotagger: estrae titolo, artista, album, anno, genere in modo sincrono e affidabile.
+     * - JavaFX MediaPlayer: utilizzato esclusivamente per calcolare la durata del brano.
+     * Entrambe le operazioni vengono eseguite in un thread separato per non bloccare l'UI.
+     *
      * @param file Il file da analizzare.
      */
     private void analyzeFileMetadata(File file) {
-        try {
-            Media media = new Media(file.toURI().toString());
-            MediaPlayer tempPlayer = new MediaPlayer(media);
-            
-            // Estrazione metadati asincrona (Titolo, Artista, Album, Anno, Genere)
-            media.getMetadata().addListener((MapChangeListener<String, Object>) change -> {
-                if (change.wasAdded()) {
-                    String key = change.getKey();
-                    Object value = change.getValueAdded();
-                    Platform.runLater(() -> fillExtractedMetadata(key, value, file.getName()));
+        // Fallback immediato: usa il nome del file come titolo provvisorio
+        String fileName = file.getName();
+        int lastDot = fileName.lastIndexOf('.');
+        addTrackTitleField.setText(lastDot > 0 ? fileName.substring(0, lastDot) : fileName);
+
+        new Thread(() -> {
+            // --- 1. Lettura tag ID3 con jaudiotagger (sincrona) ---
+            String title = null, artist = null, album = null, genre = null, year = null;
+            try {
+                // Silenzia il logger verboso di jaudiotagger
+                Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
+
+                AudioFile audioFile = AudioFileIO.read(file);
+                org.jaudiotagger.tag.Tag id3Tag = audioFile.getTag();
+                if (id3Tag != null) {
+                    title  = safeGet(id3Tag, FieldKey.TITLE);
+                    artist = safeGet(id3Tag, FieldKey.ARTIST);
+                    album  = safeGet(id3Tag, FieldKey.ALBUM);
+                    genre  = safeGet(id3Tag, FieldKey.GENRE);
+                    year   = safeGet(id3Tag, FieldKey.YEAR);
+                }
+            } catch (Exception e) {
+                // File non supportato da jaudiotagger (es. WAV senza tag): si procede con campi vuoti
+            }
+
+            // Cattura variabili final per il lambda del Platform.runLater
+            final String fTitle  = title;
+            final String fArtist = artist;
+            final String fAlbum  = album;
+            final String fGenre  = genre;
+            final String fYear   = year;
+
+            // --- 2. Aggiorna i campi UI con i tag letti ---
+            Platform.runLater(() -> {
+                if (fTitle != null && !fTitle.isEmpty()) {
+                    addTrackTitleField.setText(fTitle);
+                }
+                if (fArtist != null && !fArtist.isEmpty()) {
+                    addTrackAuthorField.setText(fArtist);
+                }
+                if (fAlbum != null && !fAlbum.isEmpty()) {
+                    addTrackAlbumField.setText(fAlbum);
+                }
+                if (fYear != null && !fYear.isEmpty() && fYear.length() >= 4) {
+                    addTrackYearField.setText(fYear.substring(0, 4));
+                }
+                if (fGenre != null && !fGenre.isEmpty()) {
+                    // Cerca corrispondenza case-insensitive nella lista esistente
+                    String matched = addTrackGenreComboBox.getItems().stream()
+                        .filter(g -> g.equalsIgnoreCase(fGenre))
+                        .findFirst()
+                        .orElse(null);
+                    if (matched != null) {
+                        addTrackGenreComboBox.getSelectionModel().select(matched);
+                    } else {
+                        // Genere custom non in lista: ricostruisci la lista ordinata con il nuovo genere incluso
+                        TreeSet<String> sorted = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+                        sorted.addAll(addTrackGenreComboBox.getItems());
+                        sorted.add(fGenre);
+                        // Forza il refresh visivo della skin del ComboBox staccando e riattaccando la lista
+                        addTrackGenreComboBox.setItems(null);
+                        addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList(sorted));
+                        addTrackGenreComboBox.getSelectionModel().select(fGenre);
+                    }
                 }
             });
 
-            // Estrazione durata quando il player è "READY"
-            tempPlayer.setOnReady(() -> {
-                if (media.getDuration() != null) {
-                    extractedDuration = (int) media.getDuration().toSeconds();
+            // --- 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) ---
+            Platform.runLater(() -> {
+                try {
+                    Media media = new Media(file.toURI().toString());
+                    MediaPlayer tempPlayer = new MediaPlayer(media);
+                    tempPlayer.setOnReady(() -> {
+                        if (media.getDuration() != null) {
+                            extractedDuration = (int) media.getDuration().toSeconds();
+                        }
+                        setLoading(false);
+                        tempPlayer.dispose();
+                    });
+                    tempPlayer.setOnError(() -> {
+                        setLoading(false);
+                        tempPlayer.dispose();
+                    });
+                    startAnalysisTimeout(tempPlayer);
+                } catch (Exception e) {
+                    setLoading(false);
                 }
-                setLoading(false);
-                tempPlayer.dispose(); 
             });
-
-            tempPlayer.setOnError(() -> {
-                setLoading(false);
-                tempPlayer.dispose();
-            });
-
-            // Fallback titolo immediato basato sul nome file
-            String fileName = file.getName();
-            int lastDot = fileName.lastIndexOf('.');
-            addTrackTitleField.setText(lastDot > 0 ? fileName.substring(0, lastDot) : fileName);
-
-            // Timeout di sicurezza per evitare blocchi dell'interfaccia se il file è corrotto
-            startAnalysisTimeout(tempPlayer);
-
-        } catch (Exception e) {
-            setLoading(false);
-        }
+        }).start();
     }
 
-    private void fillExtractedMetadata(String key, Object value, String fileName) {
-        switch (key.toLowerCase()) {
-            case "title" -> {
-                if (addTrackTitleField.getText().isEmpty() || addTrackTitleField.getText().contains(fileName.split("\\.")[0]))
-                    addTrackTitleField.setText(value.toString());
-            }
-            case "artist" -> { if (addTrackAuthorField.getText().isEmpty()) addTrackAuthorField.setText(value.toString()); }
-            case "album" -> { if (addTrackAlbumField.getText().isEmpty()) addTrackAlbumField.setText(value.toString()); }
-            case "year", "date" -> {
-                if (addTrackYearField.getText().isEmpty()) {
-                    String yearVal = value.toString();
-                    if (yearVal.length() >= 4) addTrackYearField.setText(yearVal.substring(0, 4));
-                }
-            }
-            case "genre" -> {
-                if (addTrackGenreComboBox.getValue() == null) {
-                    String extGenre = value.toString();
-                    addTrackGenreComboBox.getItems().stream()
-                        .filter(g -> g.equalsIgnoreCase(extGenre))
-                        .findFirst()
-                        .ifPresent(addTrackGenreComboBox::setValue);
-                }
-            }
+    /**
+     * Legge in modo sicuro un campo da un tag jaudiotagger, restituendo null se assente o vuoto.
+     */
+    private String safeGet(org.jaudiotagger.tag.Tag tag, FieldKey key) {
+        try {
+            String value = tag.getFirst(key);
+            return (value != null && !value.trim().isEmpty()) ? value.trim() : null;
+        } catch (Exception e) {
+            return null;
         }
     }
 
