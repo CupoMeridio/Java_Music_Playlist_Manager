@@ -4,9 +4,12 @@ module it.unisa.java_music_playlist_manager {
     requires javafx.fxml;
     requires transitive javafx.media;
     requires java.base;
+    requires java.logging;
 
-    
     requires org.controlsfx.controls;
+
+    // Libreria per la lettura affidabile dei tag ID3 (MP3, M4A, FLAC, ecc.)
+    requires jaudiotagger;
     
     opens it.unisa.java_music_playlist_manager to javafx.fxml;
     opens it.unisa.java_music_playlist_manager.model to javafx.base, com.fasterxml.jackson.databind;

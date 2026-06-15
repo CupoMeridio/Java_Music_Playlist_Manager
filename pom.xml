@@ -52,6 +52,13 @@
             <version>11.2.1</version>
         </dependency>
         
+        <!-- Libreria per la lettura affidabile dei tag ID3 da file audio (MP3, FLAC, M4A, ecc.) -->
+        <dependency>
+            <groupId>net.jthink</groupId>
+            <artifactId>jaudiotagger</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <!-- Supporto ai file FXML -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -109,7 +116,11 @@
                 <version>3.14.0</version>
                 <configuration>
                     <!-- Compila usando Java 21 -->
-                    <release>21</release>                
+                    <release>21</release>
+                    <!-- Sopprime il warning sui moduli automatici con nome instabile (es. jaudiotagger) -->
+                    <compilerArgs>
+                        <arg>-Xlint:-module</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 
