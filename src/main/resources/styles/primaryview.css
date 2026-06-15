@@ -8,3 +8,120 @@
 .hidden-scrollbar .scroll-bar:horizontal {
 
 }
+
+/* Sfondo principale dell'applicazione */
+.root {
+    -fx-background-color: #FFFFFF;
+    -fx-font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* Titolo della Vista Corrente (es. "Musica", "Playlist") */
+.label {
+    -fx-text-fill: #1D1D1F;
+}
+
+#viewTitleLabel {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-padding: 10 0 10 0;
+}
+
+/* Barra superiore dei controlli (Ordina, Filtra, ecc.) */
+.hbox {
+    -fx-spacing: 12px;
+    -fx-alignment: center-left;
+}
+
+/* Pulsanti Standard in stile Apple (Grigio chiaro semi-trasparente) */
+.button {
+    -fx-background-color: #F5F5F7;
+    -fx-background-radius: 8px;
+    -fx-text-fill: #FA243C; /* Rosso iconico Apple Music */
+    -fx-font-weight: bold;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+    -fx-transition: all 0.2s ease-in-out;
+}
+
+.button:hover {
+    -fx-background-color: #E8E8ED;
+}
+
+.button:pressed {
+    -fx-background-color: #D1D1D6;
+}
+
+/* Pulsante principale di Azione (Es. "Nuova Playlist" o "Aggiungi Brano") */
+#actionButton, #playPlaylistButton {
+    -fx-background-color: #FA243C;
+    -fx-text-fill: #FFFFFF;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: #E31C33;
+}
+
+/* Pulsante Undo (Grigio chiaro o disabilitato se non attivo) */
+#undoButton {
+    -fx-background-color: #E8E8ED;
+    -fx-text-fill: #8E8E93;
+}
+#undoButton:not(:disabled) {
+    -fx-text-fill: #FA243C;
+}
+
+/* ComboBox di Ordinamento e Genere */
+.combo-box {
+    -fx-background-color: #F5F5F7;
+    -fx-background-radius: 8px;
+    -fx-padding: 4px;
+}
+.combo-box .cell {
+    -fx-text-fill: #1D1D1F;
+}
+
+/* --- TABELLA DEI BRANI (TableView Apple Style) --- */
+.table-view {
+    -fx-background-color: transparent;
+    -fx-base: transparent;
+    -fx-table-header-border-color: transparent;
+    -fx-table-cell-border-color: #F5F5F7;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 35px;
+    -fx-border-color: transparent transparent #E8E8ED transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #8E8E93;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 6px 0;
+    -fx-border-color: transparent transparent #F5F5F7 transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #F5F5F7;
+    -fx-background-radius: 4px;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #FFE5E7; /* Selezione rosa chiarissimo sfumata */
+    -fx-table-cell-fill: #FA243C;
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #FA243C;
+    -fx-font-weight: bold;
+}

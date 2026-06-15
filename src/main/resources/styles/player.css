@@ -1,0 +1,87 @@
+/* Barra del Player Inferiore */
+#playerBarContainer, .player-bar {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-border-color: #E8E8ED transparent transparent transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 12px 24px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 0, -10, 0, 0);
+}
+
+/* Copertina dell'album arrotondata */
+#albumCoverImageView {
+    -fx-image-border-radius: 6px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 0, 4, 10, 0);
+}
+
+/* Testi Brano Corrente */
+#currentTrackTitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #1D1D1F;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 12px;
+    -fx-text-fill: #8E8E93;
+}
+
+/* Pulsanti multimediali cerchiati o minimali */
+.player-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1D1D1F;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+}
+.player-button:hover {
+    -fx-text-fill: #FA243C;
+}
+
+/* Pulsante Play/Pause Centrale (Unico pulsante cerchiato e prominente) */
+#playPauseButton {
+    -fx-background-color: #FA243C;
+    -fx-text-fill: white;
+    -fx-background-radius: 50%;
+    -fx-min-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+    -fx-font-size: 14px;
+    -fx-alignment: center;
+}
+#playPauseButton:hover {
+    -fx-background-color: #E31C33;
+}
+
+/* Slider (Barra Avanzamento e Volume in pieno stile Apple) */
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: #E8E8ED;
+    -fx-background-radius: 3px;
+    -fx-height: 4px;
+}
+
+.slider .filled-track {
+    -fx-background-color: #FA243C;
+    -fx-background-radius: 3px;
+}
+
+.slider .thumb {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 50%;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 0, 1, 4, 0);
+    -fx-padding: 6px;
+    -fx-visibility: hidden; /* Scompare e appare al passaggio del mouse */
+}
+
+.slider:hover .thumb {
+    -fx-visibility: visible;
+}
+
+/* Etichette del tempo */
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 11px;
+    -fx-text-fill: #8E8E93;
+}

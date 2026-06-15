@@ -1,0 +1,51 @@
+/* Griglia / Layout Home */
+.home-container {
+    -fx-padding: 24px;
+    -fx-background-color: #FFFFFF;
+}
+
+/* Intestazione di benvenuto */
+#greetingLabel {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-padding: 0 0 20 0;
+}
+
+/* Pannelli / Card delle statistiche rapide */
+.stat-card {
+    -fx-background-color: #F5F5F7;
+    -fx-background-radius: 12px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.02), 0, 4, 12, 0);
+}
+
+.stat-card .label-title {
+    -fx-font-size: 12px;
+    -fx-text-fill: #8E8E93;
+    -fx-font-weight: bold;
+    -fx-text-transform: uppercase;
+}
+
+.stat-card .label-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #FA243C; /* Numeri in rosso Apple */
+}
+
+/* Tabelle statistiche miniaturizzate (Top 10) */
+.home-table {
+    -fx-background-color: transparent;
+    -fx-padding: 10px 0;
+}
+
+.home-table .column-header {
+    -fx-size: 28px;
+}
+
+/* Colonna del Rank numerico sfumata e in corsivo grigio */
+.top-rank-cell {
+    -fx-font-weight: bold;
+    -fx-text-fill: #8E8E93;
+    -fx-alignment: center;
+}
