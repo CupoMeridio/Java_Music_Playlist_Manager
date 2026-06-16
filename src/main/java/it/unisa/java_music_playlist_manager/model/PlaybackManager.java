@@ -38,6 +38,9 @@ public class PlaybackManager implements Subject {
     /** Flag per disabilitare l'audio reale (utile per i test unitari) */
     private boolean audioEnabled = true;
 
+    /** Flag che indica se la prossima chiamata a triggerRealPlayback è una ripresa dalla pausa */
+    private boolean resumingFromPause = false;
+
     /** Coda di riproduzione contenente elementi Playable (Pattern Composite) */
     private final List<Playable> queue = new ArrayList<>();
     
@@ -336,6 +339,7 @@ public class PlaybackManager implements Subject {
         this.currentPlayableIndex = 0;
         this.currentTrackIndexInPlayable = 0;
         this.currentPlaylistCounted = null;
+        this.resumingFromPause = false;
         lastPlayedFilePath = null;
     }
 
@@ -496,6 +500,25 @@ public class PlaybackManager implements Subject {
                 && currentPlaylistCounted != playlist) {
             playlist.incrementPlayCount();
             currentPlaylistCounted = playlist;
+            
+            // Sincronizza con l'istanza canonica nella Library (se è una copia creata da Jackson)
+            for (Playlist p : Library.getInstance().getPlaylists()) {
+                if (p.equals(playlist) && p != playlist) {
+                    p.incrementPlayCount();
+                    break;
+                }
+            }
+        }
+    }
+
+    private void incrementTrackPlayCount(Track current) {
+        current.incrementPlayCount();
+        // Sincronizza con l'istanza canonica nella Library
+        for (Track t : Library.getInstance().getTracks()) {
+            if (t.equals(current) && t != current) {
+                t.incrementPlayCount();
+                break;
+            }
         }
     }
 
@@ -512,12 +535,13 @@ public class PlaybackManager implements Subject {
             return;
         }
 
-        // --- GESTIONE ANALYTICS & NOTIFICHE
-        // Incrementa il contatore di riproduzioni per le statistiche
-        countCurrentPlaylistIfPresent();
-        current.incrementPlayCount();
-
         if (!audioEnabled) {
+            // --- GESTIONE ANALYTICS (modalità test, senza audio reale)
+            if (!resumingFromPause) {
+                countCurrentPlaylistIfPresent();
+                incrementTrackPlayCount(current);
+            }
+            resumingFromPause = false;
             System.out.println("[MANAGER - TEST] Riproduzione audio simulata (audio disabilitato).");
             notifyObservers();
             return;
@@ -525,29 +549,35 @@ public class PlaybackManager implements Subject {
 
         String filePath = current.getFilePath();
 
-        // Ottimizzazione: se è lo stesso file, gestiamo ripresa o riavvio senza ricreare il MediaPlayer
-        if (mediaPlayer != null && filePath.equals(lastPlayedFilePath)) {
-            if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-                mediaPlayer.play();
-                System.out.println("[AUDIO PLAYER] Ripresa riproduzione: " + current.getTitle());
-            } else {
-                mediaPlayer.seek(javafx.util.Duration.ZERO);
-                mediaPlayer.play();
-                System.out.println("[AUDIO PLAYER] Riavvio riproduzione (skip/loop): " + current.getTitle());
-            }
+        // Caso 1: ripresa dalla pausa sullo stesso file → NON incrementare il contatore
+        if (resumingFromPause && mediaPlayer != null && filePath.equals(lastPlayedFilePath)) {
+            resumingFromPause = false;
+            mediaPlayer.play();
+            System.out.println("[AUDIO PLAYER] Ripresa riproduzione: " + current.getTitle());
             return;
         }
 
-        // Se il file è diverso, fermiamo e distruggiamo il player precedente
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.dispose();
+        // Caso 2: nuovo ascolto (nuovo file, loop, skip, onEndOfMedia) → incrementa il contatore
+        resumingFromPause = false;
+        countCurrentPlaylistIfPresent();
+        incrementTrackPlayCount(current);
+
+        // Fermiamo il player precedente (se esiste) prima di crearne uno nuovo.
+        // Salva il riferimento al vecchio player per il dispose differito:
+        // il dispose dall'interno di un callback onEndOfMedia dello stesso MediaPlayer
+        // può causare problemi in JavaFX, quindi lo differiamo.
+        MediaPlayer oldPlayer = mediaPlayer;
+        mediaPlayer = null;
+        if (oldPlayer != null) {
+            oldPlayer.stop();
+            javafx.application.Platform.runLater(oldPlayer::dispose);
         }
 
         try {
             File file = new File(filePath);
             if (!file.exists()) {
                 System.err.println("[AUDIO PLAYER - ERROR] File non trovato: " + filePath);
+                notifyObservers();
                 pressNext(); // Salta alla prossima se il file manca
                 return;
             }
@@ -555,8 +585,6 @@ public class PlaybackManager implements Subject {
             mediaPlayer = new MediaPlayer(media);
             lastPlayedFilePath = filePath;
 
-            // FORCE REFRESH: Notifica immediatamente i controller (incluso HomeController)
-            // notifyObservers();
             // Al termine della canzone, avanziamo automaticamente (delega allo stato)
             mediaPlayer.setOnEndOfMedia(() -> {
                 System.out.println("[AUDIO PLAYER] Traccia terminata, passo alla prossima.");
@@ -565,11 +593,13 @@ public class PlaybackManager implements Subject {
 
             mediaPlayer.play();
             System.out.println("[AUDIO PLAYER] Avvio nuova riproduzione: " + current.getTitle());
-            notifyObservers(); // Avvisa la UI che la traccia è cambiata e aggiorna i contatori in tempo reale
         } catch (Exception e) {
             System.err.println("[AUDIO PLAYER - ERROR] Impossibile riprodurre il file: " + e.getMessage());
             pressNext();
         }
+        // Notifica SEMPRE gli osservatori dopo l'incremento del contatore,
+        // indipendentemente dal successo della creazione del MediaPlayer.
+        notifyObservers();
     }
 
     /**
@@ -587,6 +617,7 @@ public class PlaybackManager implements Subject {
      * Mette fisicamente l'audio in pausa.
      */
     public void triggerRealPause() {
+        resumingFromPause = true;
         if (!audioEnabled) return;
         if (mediaPlayer != null) {
             mediaPlayer.pause();
