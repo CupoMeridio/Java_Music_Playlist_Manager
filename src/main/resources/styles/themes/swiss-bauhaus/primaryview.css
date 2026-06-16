@@ -1,0 +1,160 @@
+/* Swiss Bauhaus — primaryview.css */
+
+.root {
+    -fx-background-color: #F9F9F9;
+    -fx-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-text-fill: #111111;
+}
+
+#viewTitleLabel {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111111;
+    -fx-padding: 12 0 12 0;
+}
+
+.button {
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 0;
+    -fx-text-fill: #111111;
+    -fx-font-weight: normal;
+    -fx-padding: 7px 18px;
+    -fx-cursor: hand;
+    -fx-border-color: #111111;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+}
+
+.button:hover {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #0000FF;
+}
+
+.button:pressed {
+    -fx-background-color: #111111;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #111111;
+}
+
+#actionButton, #playPlaylistButton {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-border-color: #0000FF;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: #111111;
+    -fx-border-color: #111111;
+}
+
+#actionButton:pressed, #playPlaylistButton:pressed {
+    -fx-background-color: #FF0000;
+    -fx-border-color: #FF0000;
+}
+
+#undoButton {
+    -fx-background-color: #F9F9F9;
+    -fx-text-fill: #111111;
+    -fx-border-color: #111111;
+}
+
+#undoButton:not(:disabled) {
+    -fx-text-fill: #111111;
+}
+
+.combo-box {
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 0;
+    -fx-border-color: #E5E5E5;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+    -fx-padding: 3px;
+}
+
+.combo-box .cell {
+    -fx-text-fill: #111111;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #E5E5E5;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 1px;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #F9F9F9;
+    -fx-text-fill: #111111;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.table-view {
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 0;
+    -fx-table-cell-border-color: #E5E5E5;
+    -fx-border-color: #E5E5E5;
+    -fx-border-width: 1px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 0;
+    -fx-border-color: #E5E5E5;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+    -fx-border-color: transparent transparent #E5E5E5 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #111111;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #F9F9F9;
+    -fx-padding: 5px 0;
+    -fx-border-color: transparent transparent #E5E5E5 transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #FFFFFF;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #0000FF;
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.scroll-pane {
+    -fx-background-color: #F9F9F9;
+}

@@ -1,0 +1,91 @@
+/* Terminal ASCII (Light Mode) — addtrack.css */
+
+#formTitleLabel {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1B2A22;
+    -fx-padding: 0 0 12 0;
+}
+
+.text-field {
+    -fx-background-color: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #1B2A22;
+    -fx-prompt-text-fill: #667766;
+}
+
+.text-field:focused {
+    -fx-background-color: #E2EFE7;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+}
+
+.combo-box {
+    -fx-background-color: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+}
+
+.combo-box:focused {
+    -fx-background-color: #E2EFE7;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+}
+
+.check-combo-box {
+    -fx-background-color: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+}
+
+#addTrackErrorLabel {
+    -fx-text-fill: #1B2A22;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+#filePathLabel {
+    -fx-text-fill: #667766;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+#saveTrackButton {
+    -fx-background-color: #1B2A22;
+    -fx-text-fill: #F2F5F3;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-padding: 8px 22px;
+    -fx-cursor: hand;
+}
+
+#saveTrackButton:hover {
+    -fx-background-color: #E2EFE7;
+    -fx-text-fill: #1B2A22;
+}
+
+#saveTrackButton:pressed {
+    -fx-background-color: #1B2A22;
+    -fx-text-fill: #F2F5F3;
+}
+
+#loadingOverlay {
+    -fx-background-color: #F2F5F3;
+    -fx-alignment: center;
+    -fx-spacing: 12px;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+}

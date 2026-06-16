@@ -1,0 +1,41 @@
+/* Playful Bento Box — home.css */
+
+.home-container {
+    -fx-padding: 24px;
+    -fx-background-color: #F0F2F5;
+}
+
+.stat-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 24px;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+    -fx-padding: 18px 22px;
+}
+
+.stat-card:hover {
+    -fx-background-color: #DBEAFE;
+}
+
+.stat-card .label-title {
+    -fx-font-size: 11px;
+    -fx-text-fill: #64748B;
+    -fx-font-weight: bold;
+}
+
+.stat-card .label-value {
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #3B82F6;
+}
+
+.home-table {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0;
+}
+
+.top-rank-cell {
+    -fx-font-weight: bold;
+    -fx-text-fill: #64748B;
+    -fx-alignment: center;
+}

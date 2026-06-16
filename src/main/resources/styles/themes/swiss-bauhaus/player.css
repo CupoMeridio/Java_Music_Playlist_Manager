@@ -1,0 +1,102 @@
+/* Swiss Bauhaus — player.css */
+
+.player-bar {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #E5E5E5 transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 12px 22px;
+}
+
+#currentTrackTitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #111111;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+}
+
+.player-button {
+    -fx-background-color: #F9F9F9;
+    -fx-text-fill: #111111;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: #111111;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.player-button:hover {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #0000FF;
+}
+
+.player-button:pressed {
+    -fx-background-color: #111111;
+    -fx-text-fill: #FFFFFF;
+}
+
+#playPauseButton {
+    -fx-background-color: #FF0000;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-border-color: #FF0000;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-min-width: 42px;
+    -fx-max-width: 42px;
+    -fx-min-height: 42px;
+    -fx-max-height: 42px;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #0000FF;
+    -fx-border-color: #0000FF;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: #111111;
+    -fx-border-color: #111111;
+}
+
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: #E5E5E5;
+    -fx-background-radius: 0;
+    -fx-pref-height: 6px;
+}
+
+.slider .thumb {
+    -fx-background-color: #0000FF;
+    -fx-background-radius: 0;
+    -fx-pref-width: 14px;
+    -fx-pref-height: 14px;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #FF0000;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+    -fx-font-weight: normal;
+}

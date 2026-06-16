@@ -3,44 +3,30 @@ package it.unisa.java_music_playlist_manager;
 import java.util.function.Consumer;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
 
 /**
- * Controller per la gestione della barra laterale (SidebarView.fxml).
- * Estratto da PrimaryViewController per separare la responsabilità della
- * navigazione laterale dalla gestione della vista principale.
- */
-/**
  * SidebarController gestisce l'interfaccia della barra di navigazione laterale.
- * Permette all'utente di passare tra le diverse sezioni dell'applicazione:
- * Libreria Musicale, Coda di riproduzione e Playlist.
- * 
- * Ruolo nel progetto:
- * - Agisce come emettitore di eventi di navigazione.
- * - Comunica con il {@link PrimaryViewController} tramite un {@link Consumer} di stringhe,
- *   disaccoppiando la struttura della barra laterale dalla logica di visualizzazione centrale.
+ * Permette all'utente di passare tra le diverse sezioni dell'applicazione e
+ * di selezionare il tema visivo tramite il pulsante 🎨.
  */
 public class SidebarController {
 
-    /** Callback per la notifica degli eventi di navigazione al controller principale */
     private Consumer<String> onNavigate;
     private Consumer<String> onSearchQueryChange;
 
-    @FXML
-    private TextField searchField;
-    @FXML
-    private Button homeButton;
-    @FXML
-    private Button musicLibraryButton;
-    @FXML
-    private Button playQueueButton;
-    @FXML
-    private Button playlistButton;
+    @FXML private TextField searchField;
+    @FXML private Button homeButton;
+    @FXML private Button musicLibraryButton;
+    @FXML private Button playQueueButton;
+    @FXML private Button playlistButton;
+    @FXML private Button themeButton;
 
-    /**
-     * Imposta il callback di navigazione.
-     * @param callback Un Consumer che accetta l'identificativo della vista ("Musica", "Coda", "Playlist").
-     */
+    /** Menu contestuale con l'elenco dei temi disponibili */
+    private ContextMenu themeMenu;
+
     public void setOnNavigate(Consumer<String> callback) {
         this.onNavigate = callback;
     }
@@ -53,44 +39,67 @@ public class SidebarController {
     private void initialize() {
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldValue, newValue) -> {
-                if (onSearchQueryChange != null) {
-                    onSearchQueryChange.accept(newValue);
-                }
+                if (onSearchQueryChange != null) onSearchQueryChange.accept(newValue);
             });
+        }
+        buildThemeMenu();
+    }
+
+    /**
+     * Costruisce il ContextMenu con tutti i temi registrati nel ThemeManager.
+     * Il tema attivo viene marcato con ✓.
+     */
+    private void buildThemeMenu() {
+        themeMenu = new ContextMenu();
+        themeMenu.getStyleClass().add("theme-menu");
+
+        for (String name : ThemeManager.getInstance().getThemeNames()) {
+            MenuItem item = new MenuItem(name);
+            item.setOnAction(e -> {
+                ThemeManager.getInstance().applyTheme(name);
+                refreshThemeMenu(); // aggiorna il segno di spunta
+            });
+            themeMenu.getItems().add(item);
+        }
+        refreshThemeMenu();
+    }
+
+    /** Aggiorna i segni di spunta nel menu in base al tema attivo corrente. */
+    private void refreshThemeMenu() {
+        String active = ThemeManager.getInstance().getActiveTheme();
+        for (MenuItem item : themeMenu.getItems()) {
+            String label = item.getText().replace("✓  ", "");
+            item.setText(active.equals(label) ? "✓  " + label : label);
         }
     }
 
     // --- Gestori eventi UI ---
 
-    /** Notifica la richiesta di visualizzazione della Home (statistiche). */
     @FXML
     private void handleHomeAction() {
-        if (onNavigate != null) {
-            onNavigate.accept("Home");
-        }
+        if (onNavigate != null) onNavigate.accept("Home");
     }
 
-    /** Notifica la richiesta di visualizzazione della Libreria Musicale. */
     @FXML
     private void handleMusicLibraryAction() {
-        if (onNavigate != null) {
-            onNavigate.accept("Musica");
-        }
+        if (onNavigate != null) onNavigate.accept("Musica");
     }
 
-    /** Notifica la richiesta di visualizzazione della Coda di Riproduzione. */
     @FXML
     private void handlePlayQueueAction() {
-        if (onNavigate != null) {
-            onNavigate.accept("Coda");
-        }
+        if (onNavigate != null) onNavigate.accept("Coda");
     }
 
-    /** Notifica la richiesta di visualizzazione dell'elenco delle Playlist. */
     @FXML
     private void handlePlaylistAction() {
-        if (onNavigate != null) {
-            onNavigate.accept("Playlist");
+        if (onNavigate != null) onNavigate.accept("Playlist");
+    }
+
+    /** Mostra il menu dei temi sotto il pulsante 🎨. */
+    @FXML
+    private void handleThemeAction() {
+        if (themeButton != null && themeMenu != null) {
+            themeMenu.show(themeButton, javafx.geometry.Side.RIGHT, 0, 0);
         }
     }
 }

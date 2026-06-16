@@ -1,0 +1,41 @@
+/* Terminal ASCII (Light Mode) — home.css */
+
+.home-container {
+    -fx-padding: 20px;
+    -fx-background-color: #F2F5F3;
+}
+
+.stat-card {
+    -fx-background-color: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-padding: 16px 20px;
+}
+
+.stat-card:hover {
+    -fx-background-color: #E2EFE7;
+}
+
+.stat-card .label-title {
+    -fx-font-size: 10px;
+    -fx-text-fill: #667766;
+    -fx-font-weight: bold;
+}
+
+.stat-card .label-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1B2A22;
+}
+
+.home-table {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0;
+}
+
+.top-rank-cell {
+    -fx-font-weight: bold;
+    -fx-text-fill: #667766;
+    -fx-alignment: center;
+}

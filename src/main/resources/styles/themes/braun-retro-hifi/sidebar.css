@@ -1,0 +1,80 @@
+/* Braun Retro-HiFi — sidebar.css */
+
+.sidebar {
+    -fx-background-color: #EBEBEB;
+    -fx-padding: 20px 12px;
+    -fx-border-color: #B8B8B8;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.sidebar > .children > .label {
+    -fx-font-size: 15px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #2B2B2B;
+}
+
+#searchField {
+    -fx-background-color: #D4D4D4;
+    -fx-background-radius: 3px;
+    -fx-border-color: #A8A8A8;
+    -fx-border-radius: 3px;
+    -fx-border-width: 1px;
+    -fx-padding: 7px 12px;
+    -fx-prompt-text-fill: #707070;
+    -fx-text-fill: #2B2B2B;
+}
+
+#searchField:focused {
+    -fx-background-color: #D4D4D4;
+    -fx-border-color: #FF5500;
+    -fx-border-width: 2px;
+}
+
+.sidebar-button {
+    -fx-background-color: #D4D4D4;
+    -fx-text-fill: #2B2B2B;
+    -fx-alignment: center-left;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-padding: 9px 12px;
+    -fx-max-width: infinity;
+    -fx-cursor: hand;
+    -fx-background-radius: 3px;
+    -fx-border-color: #A8A8A8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #EBEBEB;
+    -fx-border-color: #FF5500;
+    -fx-text-fill: #2B2B2B;
+}
+
+.sidebar-button.active {
+    -fx-background-color: #FF5500;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: normal;
+    -fx-border-color: #A63A00;
+}
+
+.context-menu {
+    -fx-background-color: #D4D4D4;
+    -fx-border-color: #A8A8A8;
+    -fx-border-width: 1px;
+}
+
+.context-menu .label {
+    -fx-text-fill: #2B2B2B;
+}
+
+.menu-item {
+    -fx-background-color: #D4D4D4;
+    -fx-text-fill: #2B2B2B;
+    -fx-padding: 8px 16px;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #FF5500;
+    -fx-text-fill: #FFFFFF;
+}

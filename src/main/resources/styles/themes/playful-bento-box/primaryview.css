@@ -1,0 +1,155 @@
+/* Playful Bento Box — primaryview.css */
+
+.root {
+    -fx-background-color: #F0F2F5;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-text-fill: #1F2937;
+}
+
+#viewTitleLabel {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1F2937;
+    -fx-padding: 8 0 8 0;
+}
+
+.button {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 18px;
+    -fx-text-fill: #1F2937;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 18px;
+    -fx-cursor: hand;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 18px;
+}
+
+.button:hover {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #3B82F6;
+}
+
+.button:pressed {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: #FFFFFF;
+}
+
+#actionButton, #playPlaylistButton {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-border-color: #3B82F6;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: #2563EB;
+    -fx-border-color: #2563EB;
+}
+
+#actionButton:pressed, #playPlaylistButton:pressed {
+    -fx-background-color: #1D4ED8;
+}
+
+#undoButton {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-border-color: #E4E7EB;
+}
+
+#undoButton:not(:disabled) {
+    -fx-text-fill: #1F2937;
+}
+
+.combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 16px;
+    -fx-border-color: #E4E7EB;
+    -fx-border-radius: 16px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 4px;
+}
+
+.combo-box .cell {
+    -fx-text-fill: #1F2937;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E4E7EB;
+    -fx-border-radius: 16px;
+    -fx-background-radius: 16px;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #1F2937;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 22px;
+    -fx-table-cell-border-color: #E4E7EB;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 22px 22px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+    -fx-border-color: transparent transparent #E4E7EB transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 5px 0;
+    -fx-border-color: transparent transparent #E4E7EB transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #DBEAFE;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #3B82F6;
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.scroll-pane {
+    -fx-background-color: #F0F2F5;
+}

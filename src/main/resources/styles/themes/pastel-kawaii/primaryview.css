@@ -1,0 +1,156 @@
+/* Pastel Kawaii — primaryview.css */
+
+.root {
+    -fx-background-color: #fff5f8;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-text-fill: #8a5c70;
+}
+
+#viewTitleLabel {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d48ef5;
+    -fx-padding: 8 0 8 0;
+}
+
+.button {
+    -fx-background-color: linear-gradient(to bottom, #ffd6e8, #ffc3dc);
+    -fx-background-radius: 24px;
+    -fx-text-fill: #8a5c70;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+    -fx-border-color: #ffd6e8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 24px;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #e8b4f8, #d48ef5);
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #e8b4f8;
+}
+
+.button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #ffb3d1, #e080a0);
+    -fx-text-fill: #ffffff;
+}
+
+#actionButton, #playPlaylistButton {
+    -fx-background-color: linear-gradient(to bottom, #ffb3d1, #e080a0);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-border-color: #ffd6e8;
+    -fx-border-width: 1px;
+    -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: linear-gradient(to bottom, #e8b4f8, #d48ef5);
+    -fx-border-color: #e8b4f8;
+}
+
+#actionButton:pressed, #playPlaylistButton:pressed {
+    -fx-background-color: linear-gradient(to bottom, #d48ef5, #b8f0e0);
+}
+
+#undoButton {
+    -fx-background-color: linear-gradient(to bottom, #ffd6e8, #fff5f8);
+    -fx-text-fill: #8a5c70;
+    -fx-border-color: #ffd6e8;
+}
+
+#undoButton:not(:disabled) {
+    -fx-text-fill: #8a5c70;
+}
+
+.combo-box {
+    -fx-background-color: linear-gradient(to bottom, #ffd6e8, #fff5f8);
+    -fx-background-radius: 22px;
+    -fx-border-color: #ffd6e8;
+    -fx-border-radius: 22px;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+}
+
+.combo-box .cell {
+    -fx-text-fill: #8a5c70;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #fff5f8;
+    -fx-border-color: #ffd6e8;
+    -fx-border-radius: 22px;
+    -fx-background-radius: 22px;
+    -fx-border-width: 1px;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #fff5f8;
+    -fx-text-fill: #8a5c70;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #b8f0e0;
+    -fx-text-fill: #8a5c70;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: linear-gradient(to bottom, #e8b4f8, #d48ef5);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.table-view {
+    -fx-background-color: #fff5f8;
+    -fx-background-radius: 26px;
+    -fx-table-cell-border-color: #ffd6e8;
+    -fx-border-color: #ffd6e8;
+    -fx-border-width: 1px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #fff5f8;
+    -fx-background-radius: 26px 26px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+    -fx-border-color: transparent transparent #ffd6e8 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #d48ef5;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #fff5f8;
+    -fx-padding: 5px 0;
+    -fx-border-color: transparent transparent #ffd6e8 transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #ffd6e8;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: linear-gradient(to bottom, #e8b4f8, #d48ef5);
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.scroll-pane {
+    -fx-background-color: #fff5f8;
+}

@@ -1,0 +1,81 @@
+/* Swiss Bauhaus — sidebar.css */
+
+.sidebar {
+    -fx-background-color: #F9F9F9;
+    -fx-padding: 22px 14px;
+    -fx-border-color: #E5E5E5;
+    -fx-border-width: 0 1px 0 0;
+}
+
+.sidebar > .children > .label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #111111;
+}
+
+#searchField {
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 0;
+    -fx-border-color: #E5E5E5;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 12px;
+    -fx-prompt-text-fill: #666666;
+    -fx-text-fill: #111111;
+}
+
+#searchField:focused {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #0000FF;
+    -fx-border-width: 1px;
+}
+
+.sidebar-button {
+    -fx-background-color: #F9F9F9;
+    -fx-text-fill: #111111;
+    -fx-alignment: center-left;
+    -fx-font-size: 13px;
+    -fx-font-weight: normal;
+    -fx-padding: 10px 14px;
+    -fx-max-width: infinity;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+}
+
+.sidebar-button.active {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.context-menu {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #E5E5E5;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.context-menu .label {
+    -fx-text-fill: #111111;
+    -fx-font-weight: bold;
+}
+
+.menu-item {
+    -fx-background-color: #F9F9F9;
+    -fx-text-fill: #111111;
+    -fx-padding: 9px 16px;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #0000FF;
+    -fx-text-fill: #FFFFFF;
+}

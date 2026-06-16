@@ -5,13 +5,30 @@ import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import it.unisa.java_music_playlist_manager.model.Library;
+import javafx.animation.RotateTransition;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javafx.util.Duration;
+
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.images.Artwork;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller per la gestione della barra di riproduzione (PlayerBarView.fxml).
@@ -57,7 +74,7 @@ public class PlayerController implements Observer {
     @FXML
     private Label totalTimeLabel;
     @FXML
-    private ImageView albumCoverImageView;
+    private StackPane coverContainer;
     @FXML
     private Label currentTrackTitle;
     @FXML
@@ -76,6 +93,19 @@ public class PlayerController implements Observer {
     private Button volumeButton;
     @FXML
     private Slider volumeSlider;
+
+    // --- Vista copertina ---
+    /** Vista standard: ImageView quadrata */
+    private ImageView albumCoverImageView;
+    /** Vista vinile: cerchio che ruota */
+    private Circle vinylCircle;
+    /** Animazione rotazione vinile */
+    private RotateTransition vinylRotation;
+    /** true = vista vinile attiva, false = vista standard */
+    private boolean vinylViewActive = false;
+
+    /** Dimensione fissa del widget copertina */
+    private static final double COVER_SIZE = 50.0;
 
     /**
      * per l'undo:
@@ -121,6 +151,10 @@ public class PlayerController implements Observer {
         PlaybackManager.getInstance().attach(this);
         Library.getInstance().attach(this);
 
+        // Costruisce le due viste copertina e mostra quella standard
+        buildCoverViews();
+        showStandardView();
+
         // Reset testi iniziali
         if (currentTimeLabel != null) currentTimeLabel.setText("00:00");
         if (totalTimeLabel != null) totalTimeLabel.setText("00:00");
@@ -140,7 +174,7 @@ public class PlayerController implements Observer {
         if (progressSlider != null) {
             progressSlider.setOnMousePressed(e -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-                if (mp != null) mp.pause(); // Pausa temporanea durante il trascinamento
+                if (mp != null) mp.pause();
             });
             progressSlider.setOnMouseReleased(e -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
@@ -149,6 +183,129 @@ public class PlayerController implements Observer {
                     mp.play();
                 }
             });
+        }
+    }
+
+    /**
+     * Costruisce le due viste copertina (standard e vinile) e le aggiunge al container.
+     * Entrambe vengono create una sola volta e poi mostrate/nascoste al click.
+     */
+    private void buildCoverViews() {
+        if (coverContainer == null) return;
+
+        // --- Vista standard: ImageView quadrata con bordo ---
+        albumCoverImageView = new ImageView();
+        albumCoverImageView.setFitWidth(COVER_SIZE);
+        albumCoverImageView.setFitHeight(COVER_SIZE);
+        albumCoverImageView.setPreserveRatio(true);
+        albumCoverImageView.setPickOnBounds(true);
+        albumCoverImageView.setStyle("-fx-border-color: #999999; -fx-border-width: 1;");
+
+        // --- Vista vinile: cerchio con solchi disegnati via Canvas ---
+        vinylCircle = new Circle(COVER_SIZE / 2);
+        drawVinyl(null); // disegna il disco senza copertina inizialmente
+
+        // Animazione rotazione continua (1 giro ogni 3 secondi)
+        vinylRotation = new RotateTransition(Duration.seconds(3), vinylCircle);
+        vinylRotation.setByAngle(360);
+        vinylRotation.setCycleCount(RotateTransition.INDEFINITE);
+        vinylRotation.setInterpolator(javafx.animation.Interpolator.LINEAR);
+
+        coverContainer.getChildren().addAll(albumCoverImageView, vinylCircle);
+    }
+
+    /**
+     * Disegna la texture del disco vinile sul cerchio.
+     * La copertina (se presente) viene usata come riempimento circolare centrale.
+     * I solchi sono cerchi concentrici grigi su sfondo nero.
+     *
+     * @param cover immagine copertina, o null per usare solo il nero
+     */
+    private void drawVinyl(Image cover) {
+        if (vinylCircle == null) return;
+
+        double r = COVER_SIZE / 2;
+
+        // Sfondo: canvas nero su cui disegniamo i solchi
+        Canvas canvas = new Canvas(COVER_SIZE, COVER_SIZE);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+
+        // Disco nero di base
+        gc.setFill(Color.web("#1a1a1a"));
+        gc.fillOval(0, 0, COVER_SIZE, COVER_SIZE);
+
+        // Solchi concentrici (cerchi grigi a distanze regolari)
+        gc.setStroke(Color.web("#3a3a3a"));
+        gc.setLineWidth(0.5);
+        for (double groove = r * 0.45; groove < r * 0.92; groove += 3.0) {
+            gc.strokeOval(r - groove, r - groove, groove * 2, groove * 2);
+        }
+
+        // Etichetta centrale: copertina circolare o cerchio colorato
+        double labelRadius = r * 0.38;
+        if (cover != null) {
+            // Ritaglia la copertina in un cerchio centrale
+            gc.save();
+            gc.beginPath();
+            gc.arc(r, r, labelRadius, labelRadius, 0, 360);
+            gc.closePath();
+            gc.clip();
+            gc.drawImage(cover,
+                r - labelRadius, r - labelRadius,
+                labelRadius * 2, labelRadius * 2);
+            gc.restore();
+        } else {
+            // Etichetta colorata generica
+            gc.setFill(Color.web("#cc3333"));
+            gc.fillOval(r - labelRadius, r - labelRadius, labelRadius * 2, labelRadius * 2);
+        }
+
+        // Buco centrale del vinile
+        double holeRadius = r * 0.06;
+        gc.setFill(Color.web("#111111"));
+        gc.fillOval(r - holeRadius, r - holeRadius, holeRadius * 2, holeRadius * 2);
+
+        // Converti il canvas in immagine e usala come fill del cerchio
+        javafx.scene.SnapshotParameters sp = new javafx.scene.SnapshotParameters();
+        sp.setFill(Color.TRANSPARENT);
+        Image vinylImage = canvas.snapshot(sp, null);
+        vinylCircle.setFill(new ImagePattern(vinylImage));
+    }
+
+    /** Mostra la vista standard (ImageView) e nasconde il vinile. */
+    private void showStandardView() {
+        if (albumCoverImageView != null) albumCoverImageView.setVisible(true);
+        if (vinylCircle != null) vinylCircle.setVisible(false);
+        if (vinylRotation != null) vinylRotation.pause();
+        vinylViewActive = false;
+    }
+
+    /** Mostra la vista vinile e nasconde la standard. Avvia la rotazione se il player è attivo. */
+    private void showVinylView() {
+        if (albumCoverImageView != null) albumCoverImageView.setVisible(false);
+        if (vinylCircle != null) vinylCircle.setVisible(true);
+        vinylViewActive = true;
+        syncVinylRotation();
+    }
+
+    /** Avvia o ferma la rotazione del vinile in base allo stato del player. */
+    private void syncVinylRotation() {
+        if (!vinylViewActive || vinylRotation == null) return;
+        String state = PlaybackManager.getInstance().getCurrentState().getClass().getSimpleName().toLowerCase();
+        if (state.contains("play")) {
+            vinylRotation.play();
+        } else {
+            vinylRotation.pause();
+        }
+    }
+
+    /** Gestisce il click sul container copertina: alterna tra le due viste. */
+    @FXML
+    private void handleCoverClick() {
+        if (vinylViewActive) {
+            showStandardView();
+        } else {
+            showVinylView();
         }
     }
 
@@ -272,7 +429,7 @@ public class PlayerController implements Observer {
 
     /**
      * Sincronizza l'interfaccia del player con lo stato attuale del manager.
-     * Aggiorna titolo, autore e l'icona del pulsante Play/Pause.
+     * Aggiorna titolo, autore, copertina e l'icona del pulsante Play/Pause.
      */
     public void updatePlayerUI() {
         PlaybackManager manager = PlaybackManager.getInstance();
@@ -281,16 +438,55 @@ public class PlayerController implements Observer {
         if (currentTrack != null) {
             if (currentTrackTitle != null) currentTrackTitle.setText(currentTrack.getTitle());
             if (currentTrackDetails != null) currentTrackDetails.setText(currentTrack.getAuthor());
+            updateAlbumCover(currentTrack.getFilePath());
         } else {
             if (currentTrackTitle != null) currentTrackTitle.setText("Nessun brano in riproduzione");
             if (currentTrackDetails != null) currentTrackDetails.setText("");
+            if (albumCoverImageView != null) albumCoverImageView.setImage(null);
+            drawVinyl(null);
         }
 
         // Cambio icona dinamico basato sullo stato corrente del Pattern State
         if (playPauseButton != null) {
             String stateName = manager.getCurrentState().getClass().getSimpleName();
-            // Se siamo in uno stato di riproduzione (PlayingState), mostriamo l'icona Pausa
             playPauseButton.setText(stateName.toLowerCase().contains("play") ? "||" : "▶️");
         }
+
+        // Sincronizza la rotazione del vinile con lo stato play/pausa
+        syncVinylRotation();
+    }
+
+    /**
+     * Estrae la copertina embedded nel file audio tramite jaudiotagger.
+     * Aggiorna sia la vista standard che quella vinile.
+     */
+    private void updateAlbumCover(String filePath) {
+        if (filePath == null) return;
+
+        new Thread(() -> {
+            Image cover = null;
+            try {
+                Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
+                AudioFile audioFile = AudioFileIO.read(new File(filePath));
+                org.jaudiotagger.tag.Tag tag = audioFile.getTag();
+                if (tag != null) {
+                    Artwork artwork = tag.getFirstArtwork();
+                    if (artwork != null) {
+                        byte[] data = artwork.getBinaryData();
+                        if (data != null && data.length > 0) {
+                            cover = new Image(new ByteArrayInputStream(data));
+                        }
+                    }
+                }
+            } catch (Exception ignored) {}
+
+            final Image finalCover = cover;
+            javafx.application.Platform.runLater(() -> {
+                // Aggiorna vista standard
+                if (albumCoverImageView != null) albumCoverImageView.setImage(finalCover);
+                // Ridisegna il vinile con la nuova copertina
+                drawVinyl(finalCover);
+            });
+        }).start();
     }
 }

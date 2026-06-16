@@ -27,12 +27,12 @@
             </padding>
             
             <children>
-                <Label fx:id="formTitleLabel" style="-fx-font-size: 20px; -fx-font-weight: bold;" text="Aggiungi nuovo brano" />
+                <Label fx:id="formTitleLabel" text="Aggiungi nuovo brano" />
 
                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                     <children>
                         <Button onAction="#handleSelectFile" text="Seleziona File Audio" />
-                        <Label fx:id="filePathLabel" style="-fx-text-fill: #666666; -fx-font-style: italic;" text="Nessun file selezionato" />
+                        <Label fx:id="filePathLabel" text="Nessun file selezionato" />
                     </children>
                 </HBox>
 
@@ -71,7 +71,7 @@
                </rowConstraints>
                 </GridPane>
 
-                <Label fx:id="addTrackErrorLabel" style="-fx-text-fill: red;" text="" />
+                <Label fx:id="addTrackErrorLabel" text="" />
 
                 <Region VBox.vgrow="ALWAYS" />
 

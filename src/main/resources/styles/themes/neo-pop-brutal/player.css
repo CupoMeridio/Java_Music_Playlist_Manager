@@ -1,0 +1,104 @@
+/* Neo-Pop Brutal — player.css */
+
+.player-bar {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000 transparent transparent transparent;
+    -fx-border-width: 2px 0 0 0;
+    -fx-padding: 10px 20px;
+}
+
+#currentTrackTitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #000000;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 11px;
+    -fx-text-fill: #000000;
+}
+
+.player-button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.player-button:hover {
+    -fx-background-color: #FFDE47;
+    -fx-text-fill: #000000;
+}
+
+.player-button:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+#playPauseButton {
+    -fx-background-color: #FF5C5C;
+    -fx-text-fill: #000000;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-min-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #FFDE47;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-pref-height: 8px;
+}
+
+.slider .thumb {
+    -fx-background-color: #FF5C5C;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #FFDE47;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 11px;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}

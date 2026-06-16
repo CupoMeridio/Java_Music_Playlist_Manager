@@ -1,0 +1,103 @@
+/* Braun Retro-HiFi — player.css */
+
+.player-bar {
+    -fx-background-color: #EBEBEB;
+    -fx-border-color: #B8B8B8 transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 10px 20px;
+}
+
+#currentTrackTitle {
+    -fx-font-weight: normal;
+    -fx-font-size: 13px;
+    -fx-text-fill: #2B2B2B;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 11px;
+    -fx-text-fill: #707070;
+}
+
+.player-button {
+    -fx-background-color: #D4D4D4;
+    -fx-text-fill: #2B2B2B;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-cursor: hand;
+    -fx-background-radius: 50%;
+    -fx-border-color: #A8A8A8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.player-button:hover {
+    -fx-background-color: #EBEBEB;
+    -fx-border-color: #FF5500;
+}
+
+.player-button:pressed {
+    -fx-background-color: #BFBFBF;
+}
+
+#playPauseButton {
+    -fx-background-color: #FF5500;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 50%;
+    -fx-border-color: #A63A00;
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+    -fx-min-width: 40px;
+    -fx-max-width: 40px;
+    -fx-min-height: 40px;
+    -fx-max-height: 40px;
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #FF5500;
+    -fx-border-color: #2B2B2B;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: #C94500;
+}
+
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: #D4D4D4;
+    -fx-background-radius: 2px;
+    -fx-border-color: #A8A8A8;
+    -fx-border-width: 1px;
+    -fx-pref-height: 6px;
+}
+
+.slider .thumb {
+    -fx-background-color: #FF5500;
+    -fx-background-radius: 50%;
+    -fx-border-color: #A63A00;
+    -fx-border-width: 1px;
+    -fx-pref-width: 14px;
+    -fx-pref-height: 14px;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #FF5500;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 11px;
+    -fx-text-fill: #707070;
+    -fx-font-weight: normal;
+}

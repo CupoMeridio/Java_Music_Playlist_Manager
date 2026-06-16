@@ -1,0 +1,84 @@
+/* Playful Bento Box — sidebar.css */
+
+.sidebar {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 20px 14px;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
+}
+
+.sidebar > .children > .label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1F2937;
+}
+
+#searchField {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 18px;
+    -fx-border-color: #E4E7EB;
+    -fx-border-radius: 18px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 8px 14px;
+    -fx-prompt-text-fill: #94A3B8;
+    -fx-text-fill: #1F2937;
+}
+
+#searchField:focused {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #3B82F6;
+    -fx-border-width: 2px;
+}
+
+.sidebar-button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-alignment: center-left;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 14px;
+    -fx-max-width: infinity;
+    -fx-cursor: hand;
+    -fx-background-radius: 18px;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 18px;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #1F2937;
+}
+
+.sidebar-button.active {
+    -fx-background-color: #3B82F6;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+    -fx-border-color: #3B82F6;
+}
+
+.context-menu {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+}
+
+.context-menu .label {
+    -fx-text-fill: #1F2937;
+    -fx-font-weight: bold;
+}
+
+.menu-item {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+    -fx-padding: 9px 16px;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #1F2937;
+}

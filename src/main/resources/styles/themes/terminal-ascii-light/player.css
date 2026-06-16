@@ -1,0 +1,103 @@
+/* Terminal ASCII (Light Mode) — player.css */
+
+.player-bar {
+    -fx-background-color: #F2F5F3;
+    -fx-border-color: #1B2A22 transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 10px 18px;
+}
+
+#currentTrackTitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #1B2A22;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 10px;
+    -fx-text-fill: #667766;
+}
+
+.player-button {
+    -fx-background-color: #F2F5F3;
+    -fx-text-fill: #1B2A22;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-min-width: 30px;
+    -fx-max-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.player-button:hover {
+    -fx-background-color: #E2EFE7;
+    -fx-text-fill: #1B2A22;
+}
+
+.player-button:pressed {
+    -fx-background-color: #1B2A22;
+    -fx-text-fill: #F2F5F3;
+}
+
+#playPauseButton {
+    -fx-background-color: #1B2A22;
+    -fx-text-fill: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #E2EFE7;
+    -fx-text-fill: #1B2A22;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: #1B2A22;
+    -fx-text-fill: #F2F5F3;
+}
+
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: #1B2A22;
+    -fx-background-radius: 0;
+    -fx-pref-height: 2px;
+}
+
+.slider .thumb {
+    -fx-background-color: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-pref-width: 12px;
+    -fx-pref-height: 12px;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #E2EFE7;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 10px;
+    -fx-text-fill: #667766;
+    -fx-font-weight: bold;
+}

@@ -1,0 +1,91 @@
+/* Neo-Pop Brutal — addtrack.css */
+
+#formTitleLabel {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-padding: 0 0 12 0;
+}
+
+.text-field {
+    -fx-background-color: #FDF9F5;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #000000;
+    -fx-prompt-text-fill: #000000;
+}
+
+.text-field:focused {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+    -fx-border-width: 3px;
+}
+
+.combo-box {
+    -fx-background-color: #FDF9F5;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+}
+
+.combo-box:focused {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+    -fx-border-width: 3px;
+}
+
+.check-combo-box {
+    -fx-background-color: #FDF9F5;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+}
+
+#addTrackErrorLabel {
+    -fx-text-fill: #FF5C5C;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+#filePathLabel {
+    -fx-text-fill: #000000;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+#saveTrackButton {
+    -fx-background-color: #FFDE47;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-padding: 9px 24px;
+    -fx-cursor: hand;
+}
+
+#saveTrackButton:hover {
+    -fx-background-color: #FF5C5C;
+}
+
+#saveTrackButton:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+#loadingOverlay {
+    -fx-background-color: #FDF9F5;
+    -fx-alignment: center;
+    -fx-spacing: 14px;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
+}

@@ -1,0 +1,45 @@
+/* Vaporwave Sunset — home.css */
+
+.home-container {
+    -fx-padding: 24px;
+    -fx-background-color: transparent;
+}
+
+.stat-card {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-background-radius: 26px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-padding: 18px 22px;
+}
+
+.stat-card:hover {
+    -fx-background-color: rgba(1, 205, 254, 0.18);
+}
+
+.stat-card:hover .label-value {
+    -fx-text-fill: #ff6b35;
+}
+
+.stat-card .label-title {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7b4a64;
+    -fx-font-weight: bold;
+}
+
+.stat-card .label-value {
+    -fx-font-size: 30px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #b967ff;
+}
+
+.home-table {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0;
+}
+
+.top-rank-cell {
+    -fx-font-weight: bold;
+    -fx-text-fill: #7b4a64;
+    -fx-alignment: center;
+}

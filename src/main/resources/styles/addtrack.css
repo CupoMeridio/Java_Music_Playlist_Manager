@@ -1,62 +1,81 @@
-/* Titolo del Form */
+/* =============================================================
+   FORM AGGIUNGI / MODIFICA BRANO — TEMA BASE
+   ============================================================= */
+
 #formTitleLabel {
-    -fx-font-size: 20px;
+    -fx-font-size: 19px;
     -fx-font-weight: bold;
     -fx-text-fill: #1D1D1F;
-    -fx-padding: 0 0 16 0;
+    -fx-padding: 0 0 12 0;
 }
 
-/* Campi di input formattati */
 .text-field {
     -fx-background-color: #F5F5F7;
     -fx-background-radius: 8px;
-    -fx-border-color: #E8E8ED;
+    -fx-border-color: transparent;
     -fx-border-radius: 8px;
-    -fx-padding: 10px;
+    -fx-padding: 8px 10px;
     -fx-text-fill: #1D1D1F;
+    -fx-prompt-text-fill: #86868B;
 }
 
 .text-field:focused {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: #FA243C;
-    -fx-effect: dropshadow(three-pass-box, rgba(250,36,60,0.1), 0, 0, 8, 0);
+    -fx-border-color: #0071E3;
+    -fx-border-width: 1.5px;
 }
 
-/* Etichetta dei messaggi di errore */
-#addTrackErrorLabel {
-    -fx-text-fill: #FF3B30; /* Rosso di errore Apple di sistema */
-    -fx-font-size: 12px;
-}
-
-/* Percorso del File Selezionato */
-#filePathLabel {
-    -fx-text-fill: #8E8E93;
-    -fx-font-size: 12px;
-    -fx-background-color: #E8E8ED;
-    -fx-padding: 6px;
-    -fx-background-radius: 4px;
-}
-
-/* Pulsante di salvataggio */
-#saveTrackButton {
-    -fx-background-color: #FA243C;
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
+.combo-box {
+    -fx-background-color: #F5F5F7;
     -fx-background-radius: 8px;
-    -fx-padding: 10px 24px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8px;
 }
 
-/* Componente ControlsFX CheckComboBox */
+.combo-box:focused {
+    -fx-border-color: #0071E3;
+    -fx-border-width: 1.5px;
+}
+
 .check-combo-box {
     -fx-background-color: #F5F5F7;
     -fx-background-radius: 8px;
+    -fx-border-color: transparent;
     -fx-border-radius: 8px;
-    -fx-border-color: #E8E8ED;
 }
 
-/* Overlay di caricamento/analisi file audio */
+#addTrackErrorLabel {
+    -fx-text-fill: #FA243C;
+    -fx-font-size: 12px;
+}
+
+#filePathLabel {
+    -fx-text-fill: #86868B;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+#saveTrackButton {
+    -fx-background-color: #0071E3;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: 600;
+    -fx-background-radius: 8px;
+    -fx-padding: 9px 24px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+
+#saveTrackButton:hover {
+    -fx-background-color: #0077ED;
+}
+
+#saveTrackButton:pressed {
+    -fx-background-color: #005bbf;
+}
+
 #loadingOverlay {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-color: rgba(255, 255, 255, 0.90);
     -fx-alignment: center;
-    -fx-spacing: 16px;
+    -fx-spacing: 14px;
+    -fx-background-radius: 12px;
 }

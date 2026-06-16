@@ -1,0 +1,46 @@
+/* Swiss Bauhaus — home.css */
+
+.home-container {
+    -fx-padding: 24px;
+    -fx-background-color: #F9F9F9;
+}
+
+.stat-card {
+    -fx-background-color: #F9F9F9;
+    -fx-background-radius: 0;
+    -fx-border-color: #E5E5E5;
+    -fx-border-width: 1px;
+    -fx-padding: 18px 22px;
+}
+
+.stat-card:hover {
+    -fx-background-color: #0000FF;
+}
+
+.stat-card:hover .label-title,
+.stat-card:hover .label-value {
+    -fx-text-fill: #FFFFFF;
+}
+
+.stat-card .label-title {
+    -fx-font-size: 11px;
+    -fx-text-fill: #666666;
+    -fx-font-weight: bold;
+}
+
+.stat-card .label-value {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #0000FF;
+}
+
+.home-table {
+    -fx-background-color: transparent;
+    -fx-padding: 8px 0;
+}
+
+.top-rank-cell {
+    -fx-font-weight: bold;
+    -fx-text-fill: #666666;
+    -fx-alignment: center;
+}

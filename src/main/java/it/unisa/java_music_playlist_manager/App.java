@@ -46,7 +46,8 @@ public class App extends Application {
         // per garantire la compatibilità con SceneBuilder e diversi IDE.
         scene = new Scene(loadFXML("/fxml/primaryView"), 1024, 700);
         stage.setTitle("Java Music Playlist Manager");
-        loadStylesheets(scene);
+        ThemeManager.getInstance().setScene(scene);
+        ThemeManager.getInstance().applyActiveTheme();
        
         // Caricamento delle icone dell'applicazione in diverse dimensioni.
         // Il sistema operativo sceglierà automaticamente la dimensione più adatta.
@@ -68,33 +69,6 @@ public class App extends Application {
                 "Impossibile salvare la libreria precedente.\nDettagli: " + ex.getMessage(), 
                 ButtonType.OK);
             alert.showAndWait();
-        }
-    }
-
-    /**
-     * Carica i fogli di stile CSS all'interno della Scena principale.
-     * @param scene La scena dell'applicazione.
-     */
-    private void loadStylesheets(Scene scene) {
-        String[] cssFiles = {
-                "/styles/primaryview.css",
-                "/styles/player.css",
-                "/styles/sidebar.css",
-                "/styles/home.css",
-                "/styles/addtrack.css"
-        };
-
-        for (String cssPath : cssFiles) {
-            try {
-                var resource = getClass().getResource(cssPath);
-                if (resource != null) {
-                    scene.getStylesheets().add(resource.toExternalForm());
-                } else {
-                    System.err.println("[CSS WARNING] File non trovato: " + cssPath);
-                }
-            } catch (Exception e) {
-                System.err.println("[CSS ERROR] Errore nel caricamento di: " + cssPath + " -> " + e.getMessage());
-            }
         }
     }
 

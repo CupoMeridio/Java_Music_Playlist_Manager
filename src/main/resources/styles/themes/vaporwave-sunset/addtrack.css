@@ -1,0 +1,89 @@
+/* Vaporwave Sunset — addtrack.css */
+
+#formTitleLabel {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3d1a2e;
+    -fx-padding: 0 0 12 0;
+}
+
+.text-field {
+    -fx-background-color: rgba(255, 248, 245, 0.82);
+    -fx-background-radius: 22px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-radius: 22px;
+    -fx-border-width: 1px;
+    -fx-padding: 9px 12px;
+    -fx-text-fill: #3d1a2e;
+    -fx-prompt-text-fill: #7b4a64;
+}
+
+.text-field:focused {
+    -fx-background-color: rgba(255, 248, 245, 0.92);
+    -fx-border-color: #b967ff;
+    -fx-border-width: 1px;
+}
+
+.combo-box {
+    -fx-background-color: rgba(255, 248, 245, 0.82);
+    -fx-background-radius: 22px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-radius: 22px;
+    -fx-border-width: 1px;
+}
+
+.combo-box:focused {
+    -fx-background-color: rgba(255, 248, 245, 0.92);
+    -fx-border-color: #b967ff;
+    -fx-border-width: 1px;
+}
+
+.check-combo-box {
+    -fx-background-color: rgba(255, 248, 245, 0.82);
+    -fx-background-radius: 22px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-radius: 22px;
+    -fx-border-width: 1px;
+}
+
+#addTrackErrorLabel {
+    -fx-text-fill: #ff6b35;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+#filePathLabel {
+    -fx-text-fill: #7b4a64;
+    -fx-font-size: 12px;
+}
+
+#saveTrackButton {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-background-radius: 22px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-border-radius: 22px;
+    -fx-padding: 10px 26px;
+    -fx-cursor: hand;
+}
+
+#saveTrackButton:hover {
+    -fx-background-color: #ff6b35;
+    -fx-border-color: #ff6b35;
+}
+
+#saveTrackButton:pressed {
+    -fx-background-color: linear-gradient(to right, #01cdfe, #b967ff);
+}
+
+#loadingOverlay {
+    -fx-background-color: rgba(255, 248, 245, 0.92);
+    -fx-alignment: center;
+    -fx-spacing: 14px;
+    -fx-background-radius: 28px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-border-radius: 28px;
+}

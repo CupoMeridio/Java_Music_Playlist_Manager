@@ -1,0 +1,84 @@
+/* Pastel Kawaii — sidebar.css */
+
+.sidebar {
+    -fx-background-color: #fff5f8;
+    -fx-padding: 20px 14px;
+    -fx-border-color: #ffd6e8;
+    -fx-border-width: 0 0 0 1px;
+    -fx-background-radius: 28px;
+    -fx-border-radius: 28px;
+}
+
+.sidebar > .children > .label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d48ef5;
+}
+
+#searchField {
+    -fx-background-color: linear-gradient(to bottom, #fff5f8, #ffd6e8);
+    -fx-background-radius: 24px;
+    -fx-border-color: #ffd6e8;
+    -fx-border-radius: 24px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 14px;
+    -fx-prompt-text-fill: #c59bb0;
+    -fx-text-fill: #8a5c70;
+}
+
+#searchField:focused {
+    -fx-background-color: linear-gradient(to bottom, #fff5f8, #b8f0e0);
+    -fx-border-color: #b8f0e0;
+    -fx-border-width: 1px;
+}
+
+.sidebar-button {
+    -fx-background-color: linear-gradient(to bottom, #fff5f8, #ffd6e8);
+    -fx-text-fill: #8a5c70;
+    -fx-alignment: center-left;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 14px;
+    -fx-max-width: infinity;
+    -fx-cursor: hand;
+    -fx-background-radius: 24px;
+    -fx-border-color: #ffd6e8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 24px;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #e8b4f8, #d48ef5);
+    -fx-text-fill: #ffffff;
+}
+
+.sidebar-button.active {
+    -fx-background-color: linear-gradient(to bottom, #e8b4f8, #d48ef5);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-border-color: #e8b4f8;
+}
+
+.context-menu {
+    -fx-background-color: #fff5f8;
+    -fx-border-color: #ffd6e8;
+    -fx-border-width: 1px;
+    -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
+}
+
+.context-menu .label {
+    -fx-text-fill: #8a5c70;
+    -fx-font-weight: bold;
+}
+
+.menu-item {
+    -fx-background-color: #fff5f8;
+    -fx-text-fill: #8a5c70;
+    -fx-padding: 9px 16px;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #b8f0e0;
+    -fx-text-fill: #8a5c70;
+}

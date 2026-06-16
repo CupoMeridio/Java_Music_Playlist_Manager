@@ -4,19 +4,15 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<!--
-    Barra laterale (sidebar) dell'applicazione.
-    Collegata al controller SidebarController.
--->
-
-<VBox prefWidth="220.0" spacing="15.0" style="-fx-border-color: #cccccc; -fx-border-width: 0 1 0 0;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.SidebarController">
+<VBox prefWidth="220.0" spacing="15.0" styleClass="sidebar" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.SidebarController">
    <padding>
       <Insets bottom="15.0" left="15.0" right="15.0" top="20.0" />
    </padding>
    <children>
-      <!-- Titolo Applicazione (Opzionale) -->
+      <!-- Titolo Applicazione -->
       <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Lettore musicale" />
       
       <!-- Barra di Ricerca -->
@@ -25,11 +21,17 @@
       <!-- Pulsanti Principali Sidebar -->
       <VBox spacing="8.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="homeButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleHomeAction" text="Home" />
-            <Button fx:id="musicLibraryButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleMusicLibraryAction" text="Libreria musicale" />
-            <Button fx:id="playQueueButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlayQueueAction" text="Coda di riproduzione" />
-            <Button fx:id="playlistButton" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlaylistAction" text="Playlist" />
+            <Button fx:id="homeButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleHomeAction" text="🏠  Home" />
+            <Button fx:id="musicLibraryButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleMusicLibraryAction" text="🎵  Libreria musicale" />
+            <Button fx:id="playQueueButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlayQueueAction" text="▶  Coda di riproduzione" />
+            <Button fx:id="playlistButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlaylistAction" text="≡  Playlist" />
          </children>
       </VBox>
+
+      <!-- Spaziatore per spingere il pulsante tema in fondo -->
+      <Region VBox.vgrow="ALWAYS" />
+
+      <!-- Pulsante selezione tema -->
+      <Button fx:id="themeButton" styleClass="sidebar-button" maxWidth="Infinity" onAction="#handleThemeAction" text="🎨  Tema" />
    </children>
 </VBox>

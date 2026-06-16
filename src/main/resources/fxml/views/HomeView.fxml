@@ -28,26 +28,26 @@
          <children>
 
             <!-- Card: Totale brani -->
-            <VBox fx:id="cardTotalTracks" maxWidth="Infinity" spacing="6.0" style="-fx-padding: 20 24;" HBox.hgrow="ALWAYS">
+            <VBox fx:id="cardTotalTracks" styleClass="stat-card" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Brani in libreria" />
-                  <Label fx:id="totalTracksLabel" text="0" />
+                  <Label styleClass="label-title" text="Brani in libreria" />
+                  <Label fx:id="totalTracksLabel" styleClass="label-value" text="0" />
                </children>
             </VBox>
 
             <!-- Card: Totale playlist -->
-            <VBox fx:id="cardTotalPlaylists" maxWidth="Infinity" spacing="6.0" style="-fx-padding: 20 24;" HBox.hgrow="ALWAYS">
+            <VBox fx:id="cardTotalPlaylists" styleClass="stat-card" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Playlist create" />
-                  <Label fx:id="totalPlaylistsLabel" text="0" />
+                  <Label styleClass="label-title" text="Playlist create" />
+                  <Label fx:id="totalPlaylistsLabel" styleClass="label-value" text="0" />
                </children>
             </VBox>
 
             <!-- Card: Brani riprodotti -->
-            <VBox fx:id="cardTotalPlays" maxWidth="Infinity" spacing="6.0" style="-fx-padding: 20 24;" HBox.hgrow="ALWAYS">
+            <VBox fx:id="cardTotalPlays" styleClass="stat-card" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label text="Riproduzioni totali" />
-                  <Label fx:id="totalPlaysLabel" text="0" />
+                  <Label styleClass="label-title" text="Riproduzioni totali" />
+                  <Label fx:id="totalPlaysLabel" styleClass="label-value" text="0" />
                </children>
             </VBox>
 

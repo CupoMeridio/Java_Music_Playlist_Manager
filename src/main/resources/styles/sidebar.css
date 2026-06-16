@@ -1,47 +1,56 @@
-/* Sfondo laterale della Sidebar */
+/* =============================================================
+   SIDEBAR — TEMA BASE
+   ============================================================= */
+
 .sidebar {
-    -fx-background-color: #F5F5F7;
+    -fx-background-color: #FFFFFF;
     -fx-padding: 20px 12px;
-    -fx-border-color: transparent #E8E8ED transparent transparent;
+    -fx-border-color: transparent #F5F5F7 transparent transparent;
+    -fx-border-width: 0 1 0 0;
 }
 
-/* Barra di ricerca */
+.sidebar > .children > .label {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1D1D1F;
+}
+
 #searchField {
-    -fx-background-color: #E8E8ED;
+    -fx-background-color: #F5F5F7;
     -fx-background-radius: 8px;
-    -fx-padding: 8px 12px;
-    -fx-prompt-text-fill: #8E8E93;
+    -fx-border-color: transparent;
+    -fx-border-radius: 8px;
+    -fx-padding: 7px 12px;
+    -fx-prompt-text-fill: #86868B;
     -fx-text-fill: #1D1D1F;
     -fx-font-size: 13px;
 }
+
 #searchField:focused {
-    -fx-background-color: #DFDFE5;
-    -fx-border-color: #FA243C;
-    -fx-border-radius: 8px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #0071E3;
     -fx-border-width: 1px;
 }
 
-/* Pulsanti Menu Navigazione Lateral */
 .sidebar-button {
     -fx-background-color: transparent;
     -fx-text-fill: #1D1D1F;
     -fx-alignment: center-left;
-    -fx-font-size: 14px;
-    -fx-font-weight: 500;
-    -fx-padding: 10px 12px;
+    -fx-font-size: 13px;
+    -fx-font-weight: 400;
+    -fx-padding: 9px 12px;
     -fx-max-width: infinity;
     -fx-cursor: hand;
-    -fx-background-radius: 6px;
+    -fx-background-radius: 8px;
 }
 
 .sidebar-button:hover {
-    -fx-background-color: #E8E8ED;
-    -fx-text-fill: #FA243C;
+    -fx-background-color: #F5F5F7;
+    -fx-text-fill: #1D1D1F;
 }
 
-/* Classe da assegnare programmaticamente quando una vista è attiva */
-.sidebar-button:selected, .sidebar-button.active {
-    -fx-background-color: #FFE5E7;
-    -fx-text-fill: #FA243C;
+.sidebar-button.active {
+    -fx-background-color: #e8f0fb;
+    -fx-text-fill: #0071E3;
     -fx-font-weight: bold;
 }

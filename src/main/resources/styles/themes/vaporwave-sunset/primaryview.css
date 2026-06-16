@@ -1,0 +1,156 @@
+/* Vaporwave Sunset — primaryview.css */
+
+.root {
+    -fx-background-color: linear-gradient(to bottom, #fde8d8, #f5c5d0, #e8b4e0);
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-text-fill: #3d1a2e;
+}
+
+#viewTitleLabel {
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3d1a2e;
+    -fx-padding: 8 0 8 0;
+}
+
+.button {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-background-radius: 18px;
+    -fx-text-fill: #3d1a2e;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 20px;
+    -fx-cursor: hand;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-border-radius: 18px;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-text-fill: #ffffff;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+}
+
+.button:pressed {
+    -fx-background-color: #ff6b35;
+    -fx-text-fill: #ffffff;
+}
+
+#actionButton, #playPlaylistButton {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: #ff6b35;
+    -fx-border-color: #ff6b35;
+}
+
+#actionButton:pressed, #playPlaylistButton:pressed {
+    -fx-background-color: linear-gradient(to right, #01cdfe, #b967ff);
+}
+
+#undoButton {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-text-fill: #3d1a2e;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+}
+
+#undoButton:not(:disabled) {
+    -fx-text-fill: #3d1a2e;
+}
+
+.combo-box {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-background-radius: 18px;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-radius: 18px;
+    -fx-border-width: 1px;
+    -fx-padding: 4px;
+}
+
+.combo-box .cell {
+    -fx-text-fill: #3d1a2e;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #fff8f5;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-radius: 18px;
+    -fx-background-radius: 18px;
+    -fx-border-width: 1px;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #fff8f5;
+    -fx-text-fill: #3d1a2e;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: rgba(1, 205, 254, 0.18);
+    -fx-text-fill: #3d1a2e;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.table-view {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-background-radius: 24px;
+    -fx-table-cell-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-background-radius: 24px 24px 0 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+    -fx-border-color: transparent transparent rgba(200, 120, 150, 0.25) transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #3d1a2e;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-padding: 5px 0;
+    -fx-border-color: transparent transparent rgba(200, 120, 150, 0.25) transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: rgba(1, 205, 254, 0.16);
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}

@@ -1,0 +1,168 @@
+/* Neo-Pop Brutal — primaryview.css */
+
+.root {
+    -fx-background-color: #FDF9F5;
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-text-fill: #000000;
+}
+
+#viewTitleLabel {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+    -fx-padding: 8 0 8 0;
+}
+
+.button {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-padding: 7px 16px;
+    -fx-cursor: hand;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+}
+
+.button:hover {
+    -fx-background-color: #FF5C5C;
+    -fx-text-fill: #000000;
+}
+
+.button:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
+}
+
+.button:disabled {
+    -fx-opacity: 0.65;
+    -fx-effect: null;
+}
+
+#actionButton, #playPlaylistButton {
+    -fx-background-color: #FFDE47;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: #FF5C5C;
+}
+
+#actionButton:pressed, #playPlaylistButton:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+#undoButton {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+}
+
+#undoButton:not(:disabled) {
+    -fx-text-fill: #000000;
+}
+
+.combo-box {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+    -fx-padding: 3px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 3, 3);
+}
+
+.combo-box .cell {
+    -fx-text-fill: #000000;
+    -fx-background-color: transparent;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #FFDE47;
+    -fx-text-fill: #000000;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #FF5C5C;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-table-cell-border-color: #000000;
+    -fx-border-color: #000000;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #FFDE47;
+    -fx-background-radius: 0;
+    -fx-border-color: #000000;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+    -fx-border-color: transparent transparent #000000 transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #000000;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 4px 0;
+    -fx-border-color: transparent transparent #000000 transparent;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #FFDE47;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #FF5C5C;
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+}
+
+.scroll-pane {
+    -fx-background-color: #FDF9F5;
+}

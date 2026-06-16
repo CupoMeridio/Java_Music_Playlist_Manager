@@ -1,0 +1,102 @@
+/* Vaporwave Sunset — player.css */
+
+.player-bar {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-border-color: rgba(200, 120, 150, 0.25) transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 12px 22px;
+}
+
+#currentTrackTitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #ff6b35;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7b4a64;
+}
+
+.player-button {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-text-fill: #3d1a2e;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 50%;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 36px;
+    -fx-max-height: 36px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+.player-button:hover {
+    -fx-background-color: rgba(1, 205, 254, 0.22);
+    -fx-text-fill: #3d1a2e;
+}
+
+.player-button:pressed {
+    -fx-background-color: #ff6b35;
+    -fx-text-fill: #ffffff;
+}
+
+#playPauseButton {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 50%;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-border-radius: 50%;
+    -fx-min-width: 44px;
+    -fx-max-width: 44px;
+    -fx-min-height: 44px;
+    -fx-max-height: 44px;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #ff6b35;
+    -fx-border-color: #ff6b35;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: linear-gradient(to right, #01cdfe, #b967ff);
+}
+
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-background-radius: 6px;
+    -fx-pref-height: 10px;
+}
+
+.slider .thumb {
+    -fx-background-color: #ff6b35;
+    -fx-background-radius: 50%;
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+    -fx-border-width: 1px;
+    -fx-pref-width: 18px;
+    -fx-pref-height: 18px;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #01cdfe;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7b4a64;
+    -fx-font-weight: bold;
+}
