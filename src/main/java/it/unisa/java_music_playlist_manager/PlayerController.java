@@ -5,6 +5,7 @@ import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import it.unisa.java_music_playlist_manager.model.Library;
+import it.unisa.java_music_playlist_manager.model.StoppedState;
 import javafx.animation.RotateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -111,15 +112,45 @@ public class PlayerController implements Observer {
      * per l'undo:
      * Se l'utente annulla l'inserimento del brano attualmente in riproduzione,
      * il player deve fermarsi per evitare di riprodurre un file rimosso.
+     *
+     * Gestisce due casi:
+     * 1) Il brano è stato rimosso dalla Library (undo di AddTrackCommand)
+     * 2) Il brano è stato rimosso dalla playlist in coda (undo di AddElementToPlaylistCommand),
+     *    per cui getCurrentTrack() torna null ma il MediaPlayer continua a suonare.
      */
     private void checkCurrentTrackValidity() {
         PlaybackManager manager = PlaybackManager.getInstance();
         Track currentTrack = manager.getCurrentTrack();
 
-        // Se c'è un brano in riproduzione, verifichiamo che esista ancora nella Library
+        boolean needsStop = false;
+
         if (currentTrack != null && !Library.getInstance().getTracks().contains(currentTrack)) {
-            System.out.println("[PLAYER] Il brano in riproduzione è stato rimosso (Undo). Stop forzato.");
-            manager.pressNext(); // Oppure implementa un metodo manager.stop() se preferisci azzerarlo
+            // Caso 1: il brano è stato rimosso dalla libreria
+            System.out.println("[PLAYER] Il brano in riproduzione è stato rimosso dalla libreria (Undo). Stop forzato.");
+            needsStop = true;
+        } else if (currentTrack == null && manager.getMediaPlayer() != null
+                && manager.getMediaPlayer().getStatus() != MediaPlayer.Status.STOPPED
+                && manager.getMediaPlayer().getStatus() != MediaPlayer.Status.DISPOSED) {
+            // Caso 2: il brano è stato rimosso dalla playlist in coda (undo di un inserimento),
+            // getCurrentTrack() torna null ma il MediaPlayer sta ancora suonando l'audio precedente.
+            System.out.println("[PLAYER] Il brano in riproduzione non è più nella coda (Undo). Stop forzato.");
+            needsStop = true;
+        }
+
+        if (needsStop) {
+            // Ferma l'audio reale, resetta lo stato e gli slider
+            manager.triggerRealStop();
+            manager.changeState(new StoppedState());
+
+            // Reset dello slider e dei timer sulla UI
+            javafx.application.Platform.runLater(() -> {
+                if (progressSlider != null) {
+                    progressSlider.setValue(0);
+                    progressSlider.setMax(0);
+                }
+                if (currentTimeLabel != null) currentTimeLabel.setText("00:00");
+                if (totalTimeLabel != null) totalTimeLabel.setText("00:00");
+            });
         }
     }
 
