@@ -449,7 +449,7 @@ public class PlayerController implements Observer {
         // Cambio icona dinamico basato sullo stato corrente del Pattern State
         if (playPauseButton != null) {
             String stateName = manager.getCurrentState().getClass().getSimpleName();
-            playPauseButton.setText(stateName.toLowerCase().contains("play") ? "||" : "▶️");
+            playPauseButton.setText(stateName.toLowerCase().contains("play") ? "⏸" : "▶");
         }
 
         // Sincronizza la rotazione del vinile con lo stato play/pausa

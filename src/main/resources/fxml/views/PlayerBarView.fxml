@@ -60,7 +60,7 @@
                   <Button fx:id="shuffleButton" styleClass="player-button" text="🔀" onAction="#handleShuffleToggle" />
                   <Button styleClass="player-button" text="⏮⏮" onAction="#handlePreviousPlayableAction" />
                   <Button fx:id="prevButton" styleClass="player-button" text="⏮" onAction="#handlePrevAction" />
-                  <Button fx:id="playPauseButton" text="▶" onAction="#handlePlayPauseAction" />
+                  <Button fx:id="playPauseButton" styleClass="player-button" text="▶" onAction="#handlePlayPauseAction" />
                   <Button fx:id="nextButton" styleClass="player-button" text="⏭" onAction="#handleNextAction" />
                   <Button styleClass="player-button" text="⏭⏭" onAction="#handleNextPlayableAction" />
                   <Button fx:id="repeatButton" styleClass="player-button" text="🔁" onAction="#handleRepeatToggle" />
