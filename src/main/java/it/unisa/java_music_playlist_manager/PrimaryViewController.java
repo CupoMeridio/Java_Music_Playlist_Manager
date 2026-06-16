@@ -361,7 +361,7 @@ public class PrimaryViewController implements Observer {
         queueListView.setOnMouseClicked(event -> {
             QueueItem selected = queueListView.getSelectionModel().getSelectedItem();
             if (selected == null) return;
-            if (event.getClickCount() == 1 && selected.parentPlayable instanceof Playlist && selected.track == null) {
+            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY && event.getClickCount() == 1 && selected.parentPlayable instanceof Playlist && selected.track == null) {
                 Playlist p = (Playlist) selected.parentPlayable;
                 if (expandedPlaylists.contains(p)) expandedPlaylists.remove(p);
                 else expandedPlaylists.add(p);
