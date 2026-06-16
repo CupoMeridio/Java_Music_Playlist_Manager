@@ -203,15 +203,24 @@ public class PlayerController implements Observer {
 
         // Configurazione seeking manuale sulla barra di progresso
         if (progressSlider != null) {
+            // Variabile per ricordare se il player stava suonando prima del drag
+            final boolean[] wasPlaying = {false};
+
             progressSlider.setOnMousePressed(e -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-                if (mp != null) mp.pause();
+                if (mp != null) {
+                    wasPlaying[0] = (mp.getStatus() == MediaPlayer.Status.PLAYING);
+                    mp.pause();
+                }
             });
             progressSlider.setOnMouseReleased(e -> {
                 MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
                 if (mp != null) {
                     mp.seek(Duration.seconds(progressSlider.getValue()));
-                    mp.play();
+                    // Riprende la riproduzione solo se era in play prima del drag
+                    if (wasPlaying[0]) {
+                        mp.play();
+                    }
                 }
             });
         }
