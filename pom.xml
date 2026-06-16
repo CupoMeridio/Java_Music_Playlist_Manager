@@ -73,6 +73,18 @@
             <version>21.0.9</version>
         </dependency>
 
+        <!-- Ikonli: supporto FontAwesome 5 per JavaFX -->
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId>
+            <version>12.4.0</version>
+        </dependency>
+
         <!-- JUnit 5 per i test unitari -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

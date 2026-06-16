@@ -36,14 +36,49 @@
     -fx-alignment: center;
 }
 
+/* Icona scura sui player-button a sfondo chiaro */
+.player-button .ikonli-font-icon {
+    -fx-icon-color: #1B2A22;
+}
+
 .player-button:hover {
     -fx-background-color: #E2EFE7;
     -fx-text-fill: #1B2A22;
 }
 
+.player-button:hover .ikonli-font-icon {
+    -fx-icon-color: #1B2A22;
+}
+
 .player-button:pressed {
     -fx-background-color: #1B2A22;
     -fx-text-fill: #F2F5F3;
+}
+
+.player-button:pressed .ikonli-font-icon {
+    -fx-icon-color: #F2F5F3;
+}
+
+/* --- Stati speciali da Java --- */
+.player-button:active .ikonli-font-icon {
+    -fx-icon-color: #555555;
+}
+.player-button:active:hover .ikonli-font-icon {
+    -fx-icon-color: #1B2A22;
+}
+
+.player-button:repeat-track .ikonli-font-icon {
+    -fx-icon-color: #999999;
+}
+.player-button:repeat-track:hover .ikonli-font-icon {
+    -fx-icon-color: #1B2A22;
+}
+
+#volumeButton:muted .ikonli-font-icon {
+    -fx-icon-color: #999999;
+}
+#volumeButton:muted:hover .ikonli-font-icon {
+    -fx-icon-color: #1B2A22;
 }
 
 #playPauseButton {
@@ -63,14 +98,28 @@
     -fx-cursor: hand;
 }
 
+/* Icona BIANCA di default: sfondo scuro #1B2A22 */
+#playPauseButton .ikonli-font-icon {
+    -fx-icon-color: #F2F5F3;
+}
+
 #playPauseButton:hover {
     -fx-background-color: #E2EFE7;
     -fx-text-fill: #1B2A22;
 }
 
+/* In hover lo sfondo è chiaro: icona diventa NERA */
+#playPauseButton:hover .ikonli-font-icon {
+    -fx-icon-color: #1B2A22;
+}
+
 #playPauseButton:pressed {
     -fx-background-color: #1B2A22;
     -fx-text-fill: #F2F5F3;
+}
+
+#playPauseButton:pressed .ikonli-font-icon {
+    -fx-icon-color: #F2F5F3;
 }
 
 .slider {

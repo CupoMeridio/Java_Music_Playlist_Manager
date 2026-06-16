@@ -36,15 +36,49 @@
     -fx-alignment: center;
 }
 
+.player-button .ikonli-font-icon {
+    -fx-icon-color: #111111;
+}
+
 .player-button:hover {
     -fx-background-color: #0000FF;
     -fx-text-fill: #FFFFFF;
     -fx-border-color: #0000FF;
 }
 
+.player-button:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
 .player-button:pressed {
     -fx-background-color: #111111;
     -fx-text-fill: #FFFFFF;
+}
+
+.player-button:pressed .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+/* --- Stati speciali da Java --- */
+.player-button:active .ikonli-font-icon {
+    -fx-icon-color: #0000FF; /* Blu Swiss Bauhaus */
+}
+.player-button:active:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.player-button:repeat-track .ikonli-font-icon {
+    -fx-icon-color: #FF0000; /* Rosso Swiss Bauhaus */
+}
+.player-button:repeat-track:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+#volumeButton:muted .ikonli-font-icon {
+    -fx-icon-color: #FF0000; /* Muto: Rosso */
+}
+#volumeButton:muted:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF; /* Su hover sfondo blu, il bianco sta bene */
 }
 
 #playPauseButton {
@@ -64,14 +98,26 @@
     -fx-cursor: hand;
 }
 
+#playPauseButton .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
 #playPauseButton:hover {
     -fx-background-color: #0000FF;
     -fx-border-color: #0000FF;
 }
 
+#playPauseButton:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
 #playPauseButton:pressed {
     -fx-background-color: #111111;
     -fx-border-color: #111111;
+}
+
+#playPauseButton:pressed .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
 }
 
 .slider {

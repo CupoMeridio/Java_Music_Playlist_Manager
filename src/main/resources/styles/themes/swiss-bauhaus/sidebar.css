@@ -45,15 +45,27 @@
     -fx-border-radius: 0;
 }
 
+.sidebar-button .ikonli-font-icon {
+    -fx-icon-color: #111111;
+}
+
 .sidebar-button:hover {
     -fx-background-color: #0000FF;
     -fx-text-fill: #FFFFFF;
+}
+
+.sidebar-button:hover .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
 }
 
 .sidebar-button.active {
     -fx-background-color: #0000FF;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
+}
+
+.sidebar-button.active .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
 }
 
 .context-menu {

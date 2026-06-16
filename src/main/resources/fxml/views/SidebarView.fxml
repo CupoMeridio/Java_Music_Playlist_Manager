@@ -2,10 +2,12 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ContentDisplay?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <VBox prefWidth="220.0" spacing="15.0" styleClass="sidebar" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.SidebarController">
    <padding>
@@ -21,10 +23,18 @@
       <!-- Pulsanti Principali Sidebar -->
       <VBox spacing="8.0" VBox.vgrow="ALWAYS">
          <children>
-            <Button fx:id="homeButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleHomeAction" text="🏠  Home" />
-            <Button fx:id="musicLibraryButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handleMusicLibraryAction" text="🎵  Libreria musicale" />
-            <Button fx:id="playQueueButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlayQueueAction" text="▶  Coda di riproduzione" />
-            <Button fx:id="playlistButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" maxWidth="Infinity" onAction="#handlePlaylistAction" text="≡  Playlist" />
+            <Button fx:id="homeButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handleHomeAction" text="  Home">
+               <graphic><FontIcon iconLiteral="fas-home" /></graphic>
+            </Button>
+            <Button fx:id="musicLibraryButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handleMusicLibraryAction" text="  Libreria musicale">
+               <graphic><FontIcon iconLiteral="fas-music" /></graphic>
+            </Button>
+            <Button fx:id="playQueueButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handlePlayQueueAction" text="  Coda di riproduzione">
+               <graphic><FontIcon iconLiteral="fas-list" /></graphic>
+            </Button>
+            <Button fx:id="playlistButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handlePlaylistAction" text="  Playlist">
+               <graphic><FontIcon iconLiteral="fas-layer-group" /></graphic>
+            </Button>
          </children>
       </VBox>
 
@@ -32,6 +42,8 @@
       <Region VBox.vgrow="ALWAYS" />
 
       <!-- Pulsante selezione tema -->
-      <Button fx:id="themeButton" styleClass="sidebar-button" maxWidth="Infinity" onAction="#handleThemeAction" text="🎨  Tema" />
+      <Button fx:id="themeButton" styleClass="sidebar-button" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handleThemeAction" text="  Tema">
+         <graphic><FontIcon iconLiteral="fas-palette" /></graphic>
+      </Button>
    </children>
 </VBox>

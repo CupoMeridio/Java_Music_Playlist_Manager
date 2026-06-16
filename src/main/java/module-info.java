@@ -8,6 +8,11 @@ module it.unisa.java_music_playlist_manager {
 
     requires org.controlsfx.controls;
 
+    // Ikonli: icone FontAwesome 5 per JavaFX
+    requires org.kordamp.ikonli.core;
+    requires org.kordamp.ikonli.javafx;
+    requires org.kordamp.ikonli.fontawesome5;
+
     // Libreria per la lettura affidabile dei tag ID3 (MP3, M4A, FLAC, ecc.)
     requires jaudiotagger;
     

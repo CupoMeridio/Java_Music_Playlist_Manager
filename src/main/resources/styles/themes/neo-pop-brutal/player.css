@@ -36,14 +36,48 @@
     -fx-alignment: center;
 }
 
+.player-button .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
 .player-button:hover {
     -fx-background-color: #FFDE47;
     -fx-text-fill: #000000;
 }
 
+.player-button:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
 .player-button:pressed {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFFFF;
+}
+
+.player-button:pressed .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+/* --- Stati speciali da Java --- */
+.player-button:active .ikonli-font-icon {
+    -fx-icon-color: #FF5C5C; /* Rosso Neo-Pop */
+}
+.player-button:active:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+.player-button:repeat-track .ikonli-font-icon {
+    -fx-icon-color: #0000FF; /* Un colore alternativo, es. blu */
+}
+.player-button:repeat-track:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+#volumeButton:muted .ikonli-font-icon {
+    -fx-icon-color: #FF5C5C; /* Muto: Rosso */
+}
+#volumeButton:muted:hover .ikonli-font-icon {
+    -fx-icon-color: #000000; /* Su sfondo giallo in hover, il rosso potrebbe star male, mettiamo nero */
 }
 
 #playPauseButton {
@@ -63,13 +97,25 @@
     -fx-cursor: hand;
 }
 
+#playPauseButton .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
 #playPauseButton:hover {
     -fx-background-color: #FFDE47;
+}
+
+#playPauseButton:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
 }
 
 #playPauseButton:pressed {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFFFF;
+}
+
+#playPauseButton:pressed .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
 }
 
 .slider {
