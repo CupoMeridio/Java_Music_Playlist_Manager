@@ -10,6 +10,44 @@
     -fx-text-fill: #1F2937;
 }
 
+.dialog-pane {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E4E7EB;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 18px;
+    -fx-background-radius: 18px;
+    -fx-padding: 10px;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #3B82F6;
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane .content {
+    -fx-padding: 12px 0 0 0;
+}
+
+.dialog-pane .text-field {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 18px;
+    -fx-border-color: #E4E7EB;
+    -fx-border-radius: 18px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #1F2937;
+}
+
+.dialog-pane .button-bar {
+    -fx-padding: 12px 0 0 0;
+}
+
 #viewTitleLabel {
     -fx-font-size: 24px;
     -fx-font-weight: bold;

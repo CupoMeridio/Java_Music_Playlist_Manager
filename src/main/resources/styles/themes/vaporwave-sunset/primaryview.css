@@ -10,6 +10,44 @@
     -fx-text-fill: #3d1a2e;
 }
 
+.dialog-pane {
+    -fx-background-color: rgba(255, 248, 245, 0.95);
+    -fx-border-color: rgba(200, 120, 150, 0.45);
+    -fx-border-width: 1px;
+    -fx-border-radius: 18px;
+    -fx-background-radius: 18px;
+    -fx-padding: 10px;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane .content {
+    -fx-padding: 12px 0 0 0;
+}
+
+.dialog-pane .text-field {
+    -fx-background-color: rgba(255, 248, 245, 0.95);
+    -fx-background-radius: 18px;
+    -fx-border-color: rgba(200, 120, 150, 0.45);
+    -fx-border-radius: 18px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #3d1a2e;
+}
+
+.dialog-pane .button-bar {
+    -fx-padding: 12px 0 0 0;
+}
+
 #viewTitleLabel {
     -fx-font-size: 25px;
     -fx-font-weight: bold;

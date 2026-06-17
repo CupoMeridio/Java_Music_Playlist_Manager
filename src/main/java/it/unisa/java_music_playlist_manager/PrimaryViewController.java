@@ -29,6 +29,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Dialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -562,7 +563,7 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Nome playlist:");
         dialog.setGraphic(null);
 
-        dialog.showAndWait().ifPresent(name -> {
+        showThemedDialog(dialog).ifPresent(name -> {
             try {
                 Command renameCmd = new RenamePlaylistCommand(selectedPlaylist, name);
                 UndoManager.getInstance().executeCommand(renameCmd);
@@ -1050,7 +1051,7 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Nome playlist:");
         dialog.setGraphic(null);
 
-        dialog.showAndWait().ifPresent(name -> {
+        showThemedDialog(dialog).ifPresent(name -> {
             try {
                 PlaylistGenerator generator = new ManualPlaylistGenerator();
                 Playlist playlist = (Playlist) generator.createPlaylist(name);
@@ -1081,7 +1082,7 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Criterio:");
         dialog.setGraphic(null);
 
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = showThemedDialog(dialog);
 
         if (result.isEmpty()) {
             return;
@@ -1128,16 +1129,15 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Genere:");
         dialog.setGraphic(null);
 
-        Optional<String> genreResult = dialog.showAndWait();
+        Optional<String> genreResult = showThemedDialog(dialog);
         genreResult.ifPresent(genre -> {
             TextInputDialog titleDialog = new TextInputDialog("Playlist per " + genre);
             titleDialog.setTitle("Nome playlist");
             titleDialog.setHeaderText("Inserisci il nome della playlist");
             titleDialog.setContentText("Nome:");
             titleDialog.setGraphic(null);
-            
-            Optional<String> titleResult = titleDialog.showAndWait();
-            titleResult.ifPresent(title -> generateAutomaticPlaylistByGenre(genre, title));
+
+            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByGenre(genre, title));
         });
     }
 
@@ -1173,16 +1173,15 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Anno:");
         dialog.setGraphic(null);
 
-        Optional<Integer> yearResult = dialog.showAndWait();
+        Optional<Integer> yearResult = showThemedDialog(dialog);
         yearResult.ifPresent(year -> {
             TextInputDialog titleDialog = new TextInputDialog("Playlist del " + year);
             titleDialog.setTitle("Nome playlist");
             titleDialog.setHeaderText("Inserisci il nome della playlist");
             titleDialog.setContentText("Nome:");
             titleDialog.setGraphic(null);
-            
-            Optional<String> titleResult = titleDialog.showAndWait();
-            titleResult.ifPresent(title -> generateAutomaticPlaylistByYear(year, title));
+
+            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByYear(year, title));
         });
     }
 
@@ -1238,7 +1237,7 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Tag:");
         dialog.setGraphic(null);
 
-        Optional<Tag> tagResult = dialog.showAndWait();
+        Optional<Tag> tagResult = showThemedDialog(dialog);
         tagResult.ifPresent(tag -> {
             TextInputDialog titleDialog = new TextInputDialog("Playlist " + tag.getName());
             titleDialog.setTitle("Nome playlist");
@@ -1246,8 +1245,7 @@ public class PrimaryViewController implements Observer {
             titleDialog.setContentText("Nome:");
             titleDialog.setGraphic(null);
 
-            Optional<String> titleResult = titleDialog.showAndWait();
-            titleResult.ifPresent(title -> generateAutomaticPlaylistByTag(tag, title));
+            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByTag(tag, title));
         });
     }
 
@@ -1332,6 +1330,12 @@ public class PrimaryViewController implements Observer {
         }
     }
 
+    private <T> Optional<T> showThemedDialog(Dialog<T> dialog) {
+        dialog.setOnShown(event -> ThemeManager.getInstance().applyActiveThemeToScene(dialog.getDialogPane().getScene()));
+
+        return dialog.showAndWait();
+    }
+
     private void openCreatePlaylistDialog() {
         List<String> options = List.of("Playlist vuota", "Playlist automatica");
 
@@ -1341,7 +1345,7 @@ public class PrimaryViewController implements Observer {
         dialog.setContentText("Tipo:");
         dialog.setGraphic(null);
 
-        Optional<String> result = dialog.showAndWait();
+        Optional<String> result = showThemedDialog(dialog);
 
         if (result.isEmpty()) {
             return;

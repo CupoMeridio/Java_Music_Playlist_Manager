@@ -10,6 +10,44 @@
     -fx-text-fill: #1B2A22;
 }
 
+.dialog-pane {
+    -fx-background-color: #F2F5F3;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-style: solid;
+    -fx-padding: 8px;
+}
+
+.dialog-pane .header-panel {
+    -fx-background-color: #1B2A22;
+}
+
+.dialog-pane .header-panel .label {
+    -fx-text-fill: #F2F5F3;
+    -fx-font-weight: bold;
+}
+
+.dialog-pane .content {
+    -fx-padding: 12px 0 0 0;
+}
+
+.dialog-pane .text-field {
+    -fx-background-color: #F2F5F3;
+    -fx-background-radius: 0;
+    -fx-border-color: #1B2A22;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #1B2A22;
+}
+
+.dialog-pane .button-bar {
+    -fx-padding: 12px 0 0 0;
+}
+
 #viewTitleLabel {
     -fx-font-size: 20px;
     -fx-font-weight: bold;
