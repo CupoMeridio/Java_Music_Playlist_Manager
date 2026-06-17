@@ -46,24 +46,6 @@
                <children>
                   <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" style="-fx-font-weight: bold;" text="Riproduci Playlist" />
                   <ToggleButton fx:id="reorderButton" managed="false" text="Riordina" visible="false" />
-                  
-                  <!-- Spaziatore per spingere gli ordinamenti a destra -->
-                  <Region HBox.hgrow="ALWAYS" />
-                  
-                  <!-- Controlli di Ordinamento e Genere (Sulla destra) -->
-                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                     <children>
-                        <Label text="Ordina per:" />
-                        <ComboBox fx:id="sortComboBox" promptText="A - Z" />
-                        
-                        <HBox fx:id="genreFilterContainer" alignment="CENTER_RIGHT" spacing="10.0">
-                           <children>
-                              <Label text="Genere:" />
-                              <ComboBox fx:id="genreComboBox" promptText="Tutti i generi" />
-                           </children>
-                        </HBox>
-                     </children>
-                  </HBox>
                </children>
             </HBox>
             

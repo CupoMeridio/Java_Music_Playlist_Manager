@@ -20,11 +20,9 @@ import it.unisa.java_music_playlist_manager.model.AddPlaylistCommand;
 import it.unisa.java_music_playlist_manager.model.UndoManager;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
@@ -52,6 +50,7 @@ import javafx.scene.control.TableRow;
 import javafx.scene.input.TransferMode;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -142,6 +141,7 @@ public class PrimaryViewController implements Observer {
      */
     @SuppressWarnings("unchecked")
     private void refreshTableData() {
+        TableViewSortState sortState = captureSortState();
         String currentView = viewTitleLabel.getText();
 
         if (currentOpenedPlaylist != null) {
@@ -170,7 +170,29 @@ public class PrimaryViewController implements Observer {
             ObservableList<Track> trackList = filteredTracks(Library.getInstance().getTracks());
             ((TableView<Track>) songTableView).setItems(trackList);
         }
+
+        restoreSortState(sortState);
     }
+
+    @SuppressWarnings("unchecked")
+    private TableViewSortState captureSortState() {
+        if (!(songTableView instanceof TableView<?> tableView)) {
+            return new TableViewSortState(List.of());
+        }
+
+        return new TableViewSortState(new ArrayList<>((List<TableColumn<?, ?>>) (List<?>) tableView.getSortOrder()));
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private void restoreSortState(TableViewSortState sortState) {
+        if (!(songTableView instanceof TableView tableView)) {
+            return;
+        }
+
+        tableView.getSortOrder().setAll((List) sortState.sortColumns);
+    }
+
+    private record TableViewSortState(List<TableColumn<?, ?>> sortColumns) {}
 
     /**
      * Gestisce il testo segnaposto della tabella quando questa è vuota,
@@ -240,12 +262,6 @@ public class PrimaryViewController implements Observer {
     private Button playPlaylistButton;
     @FXML
     private ToggleButton reorderButton;
-    @FXML
-    private ComboBox<String> sortComboBox;
-    @FXML
-    private HBox genreFilterContainer;
-    @FXML
-    private ComboBox<String> genreComboBox;
 
     /** Tabella principale per la visualizzazione di Track o Playlist */
     @FXML
@@ -279,30 +295,6 @@ public class PrimaryViewController implements Observer {
         playerBarController.setOnPlayPauseClicked(this::handlePlayPauseAction);
         playerBarController.setOnPlayerStateChanged(this::syncTableSelection);
 
-        if (sortComboBox != null) {
-            sortComboBox.getItems().addAll("A - Z", "Z - A", "Artista", "Anno", "Durata");
-        }
-        if (genreComboBox != null) {
-            TreeSet<String> allGenres = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-            allGenres.add("Tutti i generi");
-            allGenres.addAll(List.of(
-                "Alternative", "Ambient", "Anime", "Blues", "Bollywood",
-                "Bossa Nova", "Classica", "Classical", "Country", "Dance",
-                "Disco", "Drum and Bass", "Dubstep", "Electronic", "Folk",
-                "Funk", "Generico", "Gospel", "Grunge", "Hard Rock",
-                "Heavy Metal", "Hip Hop", "House", "Indie", "Jazz",
-                "K-Pop", "Latin", "Lo-Fi", "Metal", "Metalcore", "Pop",
-                "Pop Rock", "Post-Rock", "Progressive Rock", "Punk", "R&B",
-                "Rap", "Reggae", "Reggaeton", "Rock", "Salsa", "Samba",
-                "Soul", "Synthwave", "Techno", "Trap", "World"
-            ));
-            Library.getInstance().getTracks().forEach(t -> {
-                String g = t.getGenre();
-                if (g != null && !g.isBlank()) allGenres.add(g);
-            });
-            genreComboBox.getItems().addAll(allGenres);
-        }
-
         songTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             boolean isPlaylistView = "Playlist".equals(viewTitleLabel.getText());
             if (isPlaylistView && newVal instanceof Playlist) {
@@ -317,13 +309,19 @@ public class PrimaryViewController implements Observer {
         setupContextMenu();
 
         songTableView.setOnMouseClicked(event -> {
+            if (event.getClickCount() != 2 || event.getButton() != javafx.scene.input.MouseButton.PRIMARY) {
+                return;
+            }
+
             Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-            if (event.getClickCount() == 2) {
-                if (currentOpenedPlaylist == null && "Playlist".equals(viewTitleLabel.getText()) && selectedItem instanceof Playlist playlist) {
-                    openPlaylistDetail(playlist);
-                } else if (selectedItem instanceof Track track) {
-                    handleStartTrackPlayback(track);
-                }
+            if (!isClickOnSelectedTableRow(event, selectedItem)) {
+                return;
+            }
+
+            if (currentOpenedPlaylist == null && "Playlist".equals(viewTitleLabel.getText()) && selectedItem instanceof Playlist playlist) {
+                openPlaylistDetail(playlist);
+            } else if (selectedItem instanceof Track track) {
+                handleStartTrackPlayback(track);
             }
         });
 
@@ -332,6 +330,17 @@ public class PrimaryViewController implements Observer {
         }
         updatePlayerUI();
         System.out.println("Interfaccia grafica inizializzata correttamente");
+    }
+
+    private boolean isClickOnSelectedTableRow(MouseEvent event, Object selectedItem) {
+        Node node = event.getPickResult().getIntersectedNode();
+        while (node != null) {
+            if (node instanceof TableRow<?> row) {
+                return row.getItem() != null && row.getItem() == selectedItem;
+            }
+            node = node.getParent();
+        }
+        return false;
     }
 
     private void setupQueueListView() {
@@ -608,8 +617,6 @@ public class PrimaryViewController implements Observer {
             reorderButton.setManaged(false);
             reorderButton.setSelected(false);
         }
-        genreFilterContainer.setVisible(false);
-        genreFilterContainer.setManaged(false);
 
         // Nascondi tabella e coda, mostra pannello Home
         songTableView.setVisible(false);
@@ -637,8 +644,6 @@ public class PrimaryViewController implements Observer {
         actionButton.setManaged(true);
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
-        genreFilterContainer.setVisible(true);
-        genreFilterContainer.setManaged(true);
         showSongsColumns();
     }
 
@@ -651,8 +656,6 @@ public class PrimaryViewController implements Observer {
         actionButton.setManaged(false);
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
-        genreFilterContainer.setVisible(true);
-        genreFilterContainer.setManaged(true);
         showQueueColumns();
     }
 
@@ -666,8 +669,6 @@ public class PrimaryViewController implements Observer {
         actionButton.setManaged(true);
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
-        genreFilterContainer.setVisible(false);
-        genreFilterContainer.setManaged(false);
         showPlaylistColumns();
     }
 
@@ -982,8 +983,6 @@ public class PrimaryViewController implements Observer {
         viewTitleLabel.setText(playlist.getTitle());
         actionButton.setVisible(false);
         actionButton.setManaged(false);
-        genreFilterContainer.setVisible(true);
-        genreFilterContainer.setManaged(true);
         if (playlist.isManuallyEditable() && reorderButton != null) {
             reorderButton.setVisible(true);
             reorderButton.setManaged(true);

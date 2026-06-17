@@ -93,6 +93,14 @@ Sono stati applicati diversi pattern architetturali e di design, tra cui:
 - **Composite**, per trattare tracce singole e playlist come elementi riproducibili;
 - **Factory Method**, per la creazione di playlist manuali e automatiche.
 
+## Nota didattica sull'uso dei pattern
+
+Per scopi puramente didattici, il progetto cerca di non delegare automaticamente alcuni pattern a componenti Java o librerie che li implementano già internamente, ove questo è possibile. L'obiettivo è rendere esplicita l'applicazione dei pattern studiati nel corso, mantenendo la logica architetturale leggibile e riconducibile al codice del progetto.
+
+Un esempio è il pattern **Observer**: sebbene JavaFX offra meccanismi basati su proprietà osservabili, binding e liste osservabili per aggiornare automaticamente alcuni controlli, il progetto implementa un observer applicativo dedicato tramite `Subject`, `Observer` e le notifiche di `Library` e `PlaybackManager`. In questo modo, quando cambiano la libreria o lo stato di riproduzione, la UI viene aggiornata attraverso una notifica esplicita gestita dal controller, invece di affidarsi completamente ai meccanismi osservabili nativi del framework.
+
+Lo stesso criterio guida altre scelte: dove possibile, il codice evita di nascondere dietro componenti pronti all'uso pattern come Observer, Command, State o Strategy, preferendo implementazioni esplicite che rendono più chiara la struttura architetturale dell'applicazione. Questo non esclude l'uso di JavaFX per la visualizzazione, ma limita l'impiego dei suoi meccanismi osservabili al solo supporto dell'interfaccia quando non sono centrali rispetto all'obiettivo didattico del progetto.
+
 ## Tecnologie utilizzate
 
 - Java 21
