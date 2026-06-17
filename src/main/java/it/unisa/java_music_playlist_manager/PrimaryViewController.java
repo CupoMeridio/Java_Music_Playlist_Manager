@@ -625,7 +625,11 @@ public class PrimaryViewController implements Observer {
     }
     private void handleSearchQueryChange(String query) {
         searchQuery = query == null ? "" : query;
-        refreshTableData();
+        if ("Playlist".equals(viewTitleLabel.getText())) {
+            showPlaylistColumns();
+        } else {
+            refreshTableData();
+        }
         updateTablePlaceholder();
     }
 
@@ -1319,7 +1323,10 @@ public class PrimaryViewController implements Observer {
     @FXML
     private void handleActionBtnClick() {
         String currentView = viewTitleLabel.getText();
-        if ("Musica".equals(currentView)) openAddTrackView();
+        if ("Musica".equals(currentView)) {
+            currentEditingTrack = null;
+            openAddTrackView();
+        }
         else if ("Playlist".equals(currentView)){
             openCreatePlaylistDialog();
         }
