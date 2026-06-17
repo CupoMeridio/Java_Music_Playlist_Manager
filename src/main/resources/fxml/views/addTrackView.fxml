@@ -88,11 +88,10 @@
               alignment="CENTER" 
               managed="false" 
               spacing="10.0" 
-              style="-fx-background-color: rgba(255, 255, 255, 0.7);" 
               visible="false">
             <children>
                 <ProgressIndicator maxHeight="50.0" maxWidth="50.0" />
-                <Label style="-fx-font-weight: bold; -fx-text-fill: #333333;" text="Analisi file audio in corso..." />
+                <Label text="Analisi file audio in corso..." />
             </children>
         </VBox>
     </children>

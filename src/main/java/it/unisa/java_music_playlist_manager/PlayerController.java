@@ -127,7 +127,9 @@ public class PlayerController implements Observer {
     private boolean vinylViewActive = false;
 
     /** Dimensione fissa del widget copertina */
-    private static final double COVER_SIZE = 50.0;
+    private static final double COVER_SIZE = 62.0;
+    private static final double COVER_INSET = 5.0;
+    private static final double COVER_CONTENT_SIZE = COVER_SIZE - (COVER_INSET * 2.0);
 
     /**
      * per l'undo:
@@ -279,14 +281,13 @@ public class PlayerController implements Observer {
 
         // --- Vista standard: ImageView quadrata con bordo ---
         albumCoverImageView = new ImageView();
-        albumCoverImageView.setFitWidth(COVER_SIZE);
-        albumCoverImageView.setFitHeight(COVER_SIZE);
+        albumCoverImageView.setFitWidth(COVER_CONTENT_SIZE);
+        albumCoverImageView.setFitHeight(COVER_CONTENT_SIZE);
         albumCoverImageView.setPreserveRatio(true);
         albumCoverImageView.setPickOnBounds(true);
-        albumCoverImageView.setStyle("-fx-border-color: #999999; -fx-border-width: 1;");
 
         // --- Vista vinile: cerchio con solchi disegnati via Canvas ---
-        vinylCircle = new Circle(COVER_SIZE / 2);
+        vinylCircle = new Circle(COVER_CONTENT_SIZE / 2);
         drawVinyl(null); // disegna il disco senza copertina inizialmente
 
         // Animazione rotazione continua (1 giro ogni 3 secondi)
@@ -309,15 +310,16 @@ public class PlayerController implements Observer {
         if (vinylCircle == null)
             return;
 
-        double r = COVER_SIZE / 2;
+        double r = vinylCircle.getRadius();
+        double diameter = r * 2;
 
         // Sfondo: canvas nero su cui disegniamo i solchi
-        Canvas canvas = new Canvas(COVER_SIZE, COVER_SIZE);
+        Canvas canvas = new Canvas(diameter, diameter);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // Disco nero di base
         gc.setFill(Color.web("#1a1a1a"));
-        gc.fillOval(0, 0, COVER_SIZE, COVER_SIZE);
+        gc.fillOval(0, 0, diameter, diameter);
 
         // Solchi concentrici (cerchi grigi a distanze regolari)
         gc.setStroke(Color.web("#3a3a3a"));

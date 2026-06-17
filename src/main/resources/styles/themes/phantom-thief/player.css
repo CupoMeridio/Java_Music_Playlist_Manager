@@ -1,0 +1,172 @@
+/* Phantom Thief — player.css */
+
+.player-bar {
+    -fx-background-color: #000000;
+    -fx-border-color: #D11A2A transparent transparent transparent;
+    -fx-border-width: 4px 0 0 0;
+    -fx-padding: 10px 20px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 5, 0, -5);
+}
+
+#currentTrackTitle {
+    -fx-font-weight: 900;
+    -fx-font-size: 14px;
+    -fx-text-fill: #FFFFFF;
+    -fx-rotate: -5deg;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 11px;
+    -fx-text-fill: #CCCCCC;
+    -fx-font-weight: bold;
+    -fx-rotate: -5deg;
+}
+
+.player-button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-font-size: 15px;
+    -fx-font-weight: 900;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-min-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 34px;
+    -fx-max-height: 34px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+    -fx-rotate: -5deg;
+    -fx-shape: "M17 0 L34 8 L34 26 L17 34 L0 26 L0 8 Z";
+}
+
+.player-button .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+.player-button:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.player-button:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+.player-button:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+.player-button:pressed .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.player-button:active .ikonli-font-icon {
+    -fx-icon-color: #D11A2A;
+}
+
+.player-button:active:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+.player-button:repeat-track .ikonli-font-icon {
+    -fx-icon-color: #D11A2A;
+}
+
+.player-button:repeat-track:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+#volumeButton:muted .ikonli-font-icon {
+    -fx-icon-color: #D11A2A;
+}
+
+#volumeButton:muted:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+#playPauseButton {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-min-width: 42px;
+    -fx-max-width: 42px;
+    -fx-min-height: 42px;
+    -fx-max-height: 42px;
+    -fx-font-size: 16px;
+    -fx-font-weight: 900;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+    -fx-rotate: -5deg;
+    -fx-shape: "M21 0 L42 10 L42 32 L21 42 L0 32 L0 10 Z";
+}
+
+#playPauseButton .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #FFFF00;
+}
+
+#playPauseButton:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: #000000;
+}
+
+#playPauseButton:pressed .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+#coverContainer {
+    -fx-background-color: #D11A2A;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-padding: 5px;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+    -fx-shape: "M10 0 L62 0 L62 52 L52 62 L0 62 L0 10 Z";
+}
+
+.slider {
+    -fx-cursor: hand;
+}
+
+.slider .track {
+    -fx-background-color: #000000;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-pref-height: 8px;
+}
+
+.slider .thumb {
+    -fx-background-color: #D11A2A;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-rotate: 45deg;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #FFFF00;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 11px;
+    -fx-text-fill: #FFFF00;
+    -fx-font-weight: 900;
+    -fx-rotate: -5deg;
+}

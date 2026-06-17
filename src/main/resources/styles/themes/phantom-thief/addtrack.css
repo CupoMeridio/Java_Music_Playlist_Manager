@@ -1,0 +1,143 @@
+/* Phantom Thief — addtrack.css */
+
+#formTitleLabel {
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 8px 14px 8px 18px;
+    -fx-background-color: #D11A2A;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+    -fx-rotate: -5deg;
+}
+
+.text-field {
+    -fx-background-color: #000000;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #FFFFFF;
+    -fx-prompt-text-fill: #CCCCCC;
+    -fx-font-weight: bold;
+}
+
+.text-field:focused {
+    -fx-background-color: #000000;
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 3px;
+}
+
+.combo-box {
+    -fx-background-color: #000000;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 3px;
+}
+
+.combo-box .cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #000000;
+    -fx-border-color: #D11A2A;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 2px;
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+}
+
+.check-combo-box {
+    -fx-background-color: #000000;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+}
+
+.check-combo-box:focused {
+    -fx-border-color: #FFFF00;
+    -fx-border-width: 3px;
+}
+
+#addTrackErrorLabel {
+    -fx-text-fill: #FFFF00;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+}
+
+#filePathLabel {
+    -fx-text-fill: #CCCCCC;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+#saveTrackButton {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 900;
+    -fx-background-radius: 0;
+    -fx-padding: 9px 24px;
+    -fx-cursor: hand;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+    -fx-rotate: -5deg;
+}
+
+#saveTrackButton:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+#saveTrackButton:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+#loadingOverlay {
+    -fx-alignment: center;
+    -fx-spacing: 14px;
+    -fx-background-radius: 0;
+    -fx-border-color: #D11A2A;
+    -fx-border-width: 3px;
+}
+
+#loadingOverlay .label {
+    -fx-font-weight: 900;
+    -fx-text-fill: #FFFFFF;
+}
+
+.progress-indicator .progress {
+    -fx-accent: #D11A2A;
+}
+
+.progress-indicator .determinate-indicator .indicator {
+    -fx-background-color: #D11A2A;
+}

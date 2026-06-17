@@ -60,6 +60,13 @@ public class ThemeManager {
             "/styles/themes/neo-pop-brutal/home.css",
             "/styles/themes/neo-pop-brutal/addtrack.css"
         });
+        themes.put("Phantom Thief", new String[]{
+            "/styles/themes/phantom-thief/primaryview.css",
+            "/styles/themes/phantom-thief/player.css",
+            "/styles/themes/phantom-thief/sidebar.css",
+            "/styles/themes/phantom-thief/home.css",
+            "/styles/themes/phantom-thief/addtrack.css"
+        });
         themes.put("Braun Retro-HiFi", new String[]{
             "/styles/themes/braun-retro-hifi/primaryview.css",
             "/styles/themes/braun-retro-hifi/player.css",

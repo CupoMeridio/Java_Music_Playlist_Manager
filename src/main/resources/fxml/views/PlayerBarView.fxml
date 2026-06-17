@@ -40,7 +40,7 @@
             <HBox alignment="CENTER_LEFT" prefWidth="250.0" spacing="10.0" HBox.hgrow="NEVER">
                <children>
                   <!-- Copertina del Brano / Vista Vinile (cliccabile per alternare) -->
-                  <StackPane fx:id="coverContainer" prefHeight="50.0" prefWidth="50.0" style="-fx-cursor: hand;" onMouseClicked="#handleCoverClick" />
+                  <StackPane fx:id="coverContainer" prefHeight="62.0" prefWidth="62.0" style="-fx-cursor: hand;" onMouseClicked="#handleCoverClick" />
                   
                   <!-- Metadati del Brano (Titolo e Artista) -->
                   <VBox alignment="CENTER_LEFT" spacing="3.0">

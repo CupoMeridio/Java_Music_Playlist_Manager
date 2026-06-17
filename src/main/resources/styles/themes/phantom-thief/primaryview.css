@@ -1,0 +1,233 @@
+/* Phantom Thief — primaryview.css */
+
+.root {
+    -fx-background-color:
+        radial-gradient(center 50% 50%, radius 16px, repeat 12 12, #111111 0%, #111111 12%, transparent 13%),
+        linear-gradient(to right, #000000 0%, #000000 72%, #151515 100%);
+    -fx-font-family: "Impact", "Arial Black", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+}
+
+.label {
+    -fx-text-fill: #FFFFFF;
+}
+
+#viewTitleLabel {
+    -fx-text-fill: #FFFFFF;
+    -fx-padding: 8px 14px 8px 18px;
+    -fx-background-color: #D11A2A;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
+    -fx-rotate: -5deg;
+}
+
+.button {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 900;
+    -fx-padding: 8px 16px;
+    -fx-cursor: hand;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+    -fx-rotate: -5deg;
+}
+
+.button:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.button:pressed {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
+}
+
+.button:disabled {
+    -fx-opacity: 0.55;
+    -fx-effect: null;
+}
+
+#actionButton, #playPlaylistButton {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 900;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+}
+
+#actionButton:hover, #playPlaylistButton:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+#actionButton:pressed, #playPlaylistButton:pressed {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+#undoButton {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+}
+
+#undoButton:not(:disabled) {
+    -fx-text-fill: #FFFFFF;
+}
+
+.combo-box {
+    -fx-background-color: #000000;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-radius: 0;
+    -fx-border-width: 2px;
+    -fx-padding: 3px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 3, 3);
+}
+
+.combo-box .cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: transparent;
+    -fx-font-weight: bold;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #000000;
+    -fx-border-color: #D11A2A;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
+}
+
+.combo-box-popup .list-cell {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.combo-box-popup .list-cell:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.combo-box-popup .list-cell:selected {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+}
+
+.table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-table-cell-border-color: #000000;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #D11A2A;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 0 0 2px 0;
+}
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-size: 38px;
+    -fx-border-color: transparent transparent #FFFFFF transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-size: 12px;
+    -fx-font-weight: 900;
+    -fx-rotate: -5deg;
+}
+
+.table-row-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-padding: 4px 0;
+    -fx-border-color: transparent transparent #000000 transparent;
+}
+
+.table-row-cell:row-even {
+    -fx-background-color: #F2F2F2;
+}
+
+.table-row-cell:filled:hover {
+    -fx-background-color: #FFFF00;
+}
+
+.table-row-cell:filled:selected {
+    -fx-background-color: #D11A2A;
+}
+
+.table-row-cell:filled:selected .label {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 900;
+}
+
+.list-view {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+}
+
+.list-cell {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 10px;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: #FFFF00;
+}
+
+.list-cell:selected {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFFFF;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: #000000;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #000000;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #D11A2A;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: #000000;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: #FFFFFF;
+}
+
+.progress-indicator .progress {
+    -fx-accent: #D11A2A;
+}
+
+.progress-indicator .determinate-indicator .indicator {
+    -fx-background-color: #D11A2A;
+}
