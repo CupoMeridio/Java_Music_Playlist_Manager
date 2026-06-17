@@ -2,8 +2,8 @@
 
 .root {
     -fx-background-color:
-        radial-gradient(center 50% 50%, radius 16px, repeat 12 12, #111111 0%, #111111 12%, transparent 13%),
-        linear-gradient(to right, #000000 0%, #000000 72%, #151515 100%);
+        radial-gradient(center 50% 50%, radius 16px, #111111 0%, #111111 12%, transparent 13%),
+        linear-gradient(from 0% 0% to 100% 0%, #000000 0%, #000000 72%, #151515 100%);
     -fx-font-family: "Impact", "Arial Black", "Segoe UI", sans-serif;
     -fx-font-size: 13px;
 }

@@ -7,13 +7,19 @@ package it.unisa.java_music_playlist_manager.model;
  */
 public enum TagPredefined implements Tag{
    
-    ROCK("🎸", "Rock & Alternative"),
-    CHILL("🌊", "Relax & Ambient"),
-    WORKOUT("💪", "Sport & Energia"),
-    STUDY("📚", "Studio & Focus"),
-    PARTY("🎉", "Festa & Dance"),
-    FAVOURITE("⭐","Preferiti"),
-    LOFI("☕", "Lo-Fi Beats");
+    ROCK("🎸", "Energici"),
+    CHILL("🌊", "Relax"),
+    WORKOUT("💪", "Sport"),
+    STUDY("📚", "Concentrazione"),
+    PARTY("🎉", "Festa"),
+    FAVOURITE("⭐", "Preferiti"),
+    LOFI("☕", "Colazione"),
+    ROAD_TRIP("🚗", "Viaggi"),
+    ROMANTIC("💖", "Romantici"),
+    NOSTALGIA("🌙", "Nostalgia"),
+    SAD("🌧️", "Malinconici"),
+    SUMMER("☀️", "Estate"),
+    SLEEP("😴", "Buonanotte");
     
     /** Icona associata alla categoria */
     private final String icon;

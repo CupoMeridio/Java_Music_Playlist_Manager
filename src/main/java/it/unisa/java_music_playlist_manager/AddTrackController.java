@@ -116,13 +116,18 @@ public class AddTrackController {
 
         // Popolamento lista generi predefiniti + custom dalla libreria, in ordine alfabetico
         if (addTrackGenreComboBox != null) {
+            addTrackGenreComboBox.setEditable(true);
             TreeSet<String> allGenres = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-            allGenres.addAll(java.util.Arrays.asList(
-                "Alternative", "Ambient", "Blues", "Classica", "Country",
-                "Disco", "Electronic", "Folk", "Funk", "Generico",
-                "Hip Hop", "House", "Indie", "Jazz", "Latin",
-                "Lo-Fi", "Metal", "Pop", "Punk", "R&B",
-                "Reggae", "Rock", "Soul", "Techno", "Trap"
+            allGenres.addAll(List.of(
+                "Alternative", "Ambient", "Anime", "Blues", "Bollywood",
+                "Bossa Nova", "Classica", "Classical", "Country", "Dance",
+                "Disco", "Drum and Bass", "Dubstep", "Electronic", "Folk",
+                "Funk", "Gospel", "Grunge", "Hard Rock", "Heavy Metal",
+                "Hip Hop", "House", "Indie", "Jazz", "K-Pop", "Latin",
+                "Lo-Fi", "Metal", "Metalcore", "Pop", "Pop Rock",
+                "Post-Rock", "Progressive Rock", "Punk", "R&B", "Rap",
+                "Reggae", "Reggaeton", "Rock", "Salsa", "Samba", "Soul",
+                "Synthwave", "Techno", "Trap", "World", "Generico"
             ));
             // Aggiunge i generi custom già presenti in libreria
             Library.getInstance().getTracks().forEach(t -> {
