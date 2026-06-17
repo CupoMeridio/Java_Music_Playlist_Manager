@@ -104,11 +104,11 @@ public class PrimaryViewControllerSearchTest {
 
     @Test
     public void testRicercaPerTag() throws Exception {
-        // Il tag ROCK restituisce "Rock & Alternative".
-        // Cerchiamo "alternative" in minuscolo per testare la robustezza del filtro.
-        setSearchQuery("alternative");
+        // Il tag ROCK restituisce "Energici".
+        // Cerchiamo "ener" in minuscolo per testare la robustezza del filtro.
+        setSearchQuery("ener");
 
-        assertTrue(invokeMatchesTrackSearch(track1), "Dovrebbe trovare la traccia tramite la sotto-stringa del tag 'Rock & Alternative'");
+        assertTrue(invokeMatchesTrackSearch(track1), "Dovrebbe trovare la traccia tramite la sotto-stringa del tag 'Energici'");
         assertFalse(invokeMatchesTrackSearch(track2), "La traccia senza tag non deve essere trovata");
     }
 

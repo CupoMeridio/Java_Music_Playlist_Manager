@@ -20,6 +20,7 @@ import it.unisa.java_music_playlist_manager.model.AddPlaylistCommand;
 import it.unisa.java_music_playlist_manager.model.UndoManager;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -282,7 +283,24 @@ public class PrimaryViewController implements Observer {
             sortComboBox.getItems().addAll("A - Z", "Z - A", "Artista", "Anno", "Durata");
         }
         if (genreComboBox != null) {
-            genreComboBox.getItems().addAll("Tutti i generi", "Pop", "Rock", "Jazz", "Classica", "Hip Hop");
+            TreeSet<String> allGenres = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+            allGenres.add("Tutti i generi");
+            allGenres.addAll(List.of(
+                "Alternative", "Ambient", "Anime", "Blues", "Bollywood",
+                "Bossa Nova", "Classica", "Classical", "Country", "Dance",
+                "Disco", "Drum and Bass", "Dubstep", "Electronic", "Folk",
+                "Funk", "Generico", "Gospel", "Grunge", "Hard Rock",
+                "Heavy Metal", "Hip Hop", "House", "Indie", "Jazz",
+                "K-Pop", "Latin", "Lo-Fi", "Metal", "Metalcore", "Pop",
+                "Pop Rock", "Post-Rock", "Progressive Rock", "Punk", "R&B",
+                "Rap", "Reggae", "Reggaeton", "Rock", "Salsa", "Samba",
+                "Soul", "Synthwave", "Techno", "Trap", "World"
+            ));
+            Library.getInstance().getTracks().forEach(t -> {
+                String g = t.getGenre();
+                if (g != null && !g.isBlank()) allGenres.add(g);
+            });
+            genreComboBox.getItems().addAll(allGenres);
         }
 
         songTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
