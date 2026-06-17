@@ -134,26 +134,30 @@ public class ThemeManager {
      */
     public void applyTheme(String themeName) {
         if (!themes.containsKey(themeName)) return;
-        if (scene == null) return;
 
         activeTheme = themeName;
+        applyActiveThemeToScene(scene);
+        savePreference();
+    }
 
-        scene.getStylesheets().clear();
-        for (String cssPath : themes.get(themeName)) {
+    /** Applica il tema attivo corrente alla scena principale. */
+    public void applyActiveTheme() {
+        applyActiveThemeToScene(scene);
+    }
+
+    /** Applica il tema attivo corrente a una scena secondaria, ad esempio una finestra modale. */
+    public void applyActiveThemeToScene(Scene targetScene) {
+        if (targetScene == null) return;
+
+        targetScene.getStylesheets().clear();
+        for (String cssPath : themes.get(activeTheme)) {
             var resource = getClass().getResource(cssPath);
             if (resource != null) {
-                scene.getStylesheets().add(resource.toExternalForm());
+                targetScene.getStylesheets().add(resource.toExternalForm());
             } else {
                 System.err.println("[THEME] CSS non trovato: " + cssPath);
             }
         }
-
-        savePreference();
-    }
-
-    /** Applica il tema attivo corrente (usato all'avvio). */
-    public void applyActiveTheme() {
-        applyTheme(activeTheme);
     }
 
     /** Legge la preferenza salvata. */

@@ -1269,6 +1269,7 @@ public class PrimaryViewController implements Observer {
             Stage stage = new Stage();
             stage.setTitle(currentEditingTrack == null ? "Aggiungi brano" : "Modifica brano");
             stage.setScene(new Scene(root));
+            ThemeManager.getInstance().applyActiveThemeToScene(stage.getScene());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
         } catch (IOException e) {

@@ -3,7 +3,7 @@
 .home-container {
     -fx-padding: 24px;
     -fx-background-color:
-        radial-gradient(center 50% 50%, radius 18px, repeat 11 11, #111111 0%, #111111 10%, transparent 11%),
+        radial-gradient(center 50% 50%, radius 18px, #111111 0%, #111111 10%, transparent 11%),
         #000000;
 }
 
