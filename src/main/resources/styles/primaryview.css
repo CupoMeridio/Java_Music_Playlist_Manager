@@ -45,7 +45,7 @@
 }
 
 /* Pulsanti azione principali */
-#actionButton, #playPlaylistButton {
+#actionButton, #playPlaylistButton, #reorderButton {
     -fx-background-color: #0071E3;
     -fx-text-fill: #ffffff;
     -fx-font-weight: 600;
@@ -53,13 +53,19 @@
     -fx-background-radius: 8px;
 }
 
-#actionButton:hover, #playPlaylistButton:hover {
+#actionButton:hover, #playPlaylistButton:hover, #reorderButton:hover {
     -fx-background-color: #0077ED;
     -fx-border-color: transparent;
 }
 
-#actionButton:pressed, #playPlaylistButton:pressed {
+#actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed {
     -fx-background-color: #005bbf;
+}
+
+#reorderButton:selected {
+    -fx-background-color: #005bbf;
+    -fx-text-fill: #ffffff;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 2);
 }
 
 /* Pulsante Undo */
@@ -112,6 +118,10 @@
     -fx-background-radius: 10px;
     -fx-table-cell-border-color: #F5F5F7;
     -fx-border-color: transparent;
+}
+
+.table-view.reorder-mode .table-row-cell {
+    -fx-cursor: hand;
 }
 
 .table-view .column-header-background {

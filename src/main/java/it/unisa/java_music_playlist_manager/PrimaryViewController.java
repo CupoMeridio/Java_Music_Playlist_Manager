@@ -126,6 +126,7 @@ public class PrimaryViewController implements Observer {
 
                 songTableView.refresh();
                 syncTableSelection();
+                updatePlayPlaylistButtonState();
             }
 
             // Sincronizza lo stato di attivazione del pulsante Undo
@@ -135,6 +136,24 @@ public class PrimaryViewController implements Observer {
         });
     }
 
+
+    private boolean canPlayPlaylistButton() {
+        if (currentOpenedPlaylist != null) {
+            return !currentOpenedPlaylist.getTracks().isEmpty();
+        }
+
+        if (songTableView != null && songTableView.getSelectionModel().getSelectedItem() instanceof Playlist playlist) {
+            return !playlist.getTracks().isEmpty();
+        }
+
+        return false;
+    }
+
+    private void updatePlayPlaylistButtonState() {
+        if (playPlaylistButton != null) {
+            playPlaylistButton.setDisable(!canPlayPlaylistButton());
+        }
+    }
 
     /**
      * Aggiorna i dati mostrati nella TableView in base alla vista corrente (Musica, Coda o Playlist aperta).
@@ -295,14 +314,21 @@ public class PrimaryViewController implements Observer {
         playerBarController.setOnPlayPauseClicked(this::handlePlayPauseAction);
         playerBarController.setOnPlayerStateChanged(this::syncTableSelection);
 
-        songTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            boolean isPlaylistView = "Playlist".equals(viewTitleLabel.getText());
-            if (isPlaylistView && newVal instanceof Playlist) {
-                if (playPlaylistButton != null) playPlaylistButton.setDisable(false);
-            } else {
-                if (playPlaylistButton != null) playPlaylistButton.setDisable(true);
-            }
-        });
+        songTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updatePlayPlaylistButtonState());
+
+        if (reorderButton != null) {
+            reorderButton.selectedProperty().addListener((obs, oldVal, selected) -> {
+                if (songTableView != null) {
+                    if (selected) {
+                        if (!songTableView.getStyleClass().contains("reorder-mode")) {
+                            songTableView.getStyleClass().add("reorder-mode");
+                        }
+                    } else {
+                        songTableView.getStyleClass().remove("reorder-mode");
+                    }
+                }
+            });
+        }
 
         showSongsColumns();
         setupQueueListView();
@@ -611,7 +637,7 @@ public class PrimaryViewController implements Observer {
         actionButton.setManaged(false);
         controlsBar.setVisible(false);
         controlsBar.setManaged(false);
-        playPlaylistButton.setDisable(true);
+        updatePlayPlaylistButtonState();
         if (reorderButton != null) {
             reorderButton.setVisible(false);
             reorderButton.setManaged(false);
@@ -670,6 +696,7 @@ public class PrimaryViewController implements Observer {
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
         showPlaylistColumns();
+        updatePlayPlaylistButtonState();
     }
 
     /**
@@ -704,6 +731,7 @@ public class PrimaryViewController implements Observer {
         }
         updateTablePlaceholder();
         refreshTableData();
+        updatePlayPlaylistButtonState();
     }
 
     @SuppressWarnings("unchecked")
@@ -800,7 +828,15 @@ public class PrimaryViewController implements Observer {
             row.setOnDragDropped(event -> {
                 if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
                     int draggedIndex = Integer.parseInt(event.getDragboard().getString());
-                    int dropIndex = row.isEmpty() ? tv.getItems().size() : row.getIndex();
+                    int dropIndex = row.isEmpty()
+                            ? tv.getItems().size()
+                            : row.getIndex() + (draggedIndex < row.getIndex() ? 1 : 0);
+
+                    if (draggedIndex == dropIndex) {
+                        event.setDropCompleted(true);
+                        event.consume();
+                        return;
+                    }
 
                     if (currentOpenedPlaylist instanceof ManualPlaylist) {
                         Track oldTrack = PlaybackManager.getInstance().getCurrentTrack();
@@ -824,6 +860,7 @@ public class PrimaryViewController implements Observer {
         
         updateTablePlaceholder();
         refreshTableData();
+        updatePlayPlaylistButtonState();
     }
 
     @SuppressWarnings("unchecked")
@@ -844,6 +881,7 @@ public class PrimaryViewController implements Observer {
         ((TableView<Playlist>) songTableView).getColumns().addAll(nameCol, countCol, durationCol);
         ((TableView<Playlist>) songTableView).setItems(filteredPlaylists(Library.getInstance().getPlaylists()));
         updateTablePlaceholder();
+        updatePlayPlaylistButtonState();
     }
 
     // --- Metodi di utilità per la creazione di componenti UI ---
@@ -993,6 +1031,7 @@ public class PrimaryViewController implements Observer {
             reorderButton.setSelected(false);
         }
         showSongsColumns();
+        updatePlayPlaylistButtonState();
     }
 
 
@@ -1367,9 +1406,14 @@ public class PrimaryViewController implements Observer {
     /** Avvia la riproduzione immediata della playlist selezionata. */
     @FXML
     private void handlePlayPlaylistAction() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (selectedItem instanceof Playlist selectedPlaylist) {
-            PlaybackManager.getInstance().play(selectedPlaylist, false);
+        Playable playlistToPlay = currentOpenedPlaylist != null
+                ? currentOpenedPlaylist
+                : songTableView.getSelectionModel().getSelectedItem() instanceof Playlist playlist
+                        ? playlist
+                        : null;
+
+        if (playlistToPlay != null && !playlistToPlay.getTracks().isEmpty()) {
+            PlaybackManager.getInstance().play(playlistToPlay, false);
             updatePlayerUI();
         }
     }

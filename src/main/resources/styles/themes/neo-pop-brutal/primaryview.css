@@ -46,7 +46,7 @@
     -fx-effect: null;
 }
 
-#actionButton, #playPlaylistButton {
+#actionButton, #playPlaylistButton, #reorderButton {
     -fx-background-color: #FFDE47;
     -fx-text-fill: #000000;
     -fx-font-weight: bold;
@@ -56,13 +56,19 @@
     -fx-border-radius: 0;
 }
 
-#actionButton:hover, #playPlaylistButton:hover {
+#actionButton:hover, #playPlaylistButton:hover, #reorderButton:hover {
     -fx-background-color: #FF5C5C;
 }
 
-#actionButton:pressed, #playPlaylistButton:pressed {
+#actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFFFF;
+}
+
+#reorderButton:selected {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+    -fx-effect: innershadow(gaussian, #FFDE47, 8, 0, 0, 2);
 }
 
 #undoButton {
@@ -123,6 +129,10 @@
     -fx-border-color: #000000;
     -fx-border-width: 2px;
     -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+}
+
+.table-view.reorder-mode .table-row-cell {
+    -fx-cursor: hand;
 }
 
 .table-view .column-header-background {
