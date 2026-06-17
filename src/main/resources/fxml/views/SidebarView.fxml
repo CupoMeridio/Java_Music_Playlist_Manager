@@ -24,16 +24,16 @@
       <VBox spacing="8.0" VBox.vgrow="ALWAYS">
          <children>
             <Button fx:id="homeButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handleHomeAction" text="  Home">
-               <graphic><FontIcon iconLiteral="fas-home" /></graphic>
+               <graphic><FontIcon styleClass="sidebar-icon" iconLiteral="fas-home" /></graphic>
             </Button>
             <Button fx:id="musicLibraryButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handleMusicLibraryAction" text="  Libreria musicale">
-               <graphic><FontIcon iconLiteral="fas-music" /></graphic>
+               <graphic><FontIcon styleClass="sidebar-icon" iconLiteral="fas-music" /></graphic>
             </Button>
             <Button fx:id="playQueueButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handlePlayQueueAction" text="  Coda di riproduzione">
-               <graphic><FontIcon iconLiteral="fas-list" /></graphic>
+               <graphic><FontIcon styleClass="sidebar-icon" iconLiteral="fas-list" /></graphic>
             </Button>
             <Button fx:id="playlistButton" styleClass="sidebar-button" alignment="BASELINE_LEFT" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handlePlaylistAction" text="  Playlist">
-               <graphic><FontIcon iconLiteral="fas-layer-group" /></graphic>
+               <graphic><FontIcon styleClass="sidebar-icon" iconLiteral="fas-layer-group" /></graphic>
             </Button>
          </children>
       </VBox>
@@ -43,7 +43,7 @@
 
       <!-- Pulsante selezione tema -->
       <Button fx:id="themeButton" styleClass="sidebar-button" contentDisplay="LEFT" maxWidth="Infinity" onAction="#handleThemeAction" text="  Tema">
-         <graphic><FontIcon iconLiteral="fas-palette" /></graphic>
+         <graphic><FontIcon styleClass="sidebar-icon" iconLiteral="fas-palette" /></graphic>
       </Button>
    </children>
 </VBox>

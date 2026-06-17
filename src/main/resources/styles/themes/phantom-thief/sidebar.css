@@ -53,9 +53,19 @@
     -fx-rotate: -5deg;
 }
 
+.sidebar-button .sidebar-icon,
+.sidebar-button .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
 .sidebar-button:hover {
     -fx-background-color: #FFFF00;
     -fx-text-fill: #000000;
+}
+
+.sidebar-button:hover .sidebar-icon,
+.sidebar-button:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
 }
 
 .sidebar-button.active {
@@ -64,9 +74,19 @@
     -fx-font-weight: 900;
 }
 
+.sidebar-button.active .sidebar-icon,
+.sidebar-button.active .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
 .sidebar-button.active:hover {
     -fx-background-color: #FFFFFF;
     -fx-text-fill: #000000;
+}
+
+.sidebar-button.active:hover .sidebar-icon,
+.sidebar-button.active:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
 }
 
 #themeButton {
@@ -74,9 +94,19 @@
     -fx-text-fill: #FFFFFF;
 }
 
+#themeButton .sidebar-icon,
+#themeButton .ikonli-font-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
 #themeButton:hover {
     -fx-background-color: #FFFF00;
     -fx-text-fill: #000000;
+}
+
+#themeButton:hover .sidebar-icon,
+#themeButton:hover .ikonli-font-icon {
+    -fx-icon-color: #000000;
 }
 
 .context-menu {
@@ -99,5 +129,10 @@
 
 .menu-item:hover, .menu-item:focused {
     -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+.context-menu .menu-item:hover .label,
+.context-menu .menu-item:focused .label {
     -fx-text-fill: #000000;
 }

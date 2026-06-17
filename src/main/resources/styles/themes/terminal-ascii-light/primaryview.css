@@ -156,6 +156,10 @@
     -fx-font-weight: bold;
 }
 
+.table-row-cell:filled:selected .text {
+    -fx-fill: #1B2A22;
+}
+
 .scroll-pane {
     -fx-background-color: #F2F5F3;
 }
