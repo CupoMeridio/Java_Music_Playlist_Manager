@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManualPlaylist extends Playlist {
+public class ManualPlaylist extends Playlist implements MutablePlaylist {
 
     private final List<Playable> elements;
     

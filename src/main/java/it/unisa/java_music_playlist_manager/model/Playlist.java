@@ -73,26 +73,6 @@ public abstract class Playlist implements Playable {
         this.playCount++;
     }
 
-    public void add(Playable element) {
-        throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
-    }
-
-    public void remove(Playable element) {
-        throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
-    }
-
-    public void removeTrack(Track track) {
-        throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
-    }
-
-    public void addTrack(Track track) {
-        throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
-    }
-
-    public void moveElement(int fromIndex, int toIndex) {
-        throw new UnsupportedOperationException("Operazione non supportata: non puoi modificare manualmente questa playlist.");
-    }
-
     @JsonIgnore
     public boolean isManuallyEditable() {
         return false;

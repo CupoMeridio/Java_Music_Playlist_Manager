@@ -1,10 +1,10 @@
 package it.unisa.java_music_playlist_manager.model;
 
 public class AddElementToPlaylistCommand implements Command {
-    private final ManualPlaylist playlist;
+    private final MutablePlaylist playlist;
     private final Playable element;
 
-    public AddElementToPlaylistCommand(ManualPlaylist playlist, Playable element) {
+    public AddElementToPlaylistCommand(MutablePlaylist playlist, Playable element) {
         this.playlist = playlist;
         this.element = element;
     }

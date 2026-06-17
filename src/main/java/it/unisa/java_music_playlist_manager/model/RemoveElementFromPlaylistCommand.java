@@ -1,10 +1,10 @@
 package it.unisa.java_music_playlist_manager.model;
 
 public class RemoveElementFromPlaylistCommand implements Command {
-    private final ManualPlaylist playlist;
+    private final MutablePlaylist playlist;
     private final Playable element;
 
-    public RemoveElementFromPlaylistCommand(ManualPlaylist playlist, Playable element) {
+    public RemoveElementFromPlaylistCommand(MutablePlaylist playlist, Playable element) {
         this.playlist = playlist;
         this.element = element;
     }
