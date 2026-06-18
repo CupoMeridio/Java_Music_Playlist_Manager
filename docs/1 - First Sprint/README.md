@@ -18,7 +18,7 @@ Questa cartella contiene tutti i documenti relativi alla conclusione e all'anali
 - **Descrizione:** Grafico dell'andamento dello sprint basato sugli **User Story Points**. Mostra la correlazione tra il lavoro stimato e quello effettivamente completato durante l'arco temporale del primo sprint, permettendo di valutare la velocità del team e la precisione delle stime iniziali.
 
 ### 3. Presentazione Primo Sprint
-- **File:** [Presentazione First Sprint Gruppo01.pdf](Presentazione First Sprint Gruppo01.pdf)
+- **File:** [Presentazione First Sprint Gruppo01.pdf](Presentazione%20First%20Sprint%20Gruppo01.pdf)
 - **Descrizione:** Presentazione multimediale riepilogativa dell'intero operato del Gruppo 01 durante lo sprint. Include:
     - Panoramica delle metodologie agili applicate.
     - Dettagli sulla struttura software realizzata.
