@@ -63,6 +63,10 @@ docs/
 │   ├── DiagrammaDelleClassi.jpeg
 │   └── Sprint 3 Planning Report.pdf
 └── 3 - Third Sprint/
+    ├── Sprint 3 Planning Report.pdf
+    ├── Sprint Backlog Sprint 3.pdf
+    ├── Burndown Charts Terza Sprint.pdf
+    └── Sprint 3 Retrospective Report.pdf
 ```
 
 Per una lettura guidata, si consiglia di iniziare da:
@@ -70,6 +74,7 @@ Per una lettura guidata, si consiglia di iniziare da:
 1. [`docs/0 - Pre Game/README.md`](docs/0%20-%20Pre%20Game/README.md)
 2. [`docs/1 - First Sprint/README.md`](docs/1%20-%20First%20Sprint/README.md)
 3. [`docs/2 - Second Sprint/README.md`](docs/2%20-%20Second%20Sprint/README.md)
+4. [`docs/3 - Third Sprint/README.md`](docs/3%20-%20Third%20Sprint/README.md)
 
 ## Architettura software
 
