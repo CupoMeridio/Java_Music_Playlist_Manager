@@ -1,5 +1,8 @@
 package it.unisa.java_music_playlist_manager;
 
+import it.unisa.java_music_playlist_manager.model.TagPredefined;
+import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
+
 import it.unisa.java_music_playlist_manager.model.*;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +21,7 @@ public class PrimaryViewControllerSearchTest {
     private Playlist playlist1;
 
     // Importa la classe concreta in cima al file se si trova in un altro pacchetto:
-// import it.unisa.java_music_playlist_manager.model.TagPredefined;
+
 
     @BeforeEach
     public void setUp() {
