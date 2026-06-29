@@ -8,8 +8,8 @@ import it.unisa.java_music_playlist_manager.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,109 +19,78 @@ public class PrimaryViewControllerSearchTest {
     private Track track1;
     private Track track2;
     private Playlist playlist1;
-
-    // Importa la classe concreta in cima al file se si trova in un altro pacchetto:
-
+    private List<Track> tracks;
+    private List<Playlist> playlists;
 
     @BeforeEach
     public void setUp() {
         controller = new PrimaryViewController();
 
-        // 1. Creiamo i brani usando l'esatto ordine dei parametri del tuo costruttore:
-        // parametri: (Titolo, Autore, Album, Durata [int], Genere, Anno [Integer], PercorsoFile)
         track1 = new Track("Bohemian Rhapsody", "Queen", "A Night at the Opera", 355, "Rock", 1975, "path/to/bohemian.mp3");
         track2 = new Track("Bad Guy", "Billie Eilish", "When We All Fall Asleep", 194, "Pop", 2019, "path/to/badguy.mp3");
 
-        // 2. CORRETTO: Usiamo il tuo metodo addTag() esistente invece del vecchio setTags
         track1.addTag(TagPredefined.ROCK);
 
-        // 3. Istanziamo la playlist concreta per il test
         playlist1 = new ManualPlaylist("I miei preferiti anni 70");
-    }
-
-    /**
-     * Helper per impostare il campo privato 'searchQuery' tramite Reflection
-     */
-    private void setSearchQuery(String query) throws Exception {
-        Field field = PrimaryViewController.class.getDeclaredField("searchQuery");
-        field.setAccessible(true);
-        field.set(controller, query);
-    }
-
-    /**
-     * Helper per invandare il metodo privato 'matchesTrackSearch' tramite Reflection
-     */
-    private boolean invokeMatchesTrackSearch(Track track) throws Exception {
-        Method method = PrimaryViewController.class.getDeclaredMethod("matchesTrackSearch", Track.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(controller, track);
-    }
-
-    /**
-     * Helper per invocare il metodo privato 'matchesPlaylistSearch' tramite Reflection
-     */
-    private boolean invokeMatchesPlaylistSearch(Playlist playlist) throws Exception {
-        Method method = PrimaryViewController.class.getDeclaredMethod("matchesPlaylistSearch", Playlist.class);
-        method.setAccessible(true);
-        return (boolean) method.invoke(controller, playlist);
+        
+        tracks = List.of(track1, track2);
+        playlists = List.of(playlist1);
     }
 
     @Test
-    public void testSearchQueryVuota_DovrebbeIncludereTutto() throws Exception {
-        setSearchQuery("");
+    public void testSearchQueryVuota_DovrebbeIncludereTutto() {
+        List<Track> resultTracks = LibrarySearchService.filterTracks(tracks, "");
+        List<Playlist> resultPlaylists = LibrarySearchService.filterPlaylists(playlists, "");
 
-        assertTrue(invokeMatchesTrackSearch(track1), "Con query vuota la traccia deve essere inclusa");
-        assertTrue(invokeMatchesPlaylistSearch(playlist1), "Con query vuota la playlist deve essere inclusa");
+        assertTrue(resultTracks.contains(track1), "Con query vuota la traccia deve essere inclusa");
+        assertTrue(resultPlaylists.contains(playlist1), "Con query vuota la playlist deve essere inclusa");
     }
 
     @Test
-    public void testSearchQueryNull_DovrebbeIncludereTutto() throws Exception {
-        setSearchQuery(null);
-
-        assertTrue(invokeMatchesTrackSearch(track1), "Con query null la traccia deve essere inclusa");
+    public void testSearchQueryNull_DovrebbeIncludereTutto() {
+        List<Track> resultTracks = LibrarySearchService.filterTracks(tracks, null);
+        assertTrue(resultTracks.contains(track1), "Con query null la traccia deve essere inclusa");
     }
 
     @Test
-    public void testRicercaPerTitolo_CaseInsensitiveESpazi() throws Exception {
-        setSearchQuery("  bOhEmIaN  ");
+    public void testRicercaPerTitolo_CaseInsensitiveESpazi() {
+        List<Track> resultTracks = LibrarySearchService.filterTracks(tracks, "  bOhEmIaN  ");
 
-        assertTrue(invokeMatchesTrackSearch(track1), "Dovrebbe trovare 'Bohemian Rhapsody' ignorando spazi e maiuscole");
-        assertFalse(invokeMatchesTrackSearch(track2), "Non dovrebbe trovare 'Bad Guy'");
+        assertTrue(resultTracks.contains(track1), "Dovrebbe trovare 'Bohemian Rhapsody' ignorando spazi e maiuscole");
+        assertFalse(resultTracks.contains(track2), "Non dovrebbe trovare 'Bad Guy'");
     }
 
     @Test
-    public void testRicercaPerAutore() throws Exception {
-        setSearchQuery("Queen");
+    public void testRicercaPerAutore() {
+        List<Track> resultTracks = LibrarySearchService.filterTracks(tracks, "Queen");
 
-        assertTrue(invokeMatchesTrackSearch(track1), "Dovrebbe trovare la traccia dei Queen");
-        assertFalse(invokeMatchesTrackSearch(track2));
+        assertTrue(resultTracks.contains(track1), "Dovrebbe trovare la traccia dei Queen");
+        assertFalse(resultTracks.contains(track2));
     }
 
     @Test
-    public void testRicercaPerGenere() throws Exception {
-        setSearchQuery("Pop");
+    public void testRicercaPerGenere() {
+        List<Track> resultTracks = LibrarySearchService.filterTracks(tracks, "Pop");
 
-        assertTrue(invokeMatchesTrackSearch(track2), "Dovrebbe filtrare per genere Pop");
-        assertFalse(invokeMatchesTrackSearch(track1));
+        assertTrue(resultTracks.contains(track2), "Dovrebbe filtrare per genere Pop");
+        assertFalse(resultTracks.contains(track1));
     }
 
     @Test
-    public void testRicercaPerTag() throws Exception {
-        // Il tag ROCK restituisce "Energici".
-        // Cerchiamo "ener" in minuscolo per testare la robustezza del filtro.
-        setSearchQuery("ener");
+    public void testRicercaPerTag() {
+        List<Track> resultTracks = LibrarySearchService.filterTracks(tracks, "ener");
 
-        assertTrue(invokeMatchesTrackSearch(track1), "Dovrebbe trovare la traccia tramite la sotto-stringa del tag 'Energici'");
-        assertFalse(invokeMatchesTrackSearch(track2), "La traccia senza tag non deve essere trovata");
+        assertTrue(resultTracks.contains(track1), "Dovrebbe trovare la traccia tramite la sotto-stringa del tag 'Energici'");
+        assertFalse(resultTracks.contains(track2), "La traccia senza tag non deve essere trovata");
     }
 
     @Test
-    public void testRicercaPlaylistPerTitolo() throws Exception {
-        setSearchQuery("preferiti");
-        assertTrue(invokeMatchesPlaylistSearch(playlist1), "Dovrebbe trovare la playlist per titolo");
+    public void testRicercaPlaylistPerTitolo() {
+        List<Playlist> resultPlaylists = LibrarySearchService.filterPlaylists(playlists, "preferiti");
+        assertTrue(resultPlaylists.contains(playlist1), "Dovrebbe trovare la playlist per titolo");
 
-        setSearchQuery("Rock");
-        assertFalse(invokeMatchesPlaylistSearch(playlist1), "Non dovrebbe trovare la playlist");
+        List<Playlist> resultPlaylists2 = LibrarySearchService.filterPlaylists(playlists, "Rock");
+        assertFalse(resultPlaylists2.contains(playlist1), "Non dovrebbe trovare la playlist");
     }
 
     @Test
