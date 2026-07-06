@@ -28,7 +28,7 @@
             <HBox alignment="CENTER_LEFT" spacing="20.0">
                <children>
                   <!-- Titolo Sezione Attiva -->
-                  <Label fx:id="viewTitleLabel" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Musica" />
+                  <Label fx:id="viewTitleLabel" text="Musica" />
                   
                   <!-- Spaziatore per spingere il bottone a destra -->
                   <Region HBox.hgrow="ALWAYS" />
@@ -44,7 +44,7 @@
             <!-- Barra di Controllo Playlist / Ordinamento -->
             <HBox fx:id="controlsBar" alignment="CENTER_LEFT" spacing="15.0">
                <children>
-                  <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" style="-fx-font-weight: bold;" text="Riproduci Playlist" />
+                  <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" text="Riproduci Playlist" />
                   <ToggleButton fx:id="reorderButton" managed="false" text="Riordina" visible="false" />
                </children>
             </HBox>

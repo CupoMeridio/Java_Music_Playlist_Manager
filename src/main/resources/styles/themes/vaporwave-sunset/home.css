@@ -1,10 +1,5 @@
 /* Vaporwave Sunset — home.css */
 
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color: transparent;
-}
-
 .stat-card {
     -fx-background-color: rgba(255, 248, 245, 0.72);
     -fx-background-radius: 26px;
@@ -31,15 +26,4 @@
     -fx-font-size: 30px;
     -fx-font-weight: 900;
     -fx-text-fill: #b967ff;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: bold;
-    -fx-text-fill: #7b4a64;
-    -fx-alignment: center;
 }

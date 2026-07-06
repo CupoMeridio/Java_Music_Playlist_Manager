@@ -1,10 +1,5 @@
 /* Neo-Pop Brutal — home.css */
 
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color: #FDF9F5;
-}
-
 .stat-card {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 0;
@@ -28,15 +23,4 @@
     -fx-font-size: 30px;
     -fx-font-weight: 900;
     -fx-text-fill: #FF5C5C;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: bold;
-    -fx-text-fill: #000000;
-    -fx-alignment: center;
 }

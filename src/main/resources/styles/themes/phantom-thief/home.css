@@ -1,12 +1,5 @@
 /* Phantom Thief — home.css */
 
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color:
-        radial-gradient(center 50% 50%, radius 18px, #111111 0%, #111111 10%, transparent 11%),
-        #000000;
-}
-
 .stat-card {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 0;
@@ -31,15 +24,4 @@
     -fx-font-size: 34px;
     -fx-font-weight: 900;
     -fx-text-fill: #D11A2A;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: 900;
-    -fx-text-fill: #D11A2A;
-    -fx-alignment: center;
 }

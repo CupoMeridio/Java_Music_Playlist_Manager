@@ -15,7 +15,7 @@
    </padding>
    <children>
       <!-- Titolo Applicazione -->
-      <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Lettore musicale" />
+      <Label text="Lettore musicale" />
       
       <!-- Barra di Ricerca -->
       <TextField fx:id="searchField" promptText="Cerca" />

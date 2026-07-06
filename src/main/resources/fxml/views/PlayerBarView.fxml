@@ -45,8 +45,8 @@
                   <!-- Metadati del Brano (Titolo e Artista) -->
                   <VBox alignment="CENTER_LEFT" spacing="3.0">
                      <children>
-                        <Label fx:id="currentTrackTitle" style="-fx-font-weight: bold;" text="" />
-                        <Label fx:id="currentTrackDetails" style="-fx-font-size: 11px;" text="" textOverrun="ELLIPSIS" />
+                        <Label fx:id="currentTrackTitle" text="" />
+                        <Label fx:id="currentTrackDetails" text="" textOverrun="ELLIPSIS" />
                      </children>
                   </VBox>
                </children>
