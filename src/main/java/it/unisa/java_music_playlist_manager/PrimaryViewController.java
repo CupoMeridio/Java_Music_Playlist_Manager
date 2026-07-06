@@ -1,21 +1,20 @@
 package it.unisa.java_music_playlist_manager;
 
+import it.unisa.java_music_playlist_manager.ui.ContextMenuManager;
+import it.unisa.java_music_playlist_manager.ui.ContextMenuManager.ContextMenuActions;
+
+import it.unisa.java_music_playlist_manager.ui.PlaylistDialogService;
+
 import it.unisa.java_music_playlist_manager.model.Library;
+import it.unisa.java_music_playlist_manager.model.LibrarySearchService;
 import it.unisa.java_music_playlist_manager.model.Playable;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
-import it.unisa.java_music_playlist_manager.model.PlaylistGenerator;
-import it.unisa.java_music_playlist_manager.model.ManualPlaylistGenerator;
-import it.unisa.java_music_playlist_manager.model.AutomaticPlaylistGenerator;
 import it.unisa.java_music_playlist_manager.model.Command;
 import it.unisa.java_music_playlist_manager.model.RemoveTrackCommand;
 import it.unisa.java_music_playlist_manager.model.RemovePlaylistCommand;
-import it.unisa.java_music_playlist_manager.model.RenamePlaylistCommand;
 import it.unisa.java_music_playlist_manager.model.RemoveElementFromPlaylistCommand;
-import it.unisa.java_music_playlist_manager.model.AddElementToPlaylistCommand;
-import it.unisa.java_music_playlist_manager.model.AddPlaylistCommand;
-
 
 import it.unisa.java_music_playlist_manager.model.UndoManager;
 import java.util.ArrayList;
@@ -28,14 +27,11 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Dialog;
 import javafx.scene.layout.HBox;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.collections.FXCollections;
@@ -43,45 +39,51 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Optional;
-import java.util.Locale;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import java.io.IOException;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TableRow;
-import javafx.scene.input.TransferMode;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
 import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import it.unisa.java_music_playlist_manager.model.Tag;
+import it.unisa.java_music_playlist_manager.model.ViewType;
 import java.util.Set;
 import java.util.HashSet;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.Tooltip;
 import javafx.scene.Node;
 
 /**
  * PrimaryViewController è il coordinatore principale dell'interfaccia utente.
- * Gestisce l'area centrale dell'applicazione, inclusa la visualizzazione delle tracce,
+ * Gestisce l'area centrale dell'applicazione, inclusa la visualizzazione delle
+ * tracce,
  * delle playlist e della coda di riproduzione.
  * 
- * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di gestione eventi
- * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e NetBeans.
+ * La struttura dei campi annotati con @FXML e i collegamenti ai metodi di
+ * gestione eventi
+ * sono configurati automaticamente tramite l'integrazione tra SceneBuilder e
+ * NetBeans.
  * 
  * Ruolo nel progetto:
- * - Agisce come Controller principale che integra i sotto-controller (Sidebar e PlayerBar).
- * - Implementa l'interfaccia {@link Observer} per reagire ai cambiamenti nel Modello (Library e PlaybackManager).
-- Gestisce la logica di navigazione tra le diverse viste (Musica, Playlist, Coda).
-- Coordina le operazioni CRUD su tracce e playlist tramite menu contestuali e dialoghi.
+ * - Agisce come Controller principale che integra i sotto-controller (Sidebar e
+ * PlayerBar).
+ * - Implementa l'interfaccia {@link Observer} per reagire ai cambiamenti nel
+ * Modello (Library e PlaybackManager).
+ * - Gestisce la logica di navigazione tra le diverse viste (Musica, Playlist,
+ * Coda).
+ * - Coordina le operazioni CRUD su tracce e playlist tramite menu contestuali e
+ * dialoghi.
  */
-public class PrimaryViewController implements Observer {
+public class PrimaryViewController implements Observer, ContextMenuActions {
 
-    /** Traccia attualmente in fase di modifica (usata per popolare il form di editing) */
+    /**
+     * Traccia attualmente in fase di modifica (usata per popolare il form di
+     * editing)
+     */
     private Track currentEditingTrack = null;
-    
+
+    private final PlaylistDialogService dialogService = new PlaylistDialogService(this::showPlaylistColumns);
+
     /** Playlist attualmente aperta nella vista dettaglio */
     private Playlist currentOpenedPlaylist = null;
 
@@ -112,39 +114,31 @@ public class PrimaryViewController implements Observer {
     @Override
     public void update() {
         javafx.application.Platform.runLater(() -> {
-            // Recuperiamo il titolo della vista corrente per capire dove si trova l'utente
-            String currentView = viewTitleLabel != null ? viewTitleLabel.getText() : "";
-
-            if (songTableView != null) {
-                // SE L'UTENTE È NELLA SCHERMATA PLAYLIST:
-                // Forziamo il ricaricamento delle colonne e degli elementi delle playlist,
-                // altrimenti l'Undo (che rimuove la playlist dalla libreria) non si rifletterà sulla UI.
-                if ("Playlist".equals(currentView)) {
-                    showPlaylistColumns();
-                } else {
-                    refreshTableData();
-                }
-
-                songTableView.refresh();
-                syncTableSelection();
-                updatePlayPlaylistButtonState();
+            if (currentViewType == ViewType.PLAYLISTS) {
+                showPlaylistColumns();
+                if (playlistTableView != null)
+                    playlistTableView.refresh();
+            } else {
+                refreshTableData();
+                if (trackTableView != null)
+                    trackTableView.refresh();
             }
+            syncTableSelection();
+            updatePlayPlaylistButtonState();
 
-            // Sincronizza lo stato di attivazione del pulsante Undo
             if (undoButton != null) {
                 undoButton.setDisable(!UndoManager.getInstance().canUndo());
             }
         });
     }
 
-
     private boolean canPlayPlaylistButton() {
         if (currentOpenedPlaylist != null) {
             return !currentOpenedPlaylist.getTracks().isEmpty();
         }
 
-        if (songTableView != null && songTableView.getSelectionModel().getSelectedItem() instanceof Playlist playlist) {
-            return !playlist.getTracks().isEmpty();
+        if (playlistTableView != null && playlistTableView.getSelectionModel().getSelectedItem() != null) {
+            return !playlistTableView.getSelectionModel().getSelectedItem().getTracks().isEmpty();
         }
 
         return false;
@@ -157,17 +151,18 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
-     * Aggiorna i dati mostrati nella TableView in base alla vista corrente (Musica, Coda o Playlist aperta).
+     * Aggiorna i dati mostrati nella TableView in base alla vista corrente (Musica,
+     * Coda o Playlist aperta).
      */
-    @SuppressWarnings("unchecked")
     private void refreshTableData() {
         TableViewSortState sortState = captureSortState();
-        String currentView = viewTitleLabel.getText();
 
         if (currentOpenedPlaylist != null) {
-            ObservableList<Track> trackList = filteredTracks(currentOpenedPlaylist.getTracks());
-            ((TableView<Track>) songTableView).setItems(trackList);
-        } else if ("Coda di riproduzione".equals(currentView)) {
+            ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(
+                    LibrarySearchService.filterTracks(currentOpenedPlaylist.getTracks(), searchQuery));
+            if (trackTableView != null)
+                trackTableView.setItems(trackList);
+        } else if (currentViewType == ViewType.QUEUE) {
             List<QueueItem> items = new ArrayList<>();
             List<Playable> queue = PlaybackManager.getInstance().getCurrentQueue();
             for (int i = 0; i < queue.size(); i++) {
@@ -186,78 +181,100 @@ public class PrimaryViewController implements Observer {
             if (queueListView != null) {
                 queueListView.setItems(FXCollections.observableArrayList(items));
             }
-        } else if ("Musica".equals(currentView)) {
-            ObservableList<Track> trackList = filteredTracks(Library.getInstance().getTracks());
-            ((TableView<Track>) songTableView).setItems(trackList);
+        } else if (currentViewType == ViewType.MUSIC) {
+            ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(
+                    LibrarySearchService.filterTracks(Library.getInstance().getTracks(), searchQuery));
+            if (trackTableView != null)
+                trackTableView.setItems(trackList);
         }
 
         restoreSortState(sortState);
     }
 
-    @SuppressWarnings("unchecked")
     private TableViewSortState captureSortState() {
-        if (!(songTableView instanceof TableView<?> tableView)) {
-            return new TableViewSortState(List.of());
+        if (currentViewType == ViewType.PLAYLISTS && playlistTableView != null) {
+            return new TableViewSortState(new ArrayList<>(playlistTableView.getSortOrder()));
+        } else if (trackTableView != null) {
+            return new TableViewSortState(new ArrayList<>(trackTableView.getSortOrder()));
         }
-
-        return new TableViewSortState(new ArrayList<>((List<TableColumn<?, ?>>) (List<?>) tableView.getSortOrder()));
+        return new TableViewSortState(List.of());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void restoreSortState(TableViewSortState sortState) {
-        if (!(songTableView instanceof TableView tableView)) {
-            return;
+        if (currentViewType == ViewType.PLAYLISTS && playlistTableView != null) {
+            playlistTableView.getSortOrder().setAll((List) sortState.sortColumns);
+        } else if (trackTableView != null) {
+            trackTableView.getSortOrder().setAll((List) sortState.sortColumns);
         }
-
-        tableView.getSortOrder().setAll((List) sortState.sortColumns);
     }
 
-    private record TableViewSortState(List<TableColumn<?, ?>> sortColumns) {}
+    private record TableViewSortState(List<TableColumn<?, ?>> sortColumns) {
+    }
 
     /**
      * Gestisce il testo segnaposto della tabella quando questa è vuota,
      * fornendo suggerimenti contestuali all'utente.
      */
-    private void updateTablePlaceholder() {
-        if (songTableView == null) {
-            return;
-        }
+    private Label createPlaceholderLabel(String text) {
+        Label label = new Label(text);
+        label.setWrapText(true);
+        label.setMaxWidth(420);
+        label.setStyle("-fx-alignment: center; -fx-text-alignment: center; -fx-text-fill: #666666; -fx-padding: 16;");
+        return label;
+    }
 
-        String currentView = viewTitleLabel != null ? viewTitleLabel.getText() : "";
+    private void updateTablePlaceholder() {
         String placeholderText;
 
         if (!searchQuery.isBlank()) {
             placeholderText = "Nessun risultato per \"" + searchQuery.trim() + "\".";
-        } else if ("Playlist".equals(currentView)) {
+        } else if (currentViewType == ViewType.PLAYLISTS) {
             placeholderText = "Non ci sono playlist. Clicca \"Nuova playlist\" per crearne una.";
         } else if (currentOpenedPlaylist != null) {
             placeholderText = "Questa playlist non contiene brani. Clicca \"Aggiungi brano\" per inserirne uno.";
-        } else if ("Coda di riproduzione".equals(currentView)) {
+        } else if (currentViewType == ViewType.QUEUE) {
             placeholderText = "Non ci sono brani in coda. Clicca \"Aggiungi brano\" nella Libreria musicale per popolarla.";
         } else {
             placeholderText = "Non ci sono brani. Clicca \"Aggiungi brano\" per inserirne uno.";
         }
 
-        Label placeholderLabel = new Label(placeholderText);
-        placeholderLabel.setWrapText(true);
-        placeholderLabel.setMaxWidth(420);
-        placeholderLabel.setStyle("-fx-alignment: center; -fx-text-alignment: center; -fx-text-fill: #666666; -fx-padding: 16;");
-        songTableView.setPlaceholder(placeholderLabel);
-        if (queueListView != null) {
-            Label queuePlaceholder = new Label(placeholderText);
-            queuePlaceholder.setWrapText(true);
-            queuePlaceholder.setMaxWidth(420);
-            queuePlaceholder.setStyle("-fx-alignment: center; -fx-text-alignment: center; -fx-text-fill: #666666; -fx-padding: 16;");
-            queueListView.setPlaceholder(queuePlaceholder);
+        if (trackTableView != null)
+            trackTableView.setPlaceholder(createPlaceholderLabel(placeholderText));
+        if (playlistTableView != null)
+            playlistTableView.setPlaceholder(createPlaceholderLabel(placeholderText));
+        if (queueListView != null)
+            queueListView.setPlaceholder(createPlaceholderLabel(placeholderText));
+    }
+
+    private void showOnlyTrackTable() {
+        if (trackTableView != null) {
+            trackTableView.setVisible(true);
+            trackTableView.setManaged(true);
+        }
+        if (playlistTableView != null) {
+            playlistTableView.setVisible(false);
+            playlistTableView.setManaged(false);
+        }
+    }
+
+    private void showOnlyPlaylistTable() {
+        if (playlistTableView != null) {
+            playlistTableView.setVisible(true);
+            playlistTableView.setManaged(true);
+        }
+        if (trackTableView != null) {
+            trackTableView.setVisible(false);
+            trackTableView.setManaged(false);
         }
     }
 
     // --- Componenti iniettati da FXML ---
-    
+
     /** Controller della barra laterale (iniettato tramite fx:include) */
     @FXML
     private SidebarController sidebarController;
-    
+
     /** Controller della barra del player (iniettato tramite fx:include) */
     @FXML
     private PlayerController playerBarController;
@@ -285,7 +302,11 @@ public class PrimaryViewController implements Observer {
 
     /** Tabella principale per la visualizzazione di Track o Playlist */
     @FXML
-    private TableView<?> songTableView;
+    private TableView<Track> trackTableView;
+    @FXML
+    private TableView<Playlist> playlistTableView;
+
+    private ViewType currentViewType = ViewType.HOME;
     @FXML
     private TableColumn<?, ?> titleColumn;
     @FXML
@@ -315,17 +336,22 @@ public class PrimaryViewController implements Observer {
         playerBarController.setOnPlayPauseClicked(this::handlePlayPauseAction);
         playerBarController.setOnPlayerStateChanged(this::syncTableSelection);
 
-        songTableView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> updatePlayPlaylistButtonState());
+        if (trackTableView != null)
+            trackTableView.getSelectionModel().selectedItemProperty()
+                    .addListener((obs, oldVal, newVal) -> updatePlayPlaylistButtonState());
+        if (playlistTableView != null)
+            playlistTableView.getSelectionModel().selectedItemProperty()
+                    .addListener((obs, oldVal, newVal) -> updatePlayPlaylistButtonState());
 
         if (reorderButton != null) {
             reorderButton.selectedProperty().addListener((obs, oldVal, selected) -> {
-                if (songTableView != null) {
+                if (trackTableView != null) {
                     if (selected) {
-                        if (!songTableView.getStyleClass().contains("reorder-mode")) {
-                            songTableView.getStyleClass().add("reorder-mode");
+                        if (!trackTableView.getStyleClass().contains("reorder-mode")) {
+                            trackTableView.getStyleClass().add("reorder-mode");
                         }
                     } else {
-                        songTableView.getStyleClass().remove("reorder-mode");
+                        trackTableView.getStyleClass().remove("reorder-mode");
                     }
                 }
             });
@@ -333,24 +359,40 @@ public class PrimaryViewController implements Observer {
 
         showSongsColumns();
         setupQueueListView();
-        setupContextMenu();
+        ContextMenuManager.setupTrackContextMenu(trackTableView, this);
+        ContextMenuManager.setupPlaylistContextMenu(playlistTableView, this);
 
-        songTableView.setOnMouseClicked(event -> {
-            if (event.getClickCount() != 2 || event.getButton() != javafx.scene.input.MouseButton.PRIMARY) {
-                return;
-            }
+        if (trackTableView != null)
+            trackTableView.setOnMouseClicked(event -> {
+                if (event.getClickCount() != 2 || event.getButton() != javafx.scene.input.MouseButton.PRIMARY) {
+                    return;
+                }
 
-            Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-            if (!isClickOnSelectedTableRow(event, selectedItem)) {
-                return;
-            }
+                Track selectedTrack = trackTableView.getSelectionModel().getSelectedItem();
+                if (!isClickOnSelectedTableRow(event, selectedTrack)) {
+                    return;
+                }
 
-            if (currentOpenedPlaylist == null && "Playlist".equals(viewTitleLabel.getText()) && selectedItem instanceof Playlist playlist) {
-                openPlaylistDetail(playlist);
-            } else if (selectedItem instanceof Track track) {
-                handleStartTrackPlayback(track);
-            }
-        });
+                if (selectedTrack != null) {
+                    handleStartTrackPlayback(selectedTrack);
+                }
+            });
+
+        if (playlistTableView != null)
+            playlistTableView.setOnMouseClicked(event -> {
+                if (event.getClickCount() != 2 || event.getButton() != javafx.scene.input.MouseButton.PRIMARY) {
+                    return;
+                }
+
+                Playlist playlist = playlistTableView.getSelectionModel().getSelectedItem();
+                if (!isClickOnSelectedTableRow(event, playlist)) {
+                    return;
+                }
+
+                if (currentOpenedPlaylist == null && currentViewType == ViewType.PLAYLISTS && playlist != null) {
+                    openPlaylistDetail(playlist);
+                }
+            });
 
         if (undoButton != null) {
             undoButton.setDisable(!UndoManager.getInstance().canUndo());
@@ -371,7 +413,8 @@ public class PrimaryViewController implements Observer {
     }
 
     private void setupQueueListView() {
-        if (queueListView == null) return;
+        if (queueListView == null)
+            return;
         queueListView.setCellFactory(lv -> new ListCell<>() {
             @Override
             protected void updateItem(QueueItem item, boolean empty) {
@@ -387,7 +430,8 @@ public class PrimaryViewController implements Observer {
                         setText(indicator + " " + p.getTitle() + " (" + p.getTrackCount() + " brani)");
                         setStyle("-fx-font-weight: bold;");
                     } else if (item.parentPlayable instanceof Playlist && item.track != null) {
-                        setText("    " + item.track.getTitle() + " - " + item.track.getAuthor() + " (" + formatDuration(item.track.getDuration()) + ")");
+                        setText("    " + item.track.getTitle() + " - " + item.track.getAuthor() + " ("
+                                + formatDuration(item.track.getDuration()) + ")");
                         setStyle("-fx-font-weight: normal;");
                     } else if (item.parentPlayable instanceof Track) {
                         Track t = (Track) item.parentPlayable;
@@ -414,20 +458,26 @@ public class PrimaryViewController implements Observer {
 
         queueListView.setOnMouseClicked(event -> {
             QueueItem selected = queueListView.getSelectionModel().getSelectedItem();
-            if (selected == null) return;
-            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY && event.getClickCount() == 1 && selected.parentPlayable instanceof Playlist && selected.track == null) {
+            if (selected == null)
+                return;
+            if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY && event.getClickCount() == 1
+                    && selected.parentPlayable instanceof Playlist && selected.track == null) {
                 Playlist p = (Playlist) selected.parentPlayable;
-                if (expandedPlaylists.contains(p)) expandedPlaylists.remove(p);
-                else expandedPlaylists.add(p);
+                if (expandedPlaylists.contains(p))
+                    expandedPlaylists.remove(p);
+                else
+                    expandedPlaylists.add(p);
                 refreshTableData();
             } else if (event.getClickCount() == 2) {
                 if (selected.track != null) {
                     int trackIdx = selected.parentPlayable.getTracks().indexOf(selected.track);
                     PlaybackManager.getInstance().setCurrentIndices(selected.queueIndex, trackIdx);
-                    // forcePlayCurrent: ferma l'audio corrente e avvia il brano dall'inizio (slider a 0)
+                    // forcePlayCurrent: ferma l'audio corrente e avvia il brano dall'inizio (slider
+                    // a 0)
                     PlaybackManager.getInstance().forcePlayCurrent();
                     updatePlayerUI();
-                } else if (selected.parentPlayable instanceof Playlist && !selected.parentPlayable.getTracks().isEmpty()) {
+                } else if (selected.parentPlayable instanceof Playlist
+                        && !selected.parentPlayable.getTracks().isEmpty()) {
                     PlaybackManager.getInstance().setCurrentIndices(selected.queueIndex, 0);
                     PlaybackManager.getInstance().forcePlayCurrent();
                     updatePlayerUI();
@@ -436,102 +486,28 @@ public class PrimaryViewController implements Observer {
         });
     }
 
-    /**
-     * Configura il menu contestuale della tabella, definendo azioni e visibilità delle voci.
-     */
-    private void setupContextMenu() {
-        ContextMenu contextMenu = new ContextMenu();
-        
-        MenuItem editItem = new MenuItem("Modifica brano");
-        editItem.setOnAction(e -> handleEditTrack());
-
-        MenuItem deleteItem = new MenuItem("Elimina brano");
-        deleteItem.setOnAction(e -> handleDeleteTrack());
-
-        MenuItem addToPlaylistItem = new MenuItem("Aggiungi a playlist");
-        addToPlaylistItem.setOnAction(e -> handleAddTrackToPlaylist());
-
-        MenuItem addTrackToQueueItem = new MenuItem("Aggiungi brano alla coda");
-        addTrackToQueueItem.setOnAction(e -> handleAddTrackToQueue());
-
-        MenuItem addPlaylistToQueueItem = new MenuItem("Aggiungi playlist alla coda");
-        addPlaylistToQueueItem.setOnAction(e -> handleAddPlaylistToQueue());
-
-        MenuItem editPlaylistItem = new MenuItem("Modifica playlist");
-        editPlaylistItem.setOnAction(e -> handleEditPlaylist());
-
-        MenuItem deletePlaylistItem = new MenuItem("Elimina playlist");
-        deletePlaylistItem.setOnAction(e -> handleDeletePlaylist());
-
-        MenuItem removeFromQueueItem = new MenuItem("Rimuovi dalla coda");
-        removeFromQueueItem.setOnAction(e -> handleRemoveFromQueue());
-
-        MenuItem removeFromPlaylistItem = new MenuItem("Rimuovi dalla playlist");
-        removeFromPlaylistItem.setOnAction(e -> handleRemoveFromPlaylist());
-
-        contextMenu.getItems().addAll(
-                editItem,
-                deleteItem,
-                addToPlaylistItem,
-                addTrackToQueueItem,
-                editPlaylistItem,
-                deletePlaylistItem,
-                addPlaylistToQueueItem,
-                removeFromQueueItem,
-                removeFromPlaylistItem
-        );
-        songTableView.setContextMenu(contextMenu);
-
-        // Listener per mostrare/nascondere le voci del menu in base al tipo di elemento selezionato
-        contextMenu.setOnShowing(e -> {
-            Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-            boolean noTrackSelected = !(selectedItem instanceof Track);
-            boolean noPlaylistSelected = !(selectedItem instanceof Playlist);
-            boolean isQueueView = "Coda di riproduzione".equals(viewTitleLabel.getText());
-
-            // Logica di visibilità per tracce
-            editItem.setVisible(!noTrackSelected && !isQueueView);
-            deleteItem.setVisible(!noTrackSelected && !isQueueView);
-            addToPlaylistItem.setVisible(!noTrackSelected && !isQueueView);
-            addTrackToQueueItem.setVisible(!noTrackSelected && !isQueueView);
-
-            // Logica di visibilità per playlist
-            editPlaylistItem.setVisible(!noPlaylistSelected && !isQueueView);
-            deletePlaylistItem.setVisible(!noPlaylistSelected && !isQueueView);
-            addPlaylistToQueueItem.setVisible(!noPlaylistSelected && !isQueueView);
-
-            removeFromQueueItem.setDisable(selectedItem == null || !isQueueView);
-            removeFromQueueItem.setVisible(isQueueView);
-
-            // Logica per la rimozione dalla playlist (solo se siamo in una playlist manuale)
-            boolean isPlaylistDetailView = (currentOpenedPlaylist != null);
-            boolean isEditable = currentOpenedPlaylist != null && currentOpenedPlaylist.isManuallyEditable();
-            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView || !isEditable);
-            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView && isEditable);
-        });
-    }
-
-    @FXML
-    private void handleEditTrack() {
-        Object selected = songTableView.getSelectionModel().getSelectedItem();
-        if (selected instanceof Track track) {
+    @Override
+    public void onEditTrack(Track track) {
+        if (track != null) {
             currentEditingTrack = track;
             openAddTrackView();
         }
     }
 
     /**
-     * Gestisce l'eliminazione di una traccia dalla libreria con conferma dell'utente.
+     * Gestisce l'eliminazione di una traccia dalla libreria con conferma
+     * dell'utente.
      */
-    @FXML
-    private void handleDeleteTrack() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (!(selectedItem instanceof Track selectedTrack)) return;
+    @Override
+    public void onDeleteTrack(Track selectedTrack) {
+        if (selectedTrack == null)
+            return;
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Conferma eliminazione");
         confirmAlert.setHeaderText("Eliminare il brano selezionato?");
-        confirmAlert.setContentText("Stai per eliminare \"" + selectedTrack.getTitle() + "\" dalla libreria.\nVerrà rimosso anche da tutte le playlist.");
+        confirmAlert.setContentText("Stai per eliminare \"" + selectedTrack.getTitle()
+                + "\" dalla libreria.\nVerrà rimosso anche da tutte le playlist.");
 
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
@@ -541,44 +517,31 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
-     * Utilizza la classe RemoveElementFromPlaylistCommand passandogli la plylist corrente e il brano selezionato
+     * Utilizza la classe RemoveElementFromPlaylistCommand passandogli la plylist
+     * corrente e il brano selezionato
      */
-    @FXML
-    private void handleRemoveFromPlaylist() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-
-        if (selectedItem instanceof Track selectedTrack && currentOpenedPlaylist instanceof ManualPlaylist manualPlaylist) {
+    @Override
+    public void onRemoveFromPlaylist(Track selectedTrack, Playlist currentOpenedPlaylist) {
+        if (selectedTrack != null && currentOpenedPlaylist instanceof ManualPlaylist manualPlaylist) {
             Command removeCmd = new RemoveElementFromPlaylistCommand(manualPlaylist, selectedTrack);
             UndoManager.getInstance().executeCommand(removeCmd);
         }
     }
 
-    private void handleEditPlaylist() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (!(selectedItem instanceof Playlist selectedPlaylist)) return;
-
-        TextInputDialog dialog = new TextInputDialog(selectedPlaylist.getTitle());
-        dialog.setTitle("Modifica playlist");
-        dialog.setHeaderText("Modifica il nome della playlist");
-        dialog.setContentText("Nome playlist:");
-        dialog.setGraphic(null);
-
-        showThemedDialog(dialog).ifPresent(name -> {
-            try {
-                Command renameCmd = new RenamePlaylistCommand(selectedPlaylist, name);
-                UndoManager.getInstance().executeCommand(renameCmd);
-                showPlaylistColumns();
-            } catch (IllegalArgumentException e) {
-                showErrorAlert("Errore", "Nome non valido", e.getMessage());
-            }
-        });
+    @Override
+    public void onEditPlaylist(Playlist selectedPlaylist) {
+        if (selectedPlaylist == null)
+            return;
+        dialogService.openEditPlaylistDialog(selectedPlaylist);
     }
+
     /**
      * Elimina una playlist dalla libreria con conferma.
      */
-    private void handleDeletePlaylist() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (!(selectedItem instanceof Playlist selectedPlaylist)) return;
+    @Override
+    public void onDeletePlaylist(Playlist selectedPlaylist) {
+        if (selectedPlaylist == null)
+            return;
 
         Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmAlert.setTitle("Conferma eliminazione");
@@ -593,29 +556,18 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
-     * Rimuove l'elemento selezionato dalla coda di riproduzione.
-     */
-    private void handleRemoveFromQueue() {
-        int selectedIndex = songTableView.getSelectionModel().getSelectedIndex();
-        if (selectedIndex >= 0) {
-            PlaybackManager.getInstance().removeFromQueue(selectedIndex);
-            refreshTableData();
-            updatePlayerUI();
-            updateTablePlaceholder();
-        }
-    }
-
-    /**
      * Gestisce gli eventi di navigazione provenienti dalla barra laterale.
      */
     private void handleNavigate(String viewId) {
-        if (null != viewId) switch (viewId) {
-            case "Home"     -> handleHomeAction();
-            case "Musica"   -> handleMusicLibraryAction();
-            case "Coda"     -> handlePlayQueueAction();
-            case "Playlist" -> handlePlaylistAction();
-            default -> { }
-        }
+        if (null != viewId)
+            switch (viewId) {
+                case "Home" -> handleHomeAction();
+                case "Musica" -> handleMusicLibraryAction();
+                case "Coda" -> handlePlayQueueAction();
+                case "Playlist" -> handlePlaylistAction();
+                default -> {
+                }
+            }
     }
 
     @FXML
@@ -624,9 +576,10 @@ public class PrimaryViewController implements Observer {
             UndoManager.getInstance().undo();
         }
     }
+
     private void handleSearchQueryChange(String query) {
         searchQuery = query == null ? "" : query;
-        if ("Playlist".equals(viewTitleLabel.getText())) {
+        if (currentViewType == ViewType.PLAYLISTS) {
             showPlaylistColumns();
         } else {
             refreshTableData();
@@ -637,6 +590,7 @@ public class PrimaryViewController implements Observer {
     /** Configura la vista per mostrare la schermata Home con le statistiche. */
     private void handleHomeAction() {
         currentOpenedPlaylist = null;
+        currentViewType = ViewType.HOME;
         viewTitleLabel.setText("Home");
         actionButton.setVisible(false);
         actionButton.setManaged(false);
@@ -650,8 +604,14 @@ public class PrimaryViewController implements Observer {
         }
 
         // Nascondi tabella e coda, mostra pannello Home
-        songTableView.setVisible(false);
-        songTableView.setManaged(false);
+        if (trackTableView != null) {
+            trackTableView.setVisible(false);
+            trackTableView.setManaged(false);
+        }
+        if (playlistTableView != null) {
+            playlistTableView.setVisible(false);
+            playlistTableView.setManaged(false);
+        }
         if (queueListView != null) {
             queueListView.setVisible(false);
             queueListView.setManaged(false);
@@ -669,6 +629,7 @@ public class PrimaryViewController implements Observer {
     private void handleMusicLibraryAction() {
         hideHomePanel();
         currentOpenedPlaylist = null;
+        currentViewType = ViewType.MUSIC;
         viewTitleLabel.setText("Musica");
         actionButton.setText("Aggiungi brano");
         actionButton.setVisible(true);
@@ -682,6 +643,7 @@ public class PrimaryViewController implements Observer {
     private void handlePlayQueueAction() {
         hideHomePanel();
         currentOpenedPlaylist = null;
+        currentViewType = ViewType.QUEUE;
         viewTitleLabel.setText("Coda di riproduzione");
         actionButton.setVisible(false);
         actionButton.setManaged(false);
@@ -694,6 +656,7 @@ public class PrimaryViewController implements Observer {
     private void handlePlaylistAction() {
         hideHomePanel();
         currentOpenedPlaylist = null;
+        currentViewType = ViewType.PLAYLISTS;
         viewTitleLabel.setText("Playlist");
         actionButton.setText("Nuova playlist");
         actionButton.setVisible(true);
@@ -705,7 +668,8 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
-     * Nasconde il pannello Home e ripristina la visibilità della TableView principale.
+     * Nasconde il pannello Home e ripristina la visibilità della TableView
+     * principale.
      * Da chiamare all'inizio di ogni metodo di navigazione che non sia la Home.
      */
     private void hideHomePanel() {
@@ -719,17 +683,20 @@ public class PrimaryViewController implements Observer {
             homeView.setManaged(false);
         }
         // Ripristina la visibilità della tabella principale se non era già visibile
-        if (songTableView != null && !songTableView.isVisible()) {
-            songTableView.setVisible(true);
-            songTableView.setManaged(true);
-        }
+        // Gestito separatamente da showOnlyTrackTable e showOnlyPlaylistTable
     }
 
     // --- Metodi per la configurazione dinamica delle colonne della TableView ---
 
     private void showQueueColumns() {
-        songTableView.setVisible(false);
-        songTableView.setManaged(false);
+        if (trackTableView != null) {
+            trackTableView.setVisible(false);
+            trackTableView.setManaged(false);
+        }
+        if (playlistTableView != null) {
+            playlistTableView.setVisible(false);
+            playlistTableView.setManaged(false);
+        }
         if (queueListView != null) {
             queueListView.setVisible(true);
             queueListView.setManaged(true);
@@ -745,9 +712,10 @@ public class PrimaryViewController implements Observer {
             queueListView.setVisible(false);
             queueListView.setManaged(false);
         }
-        songTableView.setVisible(true);
-        songTableView.setManaged(true);
-        songTableView.getColumns().clear();
+        showOnlyTrackTable();
+        if (trackTableView == null)
+            return;
+        trackTableView.getColumns().clear();
 
         TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
         titleCol.setPrefWidth(200);
@@ -783,86 +751,20 @@ public class PrimaryViewController implements Observer {
             int seconds = data.getValue().getDuration();
             return new SimpleStringProperty(String.format("%02d:%02d", seconds / 60, seconds % 60));
         });
-        
+
         // Risoluzione conflitto: Reintroduzione colonna e cellFactory custom per i Tag
         TableColumn<Track, Set<Tag>> tagCol = new TableColumn<>("Tag");
         tagCol.setPrefWidth(180);
         tagCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTags()));
-        tagCol.setCellFactory(column -> createTagCellFactory());
+        tagCol.setCellFactory(new TagCellFactory());
 
-        ((TableView<Track>) songTableView).getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
-        
-        ((TableView<Track>) songTableView).setRowFactory(tv -> {
-            TableRow<Track> row = new TableRow<>();
+        trackTableView.getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
 
-            row.setOnDragDetected(event -> {
-                if (!row.isEmpty() && reorderButton != null && reorderButton.isSelected()) {
-                    Integer index = row.getIndex();
-                    Dragboard db = row.startDragAndDrop(TransferMode.MOVE);
-                    db.setDragView(row.snapshot(null, null));
-                    ClipboardContent cc = new ClipboardContent();
-                    cc.putString(String.valueOf(index));
-                    db.setContent(cc);
-                    event.consume();
-                }
-            });
+        trackTableView.setRowFactory(new ReorderableTrackRowFactory(
+                () -> reorderButton != null && reorderButton.isSelected(),
+                () -> currentOpenedPlaylist,
+                this::updatePlayerUI));
 
-            row.setOnDragOver(event -> {
-                if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
-                    if (row.getIndex() != Integer.parseInt(event.getDragboard().getString())) {
-                        event.acceptTransferModes(TransferMode.MOVE);
-                        event.consume();
-                    }
-                }
-            });
-
-            row.setOnDragEntered(event -> {
-                if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
-                    if (row.getIndex() != Integer.parseInt(event.getDragboard().getString())) {
-                        row.setStyle("-fx-background-color: #dcdcdc;");
-                    }
-                }
-            });
-
-            row.setOnDragExited(event -> {
-                if (reorderButton != null && reorderButton.isSelected()) {
-                    row.setStyle("");
-                }
-            });
-
-            row.setOnDragDropped(event -> {
-                if (reorderButton != null && reorderButton.isSelected() && event.getDragboard().hasString()) {
-                    int draggedIndex = Integer.parseInt(event.getDragboard().getString());
-                    int dropIndex = row.isEmpty()
-                            ? tv.getItems().size()
-                            : row.getIndex() + (draggedIndex < row.getIndex() ? 1 : 0);
-
-                    if (draggedIndex == dropIndex) {
-                        event.setDropCompleted(true);
-                        event.consume();
-                        return;
-                    }
-
-                    if (currentOpenedPlaylist instanceof ManualPlaylist) {
-                        Track oldTrack = PlaybackManager.getInstance().getCurrentTrack();
-
-                        ((ManualPlaylist) currentOpenedPlaylist).moveElement(draggedIndex, dropIndex);
-                        Library.getInstance().notifyObservers();
-
-                        Track newTrack = PlaybackManager.getInstance().getCurrentTrack();
-                        if (oldTrack != null && newTrack != null && !oldTrack.equals(newTrack)) {
-                            PlaybackManager.getInstance().forcePlayCurrent();
-                            updatePlayerUI();
-                        }
-                    }
-                    event.setDropCompleted(true);
-                    event.consume();
-                }
-            });
-
-            return row;
-        });
-        
         updateTablePlaceholder();
         refreshTableData();
         updatePlayPlaylistButtonState();
@@ -874,24 +776,28 @@ public class PrimaryViewController implements Observer {
             queueListView.setVisible(false);
             queueListView.setManaged(false);
         }
-        songTableView.setVisible(true);
-        songTableView.setManaged(true);
-        songTableView.getColumns().clear();
+        showOnlyPlaylistTable();
+        if (playlistTableView == null)
+            return;
+        playlistTableView.getColumns().clear();
         TableColumn<Playlist, String> nameCol = createColumn("Nome Playlist", 300, p -> p.getTitle());
         TableColumn<Playlist, Integer> countCol = new TableColumn<>("Numero Brani");
         countCol.setPrefWidth(150);
         countCol.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getTrackCount()).asObject());
-        TableColumn<Playlist, String> durationCol = createColumn("Durata Totale", 150, p -> formatDuration(p.getDuration()));
+        TableColumn<Playlist, String> durationCol = createColumn("Durata Totale", 150,
+                p -> formatDuration(p.getDuration()));
 
-        ((TableView<Playlist>) songTableView).getColumns().addAll(nameCol, countCol, durationCol);
-        ((TableView<Playlist>) songTableView).setItems(filteredPlaylists(Library.getInstance().getPlaylists()));
+        playlistTableView.getColumns().addAll(nameCol, countCol, durationCol);
+        playlistTableView.setItems(javafx.collections.FXCollections.observableArrayList(
+                LibrarySearchService.filterPlaylists(Library.getInstance().getPlaylists(), searchQuery)));
         updateTablePlaceholder();
         updatePlayPlaylistButtonState();
     }
 
     // --- Metodi di utilità per la creazione di componenti UI ---
 
-    private <S> TableColumn<S, String> createColumn(String title, double width, java.util.function.Function<S, String> mapper) {
+    private <S> TableColumn<S, String> createColumn(String title, double width,
+            java.util.function.Function<S, String> mapper) {
         TableColumn<S, String> col = new TableColumn<>(title);
         col.setPrefWidth(width);
         col.setCellValueFactory(data -> new SimpleStringProperty(mapper.apply(data.getValue())));
@@ -902,127 +808,12 @@ public class PrimaryViewController implements Observer {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
-    private ObservableList<Track> filteredTracks(List<Track> tracks) {
-        if (searchQuery == null || searchQuery.isBlank()) {
-            return FXCollections.observableArrayList(tracks);
-        }
-
-        return FXCollections.observableArrayList(
-                tracks.stream()
-                        .filter(this::matchesTrackSearch)
-                        .toList()
-        );
-    }
-
-    private ObservableList<Playlist> filteredPlaylists(List<Playlist> playlists) {
-        if (searchQuery == null || searchQuery.isBlank()) {
-            return FXCollections.observableArrayList(playlists);
-        }
-
-        return FXCollections.observableArrayList(
-                playlists.stream()
-                        .filter(this::matchesPlaylistSearch)
-                        .toList()
-        );
-    }
-
-    private boolean matchesTrackSearch(Track track) {
-        String query = normalizedSearchQuery();
-        if (query.isBlank()) {
-            return true;
-        }
-
-        return containsSearch(track.getTitle(), query)
-                || containsSearch(track.getAuthor(), query)
-                || containsSearch(track.getAlbum(), query)
-                || containsSearch(track.getGenre(), query)
-                || containsAnyTag(track, query);
-    }
-
-    private boolean matchesPlaylistSearch(Playlist playlist) {
-        String query = normalizedSearchQuery();
-        return query.isBlank() || containsSearch(playlist.getTitle(), query);
-    }
-
-    private boolean containsAnyTag(Track track, String query) {
-        if (track.getTags() == null) {
-            return false;
-        }
-
-        for (Tag tag : track.getTags()) {
-            if (tag != null && containsSearch(tag.getName(), query)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean containsSearch(String value, String query) {
-        return value != null && value.toLowerCase(Locale.ROOT).contains(query);
-    }
-
-    private String normalizedSearchQuery() {
-        return searchQuery == null ? "" : searchQuery.trim().toLowerCase(Locale.ROOT);
-    }
-
-  private TableCell<Track, Set<Tag>> createTagCellFactory() {
-    return new TableCell<>() {
-        
-        // 1. Dichiariamo i componenti UI fuori dall'updateItem per ottimizzare le prestazioni
-        private final HBox container = new HBox(5);
-        private final ScrollPane scrollPane = new ScrollPane(container);
-
-        // Blocco di inizializzazione della cella
-        {
-            // Impostiamo l'allineamento del contenitore
-            container.setStyle("-fx-alignment: center-left; -fx-padding: 2 0;");
-            
-            // Configuriamo lo ScrollPane per scorrere solo in orizzontale
-            scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Niente barra verticale
-            scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); // Niente barra verticale
-            scrollPane.setPannable(true);
-            scrollPane.setFitToHeight(true);
-            scrollPane.setPannable(true); // Permette di scorrere trascinando con il mouse
-            
-            // Rimuoviamo i bordi e lo sfondo di default dello ScrollPane per farlo integrare nella cella
-            scrollPane.setStyle("-fx-background-color: transparent; -fx-control-inner-background: transparent; -fx-background-insets: 0; -fx-padding: 0;");
-            
-    }
-
-        @Override
-        protected void updateItem(Set<Tag> tags, boolean empty) {
-            super.updateItem(tags, empty);
-            
-            if (empty || tags == null || tags.isEmpty()) {
-                setGraphic(null);
-            } else {
-                // 2. Svuotiamo i vecchi tag invece di creare un nuovo contenitore
-                container.getChildren().clear();
-                
-                tags.forEach(tag -> {
-                    if (tag == null) return;
-                    
-                    Label badge = new Label(tag.getIcon());
-                    badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
-                    
-                    Tooltip tooltip = new Tooltip("Tag: " + tag.getName());
-                    Tooltip.install(badge, tooltip);
-                    
-                    container.getChildren().add(badge);
-                });
-                
-                // 3. Impostiamo lo ScrollPane come grafica della cella
-                setGraphic(scrollPane);
-            }
-        }
-    };
-}
-
     /**
      * Naviga all'interno di una playlist specifica per mostrarne il contenuto.
      */
     private void openPlaylistDetail(Playlist playlist) {
         currentOpenedPlaylist = playlist;
+        currentViewType = ViewType.PLAYLIST_DETAIL;
         viewTitleLabel.setText(playlist.getTitle());
         actionButton.setVisible(false);
         actionButton.setManaged(false);
@@ -1039,264 +830,9 @@ public class PrimaryViewController implements Observer {
         updatePlayPlaylistButtonState();
     }
 
-
     /**
-     * Apre il dialogo per creare una playlist vuota.
-     *
-     */
-    private void openCreateEmptyPlaylistDialog() {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Nuova playlist");
-        dialog.setHeaderText("Crea una nuova playlist");
-        dialog.setContentText("Nome playlist:");
-        dialog.setGraphic(null);
-
-        showThemedDialog(dialog).ifPresent(name -> {
-            try {
-                PlaylistGenerator generator = new ManualPlaylistGenerator();
-                Playlist playlist = (Playlist) generator.createPlaylist(name);
-
-                // MODIFICATO: Sostituito l'add diretto con l'esecuzione del comando transazionale
-                Command addPlaylistCmd = new AddPlaylistCommand(Library.getInstance(), playlist);
-                UndoManager.getInstance().executeCommand(addPlaylistCmd);
-
-                showPlaylistColumns();
-            } catch (IllegalArgumentException e) {
-                showErrorAlert("Errore", "Nome playlist non valido", e.getMessage());
-            }
-        });
-    }
-
-
-
-    /**
-     * Apre il dialogo per scegliere il criterio della playlist automatica.
-     * I criteri disponibili sono genere musicale e anno di uscita.
-     */
-    private void openCreateAutomaticPlaylistDialog() {
-        List<String> options = List.of("Genere", "Anno", "Tag");
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("Genere", options);
-        dialog.setTitle("Playlist automatica");
-        dialog.setHeaderText("Crea una playlist automatica");
-        dialog.setContentText("Criterio:");
-        dialog.setGraphic(null);
-
-        Optional<String> result = showThemedDialog(dialog);
-
-        if (result.isEmpty()) {
-            return;
-        }
-
-        if ("Genere".equals(result.get())) {
-            openAutomaticPlaylistByGenreDialog();
-        } else if ("Anno".equals(result.get())) {
-            openAutomaticPlaylistByYearDialog();
-        } else if ("Tag".equals(result.get())) {
-            openAutomaticPlaylistByTagDialog();
-        }
-    }
-
-    /**
-     * Apre il dialogo per scegliere il genere musicale
-     * su cui basare la playlist automatica.
-     */
-    private void openAutomaticPlaylistByGenreDialog() {
-        List<String> genres = new ArrayList<>();
-
-        for (Track track : Library.getInstance().getTracks()) {
-            String genre = track.getGenre();
-
-            if (genre != null && !genre.trim().isEmpty() && !genres.contains(genre)) {
-                genres.add(genre);
-            }
-        }
-
-        genres.sort(String.CASE_INSENSITIVE_ORDER);
-
-        if (genres.isEmpty()) {
-            showInfoAlert(
-                    "Nessun genere disponibile",
-                    "Playlist automatica non creata",
-                    "Non ci sono generi disponibili nella libreria."
-            );
-            return;
-        }
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>(genres.get(0), genres);
-        dialog.setTitle("Playlist automatica per genere");
-        dialog.setHeaderText("Scegli il genere");
-        dialog.setContentText("Genere:");
-        dialog.setGraphic(null);
-
-        Optional<String> genreResult = showThemedDialog(dialog);
-        genreResult.ifPresent(genre -> {
-            TextInputDialog titleDialog = new TextInputDialog("Playlist per " + genre);
-            titleDialog.setTitle("Nome playlist");
-            titleDialog.setHeaderText("Inserisci il nome della playlist");
-            titleDialog.setContentText("Nome:");
-            titleDialog.setGraphic(null);
-
-            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByGenre(genre, title));
-        });
-    }
-
-    /**
-     * Apre il dialogo per scegliere l'anno di uscita
-     * su cui basare la playlist automatica.
-     */
-    private void openAutomaticPlaylistByYearDialog() {
-        List<Integer> years = new ArrayList<>();
-
-        for (Track track : Library.getInstance().getTracks()) {
-            Integer year = track.getYear();
-
-            if (year != null && !years.contains(year)) {
-                years.add(year);
-            }
-        }
-
-        years.sort(Integer::compareTo);
-
-        if (years.isEmpty()) {
-            showInfoAlert(
-                    "Nessun anno disponibile",
-                    "Playlist automatica non creata",
-                    "Non ci sono anni disponibili nella libreria."
-            );
-            return;
-        }
-
-        ChoiceDialog<Integer> dialog = new ChoiceDialog<>(years.get(0), years);
-        dialog.setTitle("Playlist automatica per anno");
-        dialog.setHeaderText("Scegli l'anno");
-        dialog.setContentText("Anno:");
-        dialog.setGraphic(null);
-
-        Optional<Integer> yearResult = showThemedDialog(dialog);
-        yearResult.ifPresent(year -> {
-            TextInputDialog titleDialog = new TextInputDialog("Playlist del " + year);
-            titleDialog.setTitle("Nome playlist");
-            titleDialog.setHeaderText("Inserisci il nome della playlist");
-            titleDialog.setContentText("Nome:");
-            titleDialog.setGraphic(null);
-
-            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByYear(year, title));
-        });
-    }
-
-    /**
-     * Genera una playlist automatica filtrata per genere musicale.
-     *
-     * @param genre Genere scelto dall'utente.
-     */
-    private void generateAutomaticPlaylistByGenre(String genre, String title) {
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.GENRE,
-                genre
-        );
-        Playlist playlist = (Playlist) generator.createPlaylist(title);
-        saveGeneratedPlaylist(playlist, "Playlist automatica creata per genere: ");
-    }
-
-    /**
-     * Apre il dialogo per scegliere il tag
-     * su cui basare la playlist automatica.
-     */
-    private void openAutomaticPlaylistByTagDialog() {
-        List<Tag> tags = new ArrayList<>();
-
-        // Estrazione dei tag univoci attualmente in uso nella libreria
-        for (Track track : Library.getInstance().getTracks()) {
-            Set<Tag> trackTags = track.getTags();
-            if (trackTags != null) {
-                for (Tag tag : trackTags) {
-                    if (!tags.contains(tag)) {
-                        tags.add(tag);
-                    }
-                }
-            }
-        }
-
-        // Ordinamento alfabetico basato sul nome del tag
-        tags.sort((t1, t2) -> t1.getName().compareToIgnoreCase(t2.getName()));
-
-        if (tags.isEmpty()) {
-            showInfoAlert(
-                    "Nessun tag disponibile",
-                    "Playlist automatica non creata",
-                    "Non ci sono tag associati ai brani nella libreria."
-            );
-            return;
-        }
-
-        // Il ChoiceDialog utilizzerà automaticamente il metodo toString() di TagPredefined
-        ChoiceDialog<Tag> dialog = new ChoiceDialog<>(tags.get(0), tags);
-        dialog.setTitle("Playlist automatica per tag");
-        dialog.setHeaderText("Scegli il tag");
-        dialog.setContentText("Tag:");
-        dialog.setGraphic(null);
-
-        Optional<Tag> tagResult = showThemedDialog(dialog);
-        tagResult.ifPresent(tag -> {
-            TextInputDialog titleDialog = new TextInputDialog("Playlist " + tag.getName());
-            titleDialog.setTitle("Nome playlist");
-            titleDialog.setHeaderText("Inserisci il nome della playlist");
-            titleDialog.setContentText("Nome:");
-            titleDialog.setGraphic(null);
-
-            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByTag(tag, title));
-        });
-    }
-
-    /**
-     * Genera una playlist automatica filtrata per anno di uscita.
-     *
-     * @param year Anno scelto dall'utente.
-     */
-    private void generateAutomaticPlaylistByYear(Integer year, String title) {
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.YEAR,
-                year
-        );
-        Playlist playlist = (Playlist) generator.createPlaylist(title);
-        saveGeneratedPlaylist(playlist, "Playlist automatica creata per anno: ");
-
-    }
-
-    /**
-     * Genera una playlist automatica filtrata per tag.
-     *
-     * @param tag Tag scelto dall'utente.
-     * @param title Titolo della playlist.
-     */
-    private void generateAutomaticPlaylistByTag(Tag tag, String title) {
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.TAG,
-                tag
-        );
-        Playlist playlist = (Playlist) generator.createPlaylist(title);
-        saveGeneratedPlaylist(playlist, "Playlist automatica creata per tag: ");
-    }
-
-    /**
-     * Salva nella libreria la playlist generata e aggiorna la tabella.
-     *
-     * @param playlist Playlist da salvare.
-     * @param logMessage Messaggio da stampare in console.
-     */
-    private void saveGeneratedPlaylist(Playlist playlist, String logMessage) {
-        // MODIFICATO: Anche per le playlist automatiche passiamo dal Command per supportare l'Undo
-        Command addPlaylistCmd = new AddPlaylistCommand(Library.getInstance(), playlist);
-        UndoManager.getInstance().executeCommand(addPlaylistCmd);
-
-        showPlaylistColumns();
-        System.out.println(logMessage + playlist.getTitle());
-    }
-
-
-    /**
-     * Carica e visualizza la finestra modale per l'aggiunta o la modifica di una traccia.
+     * Carica e visualizza la finestra modale per l'aggiunta o la modifica di una
+     * traccia.
      */
     private void openAddTrackView() {
         try {
@@ -1312,6 +848,9 @@ public class PrimaryViewController implements Observer {
             ThemeManager.getInstance().applyActiveThemeToScene(stage.getScene());
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.showAndWait();
+
+            // Resetta lo stato in modo da non precompilare form futuri erroneamente
+            currentEditingTrack = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -1320,98 +859,55 @@ public class PrimaryViewController implements Observer {
     /** Gestore del pulsante d'azione principale (contestuale alla vista). */
     @FXML
     private void handleActionBtnClick() {
-        String currentView = viewTitleLabel.getText();
-        if ("Musica".equals(currentView)) {
+        if (currentViewType == ViewType.MUSIC) {
             currentEditingTrack = null;
             openAddTrackView();
-        }
-        else if ("Playlist".equals(currentView)){
-            openCreatePlaylistDialog();
-        }
-    }
-
-    private <T> Optional<T> showThemedDialog(Dialog<T> dialog) {
-        dialog.setOnShown(event -> ThemeManager.getInstance().applyActiveThemeToScene(dialog.getDialogPane().getScene()));
-
-        return dialog.showAndWait();
-    }
-
-    private void openCreatePlaylistDialog() {
-        List<String> options = List.of("Playlist vuota", "Playlist automatica");
-
-        ChoiceDialog<String> dialog = new ChoiceDialog<>("Playlist vuota", options);
-        dialog.setTitle("Nuova playlist");
-        dialog.setHeaderText("Scegli il tipo di playlist");
-        dialog.setContentText("Tipo:");
-        dialog.setGraphic(null);
-
-        Optional<String> result = showThemedDialog(dialog);
-
-        if (result.isEmpty()) {
-            return;
-        }
-        if ("Playlist vuota".equals(result.get())) {
-            openCreateEmptyPlaylistDialog();
-        } else if ("Playlist automatica".equals(result.get())) {
-            openCreateAutomaticPlaylistDialog();
+        } else if (currentViewType == ViewType.PLAYLISTS) {
+            dialogService.openCreatePlaylistDialog();
         }
     }
 
     /** Aggiunge la traccia selezionata a una playlist scelta tramite dialogo. */
-    private void handleAddTrackToPlaylist() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (!(selectedItem instanceof Track selectedTrack)) return;
-
-        List<Playlist> playlists = new ArrayList<>();
-        for (Playlist playlist : Library.getInstance().getPlaylists()) {
-            if (playlist.isManuallyEditable()) {
-                playlists.add(playlist);
-            }
-        }
-
-        if (playlists.isEmpty()) {
-            showInfoAlert("Nessuna playlist", "Non ci sono playlist disponibili", "Crea prima una playlist.");
+    @Override
+    public void onAddTrackToPlaylist(Track selectedTrack) {
+        if (selectedTrack == null)
             return;
-        }
-
-        ChoiceDialog<Playlist> dialog = new ChoiceDialog<>(playlists.get(0), playlists);
-        dialog.setTitle("Aggiungi a playlist");
-        dialog.setHeaderText("Scegli la playlist");
-        dialog.setContentText("Playlist:");
-
-        Optional<Playlist> result = dialog.showAndWait();
-        result.ifPresent(playlist -> {
-            if (playlist instanceof ManualPlaylist manualPlaylist) {
-                // MODIFICATO: Utilizza il comando transazionale al posto di playlist.addTrack()
-                Command addTrackCmd = new AddElementToPlaylistCommand(manualPlaylist, selectedTrack);
-                UndoManager.getInstance().executeCommand(addTrackCmd);
-            }
-        });
+        dialogService.openAddTrackToPlaylistDialog(selectedTrack);
     }
 
     /** Aggiunge la traccia selezionata alla coda di riproduzione corrente. */
-    private void handleAddTrackToQueue() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (selectedItem instanceof Track track) {
+    @Override
+    public void onAddTrackToQueue(Track track) {
+        if (track != null) {
             PlaybackManager.getInstance().addToQueue(track);
             refreshQueueViewIfVisible();
         }
     }
 
     /** Aggiunge l'intera playlist selezionata alla coda di riproduzione. */
-    private void handleAddPlaylistToQueue() {
-        Object selectedItem = songTableView.getSelectionModel().getSelectedItem();
-        if (selectedItem instanceof Playlist playlist) {
+    @Override
+    public void onAddPlaylistToQueue(Playlist playlist) {
+        if (playlist != null) {
             PlaybackManager.getInstance().addToQueue(playlist);
             refreshQueueViewIfVisible();
         }
     }
 
     private void refreshQueueViewIfVisible() {
-        if ("Coda di riproduzione".equals(viewTitleLabel.getText())) {
+        if (currentViewType == ViewType.QUEUE) {
             refreshTableData();
             updateTablePlaceholder();
         }
+    }
+
+    @Override
+    public boolean isQueueView() {
+        return currentViewType == ViewType.QUEUE;
+    }
+
+    @Override
+    public Playlist getCurrentOpenedPlaylist() {
+        return currentOpenedPlaylist;
     }
 
     /** Avvia la riproduzione immediata della playlist selezionata. */
@@ -1419,9 +915,7 @@ public class PrimaryViewController implements Observer {
     private void handlePlayPlaylistAction() {
         Playable playlistToPlay = currentOpenedPlaylist != null
                 ? currentOpenedPlaylist
-                : songTableView.getSelectionModel().getSelectedItem() instanceof Playlist playlist
-                        ? playlist
-                        : null;
+                : playlistTableView != null ? playlistTableView.getSelectionModel().getSelectedItem() : null;
 
         if (playlistToPlay != null && !playlistToPlay.getTracks().isEmpty()) {
             PlaybackManager.getInstance().play(playlistToPlay, false);
@@ -1430,12 +924,15 @@ public class PrimaryViewController implements Observer {
     }
 
     /**
-     * Gestisce ESCLUSIVAMENTE il toggle Play/Pausa sul brano attualmente in riproduzione.
-     * NON tiene conto dell'elemento selezionato nella tabella o nella lista della coda:
+     * Gestisce ESCLUSIVAMENTE il toggle Play/Pausa sul brano attualmente in
+     * riproduzione.
+     * NON tiene conto dell'elemento selezionato nella tabella o nella lista della
+     * coda:
      * la selezione visiva è indipendente dallo stato di riproduzione.
      *
      * Se la coda è vuota e non c'è nessun brano in riproduzione, tenta di caricare
-     * il primo brano disponibile dalla vista corrente come comportamento di fallback.
+     * il primo brano disponibile dalla vista corrente come comportamento di
+     * fallback.
      */
     private void handlePlayPauseAction() {
         PlaybackManager manager = PlaybackManager.getInstance();
@@ -1451,14 +948,16 @@ public class PrimaryViewController implements Observer {
             }
         }
 
-        // Delega allo State pattern: PlayingState → pausa, PausedState → riprendi, StoppedState → avvia.
+        // Delega allo State pattern: PlayingState → pausa, PausedState → riprendi,
+        // StoppedState → avvia.
         // L'elemento selezionato nella UI non influisce su questa azione.
         manager.pressPlay();
         updatePlayerUI();
     }
 
     /**
-     * Avvia la riproduzione di una traccia specifica scelta dall'utente (es. doppio click sulla tabella).
+     * Avvia la riproduzione di una traccia specifica scelta dall'utente (es. doppio
+     * click sulla tabella).
      * A differenza di {@link #handlePlayPauseAction()}, questo metodo imposta
      * il contesto di riproduzione basandosi sulla traccia selezionata.
      *
@@ -1479,17 +978,22 @@ public class PrimaryViewController implements Observer {
         updatePlayerUI();
     }
 
-    /** Aggiorna la barra del player e sincronizza la selezione visiva nella tabella. */
+    /**
+     * Aggiorna la barra del player e sincronizza la selezione visiva nella tabella.
+     */
     private void updatePlayerUI() {
         playerBarController.updatePlayerUI();
         syncTableSelection();
     }
 
-    /** Sincronizza l'elemento selezionato nella tabella con la traccia effettivamente in riproduzione. */
+    /**
+     * Sincronizza l'elemento selezionato nella tabella con la traccia
+     * effettivamente in riproduzione.
+     */
     private void syncTableSelection() {
         Track currentTrack = PlaybackManager.getInstance().getCurrentTrack();
         if (currentTrack != null) {
-            if ("Coda di riproduzione".equals(viewTitleLabel.getText()) && queueListView != null && !queueListView.getItems().isEmpty()) {
+            if (currentViewType == ViewType.QUEUE && queueListView != null && !queueListView.getItems().isEmpty()) {
                 ObservableList<QueueItem> items = queueListView.getItems();
                 int currentQueueIndex = PlaybackManager.getInstance().getCurrentPlayableIndex();
                 for (int i = 0; i < items.size(); i++) {
@@ -1503,15 +1007,15 @@ public class PrimaryViewController implements Observer {
                         return;
                     }
                 }
-            } else if (songTableView != null && !songTableView.getItems().isEmpty()) {
-                ObservableList<?> items = songTableView.getItems();
-                
+            } else if (trackTableView != null && !trackTableView.getItems().isEmpty()) {
+                ObservableList<Track> items = trackTableView.getItems();
+
                 for (int i = 0; i < items.size(); i++) {
                     if (items.get(i).equals(currentTrack)) {
                         final int index = i;
                         javafx.application.Platform.runLater(() -> {
-                            songTableView.getSelectionModel().select(index);
-                            songTableView.scrollTo(index);
+                            trackTableView.getSelectionModel().select(index);
+                            trackTableView.scrollTo(index);
                         });
                         return;
                     }
@@ -1520,31 +1024,4 @@ public class PrimaryViewController implements Observer {
         }
     }
 
-    /**
-     * Mostra un messaggio informativo all'utente.
-     * @param title Titolo della finestra.
-     * @param header Intestazione del messaggio.
-     * @param content Testo dettagliato del messaggio.
-     */
-    private void showInfoAlert(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
-    /**
-     * Mostra un messaggio di errore all'utente.
-     * @param title Titolo della finestra.
-     * @param header Intestazione dell'errore.
-     * @param content Testo dettagliato dell'errore.
-     */
-    private void showErrorAlert(String title, String header, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(header);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
 }
