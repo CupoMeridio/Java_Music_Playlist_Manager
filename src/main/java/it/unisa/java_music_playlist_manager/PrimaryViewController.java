@@ -357,7 +357,6 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             });
         }
 
-        showSongsColumns();
         setupQueueListView();
         ContextMenuManager.setupTrackContextMenu(trackTableView, this);
         ContextMenuManager.setupPlaylistContextMenu(playlistTableView, this);
@@ -397,6 +396,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (undoButton != null) {
             undoButton.setDisable(!UndoManager.getInstance().canUndo());
         }
+        // Inizializza la vista iniziale come "Musica"
+        handleMusicLibraryAction();
         updatePlayerUI();
         System.out.println("Interfaccia grafica inizializzata correttamente");
     }
