@@ -39,7 +39,8 @@
 }
 
 .combo-box > .list-cell,
-.combo-box .text-field {
+.combo-box .text-field,
+.combo-box .arrow-button {
     -fx-border-color: transparent;
     -fx-border-width: 0;
     -fx-background-color: transparent;
@@ -80,24 +81,9 @@
 }
 
 .check-combo-box {
-    -fx-background-color: #000000;
-    -fx-background-radius: 0;
-    -fx-border-color: #FFFFFF;
-    -fx-border-radius: 0;
-    -fx-border-width: 2px;
-}
-
-.check-combo-box > .list-cell,
-.check-combo-box .text-field,
-.check-combo-box .arrow-button {
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
     -fx-background-color: transparent;
-}
-
-.check-combo-box:focused {
-    -fx-border-color: #FFFF00;
-    -fx-border-width: 3px;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
 }
 
 #addTrackErrorLabel {
@@ -155,4 +141,9 @@
 
 .progress-indicator .determinate-indicator .indicator {
     -fx-background-color: #D11A2A;
+}
+
+#addTrackTagComboBox > .combo-box {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }
