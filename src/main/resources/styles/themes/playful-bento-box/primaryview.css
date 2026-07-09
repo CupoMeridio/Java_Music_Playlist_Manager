@@ -153,6 +153,7 @@
 .table-view {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 22px;
+    -fx-border-radius: 22px;
     -fx-table-cell-border-color: #E4E7EB;
     -fx-border-color: #E4E7EB;
     -fx-border-width: 1.5px;
@@ -181,7 +182,7 @@
 
 .table-row-cell {
     -fx-background-color: #FFFFFF;
-    -fx-padding: 5px 0;
+    -fx-padding: 4px 0;
     -fx-border-color: transparent transparent #E4E7EB transparent;
 }
 

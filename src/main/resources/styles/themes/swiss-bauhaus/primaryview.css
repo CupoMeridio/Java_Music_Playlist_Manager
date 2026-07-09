@@ -184,7 +184,7 @@
 
 .table-row-cell {
     -fx-background-color: #F9F9F9;
-    -fx-padding: 5px 0;
+    -fx-padding: 4px 0;
     -fx-border-color: transparent transparent #E5E5E5 transparent;
 }
 

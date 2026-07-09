@@ -3,6 +3,7 @@
 .stat-card {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
     -fx-border-color: #E4E7EB;
     -fx-border-width: 1.5px;
     -fx-padding: 18px 22px;

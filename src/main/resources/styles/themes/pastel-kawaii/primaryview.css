@@ -1,4 +1,4 @@
-/* Pastel Kawaii — primaryview.css */
+/* Pastel Kawaii ? primaryview.css */
 
 .root {
     -fx-background-color: #fff5f8;
@@ -94,11 +94,11 @@
 }
 
 #actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed {
-    -fx-background-color: linear-gradient(to bottom, #d48ef5, #b8f0e0);
+    -fx-background-color: linear-gradient(to bottom, #d48ef5, #ffe8a1);
 }
 
 #reorderButton:selected {
-    -fx-background-color: linear-gradient(to bottom, #d48ef5, #b8f0e0);
+    -fx-background-color: linear-gradient(to bottom, #d48ef5, #ffe8a1);
     -fx-text-fill: #ffffff;
     -fx-effect: innershadow(gaussian, rgba(232, 180, 248, 0.85), 8, 0, 0, 2);
 }
@@ -141,7 +141,7 @@
 }
 
 .combo-box-popup .list-cell:hover {
-    -fx-background-color: #b8f0e0;
+    -fx-background-color: #ffe8a1;
     -fx-text-fill: #8a5c70;
 }
 
@@ -154,6 +154,7 @@
 .table-view {
     -fx-background-color: #fff5f8;
     -fx-background-radius: 26px;
+    -fx-border-radius: 26px;
     -fx-table-cell-border-color: #ffd6e8;
     -fx-border-color: #ffd6e8;
     -fx-border-width: 1px;
@@ -182,7 +183,7 @@
 
 .table-row-cell {
     -fx-background-color: #fff5f8;
-    -fx-padding: 5px 0;
+    -fx-padding: 4px 0;
     -fx-border-color: transparent transparent #ffd6e8 transparent;
 }
 

@@ -1,8 +1,9 @@
-/* Pastel Kawaii — home.css */
+/* Pastel Kawaii ? home.css */
 
 .stat-card {
     -fx-background-color: linear-gradient(to bottom, #ffd6e8, #fff5f8);
     -fx-background-radius: 28px;
+    -fx-border-radius: 28px;
     -fx-border-color: #ffd6e8;
     -fx-border-width: 1px;
     -fx-padding: 18px 22px;

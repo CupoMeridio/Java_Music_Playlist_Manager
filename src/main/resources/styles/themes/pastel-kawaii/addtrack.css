@@ -19,8 +19,8 @@
 }
 
 .text-field:focused {
-    -fx-background-color: linear-gradient(to bottom, #fff5f8, #b8f0e0);
-    -fx-border-color: #b8f0e0;
+    -fx-background-color: linear-gradient(to bottom, #fff5f8, #ffe8a1);
+    -fx-border-color: #ffe8a1;
     -fx-border-width: 1px;
 }
 
@@ -32,7 +32,7 @@
     -fx-border-width: 1px;
 }
 
-.combo-box > .list-cell,
+.combo-box>.list-cell,
 .combo-box .text-field,
 .combo-box .arrow-button {
     -fx-border-color: transparent;
@@ -41,8 +41,8 @@
 }
 
 .combo-box:focused {
-    -fx-background-color: linear-gradient(to bottom, #fff5f8, #b8f0e0);
-    -fx-border-color: #b8f0e0;
+    -fx-background-color: linear-gradient(to bottom, #fff5f8, #ffe8a1);
+    -fx-border-color: #ffe8a1;
     -fx-border-width: 1px;
 }
 
@@ -81,7 +81,7 @@
 }
 
 #saveTrackButton:pressed {
-    -fx-background-color: linear-gradient(to bottom, #d48ef5, #b8f0e0);
+    -fx-background-color: linear-gradient(to bottom, #d48ef5, #ffe8a1);
 }
 
 #loadingOverlay {
@@ -94,7 +94,7 @@
     -fx-border-radius: 30px;
 }
 
-#addTrackTagComboBox > .combo-box {
+#addTrackTagComboBox>.combo-box {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
 }
