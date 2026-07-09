@@ -399,7 +399,6 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         // Inizializza la vista iniziale come "Musica"
         handleMusicLibraryAction();
         updatePlayerUI();
-        System.out.println("Interfaccia grafica inizializzata correttamente");
     }
 
     private boolean isClickOnSelectedTableRow(MouseEvent event, Object selectedItem) {
@@ -853,7 +852,6 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             // Resetta lo stato in modo da non precompilare form futuri erroneamente
             currentEditingTrack = null;
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 

@@ -31,7 +31,6 @@ public class UndoManager {
             Command lastCommand = history.pop();
             lastCommand.undo();
         } else {
-            System.out.println("[UNDO] Nessuna operazione da annullare.");
         }
     }
 

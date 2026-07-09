@@ -155,7 +155,6 @@ public class ThemeManager {
             if (resource != null) {
                 targetScene.getStylesheets().add(resource.toExternalForm());
             } else {
-                System.err.println("[THEME] CSS non trovato: " + cssPath);
             }
         }
     }

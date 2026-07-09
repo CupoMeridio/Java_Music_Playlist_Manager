@@ -160,7 +160,6 @@ public class PlayerController implements Observer {
             // inserimento),
             // getCurrentTrack() torna null ma il MediaPlayer sta ancora suonando l'audio
             // precedente.
-            System.out.println("[PLAYER] Il brano in riproduzione non è più nella coda (Undo). Stop forzato.");
             needsStop = true;
         }
 

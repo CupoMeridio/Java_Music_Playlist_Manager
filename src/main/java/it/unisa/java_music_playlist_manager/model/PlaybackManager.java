@@ -92,7 +92,6 @@ public class PlaybackManager implements Subject {
      */
     public void pressPlay() {
         if (queue.isEmpty()) {
-            System.out.println("[MANAGER - ERROR] Impossibile avviare il player: nessuna canzone caricata nella coda.");
             return;
         }
         currentState.play(this);
@@ -199,7 +198,6 @@ public class PlaybackManager implements Subject {
             currentPlayableIndex--;
         }
         
-        System.out.println("[MANAGER] Elemento rimosso dalla coda all'indice: " + index);
     }
 
     /**
@@ -215,7 +213,6 @@ public class PlaybackManager implements Subject {
             this.currentTrackIndexInPlayable = 0;
             this.currentPlaylistCounted = null;
             skipEmptyPlayablesForward();
-            System.out.println("[MANAGER] Coda aggiornata con " + newItems.size() + " elementi Playable.");
         }
     }
 
@@ -400,7 +397,6 @@ public class PlaybackManager implements Subject {
     public void setStrategy(PlaybackStrategy newStrategy) {
         if (newStrategy != null) {
             this.currentStrategy = newStrategy;
-            System.out.println("[MANAGER] Nuova strategia impostata: " + newStrategy.getClass().getSimpleName());
         }
     }
 
@@ -422,7 +418,6 @@ public class PlaybackManager implements Subject {
             this.currentTrackIndexInPlayable = 0;
             this.currentPlaylistCounted = null;
             skipEmptyPlayablesForward();
-            System.out.println("[MANAGER] Avvio riproduzione da Playable: " + playable.getTitle());
             pressPlay();
         }
     }
@@ -450,7 +445,6 @@ public class PlaybackManager implements Subject {
                 if (trackIdx != -1) {
                     this.currentPlayableIndex = i;
                     this.currentTrackIndexInPlayable = trackIdx;
-                    System.out.println("[MANAGER] Caricato Playable " + i + " alla traccia " + trackIdx);
                     return;
                 }
             }
@@ -531,7 +525,6 @@ public class PlaybackManager implements Subject {
     public void triggerRealPlayback() {
         Track current = getCurrentTrack();
         if (current == null || current.getFilePath() == null) {
-            System.out.println("[MANAGER - ERROR] Nessuna traccia o percorso file non valido.");
             return;
         }
 
@@ -542,7 +535,6 @@ public class PlaybackManager implements Subject {
                 incrementTrackPlayCount(current);
             }
             resumingFromPause = false;
-            System.out.println("[MANAGER - TEST] Riproduzione audio simulata (audio disabilitato).");
             notifyObservers();
             return;
         }
@@ -553,7 +545,6 @@ public class PlaybackManager implements Subject {
         if (resumingFromPause && mediaPlayer != null && filePath.equals(lastPlayedFilePath)) {
             resumingFromPause = false;
             mediaPlayer.play();
-            System.out.println("[AUDIO PLAYER] Ripresa riproduzione: " + current.getTitle());
             return;
         }
 
@@ -576,7 +567,6 @@ public class PlaybackManager implements Subject {
         try {
             File file = new File(filePath);
             if (!file.exists()) {
-                System.err.println("[AUDIO PLAYER - ERROR] File non trovato: " + filePath);
                 notifyObservers();
                 pressNext(); // Salta alla prossima se il file manca
                 return;
@@ -587,14 +577,11 @@ public class PlaybackManager implements Subject {
 
             // Al termine della canzone, avanziamo automaticamente (delega allo stato)
             mediaPlayer.setOnEndOfMedia(() -> {
-                System.out.println("[AUDIO PLAYER] Traccia terminata, passo alla prossima.");
                 pressNext();
             });
 
             mediaPlayer.play();
-            System.out.println("[AUDIO PLAYER] Avvio nuova riproduzione: " + current.getTitle());
         } catch (Exception e) {
-            System.err.println("[AUDIO PLAYER - ERROR] Impossibile riprodurre il file: " + e.getMessage());
             pressNext();
         }
         // Notifica SEMPRE gli osservatori dopo l'incremento del contatore,
@@ -609,7 +596,6 @@ public class PlaybackManager implements Subject {
         if (!audioEnabled) return;
         if (mediaPlayer != null) {
             mediaPlayer.stop();
-            System.out.println("[AUDIO PLAYER] Audio interrotto e resettato.");
         }
     }
 
@@ -621,9 +607,6 @@ public class PlaybackManager implements Subject {
         if (!audioEnabled) return;
         if (mediaPlayer != null) {
             mediaPlayer.pause();
-            Track current = getCurrentTrack();
-            String title = (current != null) ? current.getTitle() : "Nessuna traccia";
-            System.out.println("[AUDIO PLAYER] Audio in pausa su: " + title);
         }
     }
 

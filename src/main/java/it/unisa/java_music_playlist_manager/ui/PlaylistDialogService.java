@@ -304,7 +304,6 @@ public class PlaylistDialogService {
         UndoManager.getInstance().executeCommand(addPlaylistCmd);
 
         if (onPlaylistChanged != null) onPlaylistChanged.run();
-        System.out.println(logMessage + playlist.getTitle());
     }
 
     private <T> Optional<T> showThemedDialog(Dialog<T> dialog) {

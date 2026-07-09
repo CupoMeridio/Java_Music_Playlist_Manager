@@ -13,7 +13,6 @@ public class PausedState implements PlaybackState {
     public void play(PlaybackManager context) {
         Track currentTrack = context.getCurrentTrack();
         if (currentTrack != null) {
-            System.out.println("[STATO: PAUSED] -> Riprendo la musica.");
             // Torna allo stato PlayingState e riavvia l'audio reale
             context.changeState(new PlayingState());
             context.triggerRealPlayback();
@@ -27,7 +26,6 @@ public class PausedState implements PlaybackState {
 
     @Override
     public void stop(PlaybackManager context) {
-        System.out.println("[STATO: PAUSED] -> Stop premuto dalla pausa. Resetto.");
         context.triggerRealStop();
         context.resetQueue();
         context.changeState(new StoppedState());
@@ -36,16 +34,13 @@ public class PausedState implements PlaybackState {
 
     @Override
     public void next(PlaybackManager context) {
-        System.out.println("[STATO: PAUSED] -> Salto alla prossima traccia (rimanendo in pausa)...");
         context.advanceTrack(); // Sposta l'indice in avanti senza avviare l'audio
 
         Track nextTrack = context.getCurrentTrack();
         if (nextTrack != null) {
-            System.out.println("[STATO: PAUSED] Coda agganciata su: " + nextTrack.getTitle());
             context.notifyObservers();
         } else {
             // Se la coda finisce, il lettore si resetta e passa in STOP
-            System.out.println("[STATO: PAUSED] Fine coda raggiunta. Spengo.");
             context.resetQueue();
             context.changeState(new StoppedState());
             context.notifyObservers();
@@ -54,15 +49,12 @@ public class PausedState implements PlaybackState {
 
     @Override
     public void nextPlayable(PlaybackManager context) {
-        System.out.println("[STATO: PAUSED] -> Salto l'intero blocco (rimanendo in pausa)...");
         context.advancePlayable();
 
         Track nextTrack = context.getCurrentTrack();
         if (nextTrack != null) {
-            System.out.println("[STATO: PAUSED] Coda agganciata sul nuovo blocco: " + nextTrack.getTitle());
             context.notifyObservers();
         } else {
-            System.out.println("[STATO: PAUSED] Fine coda raggiunta. Spengo.");
             context.resetQueue();
             context.changeState(new StoppedState());
             context.notifyObservers();
@@ -71,24 +63,20 @@ public class PausedState implements PlaybackState {
 
     @Override
     public void previous(PlaybackManager context) {
-        System.out.println("[STATO: PAUSED] -> Traccia precedente (rimanendo in pausa)...");
         context.regressTrack(); // Sposta l'indice all'indietro senza avviare l'audio
 
         Track prevTrack = context.getCurrentTrack();
         if (prevTrack != null) {
-            System.out.println("[STATO: PAUSED] Coda agganciata su: " + prevTrack.getTitle());
             context.notifyObservers();
         }
     }
 
     @Override
     public void previousPlayable(PlaybackManager context) {
-        System.out.println("[STATO: PAUSED] -> Salto al blocco precedente (rimanendo in pausa)...");
         context.regressPlayable();
 
         Track prevTrack = context.getCurrentTrack();
         if (prevTrack != null) {
-            System.out.println("[STATO: PAUSED] Coda agganciata sul blocco precedente: " + prevTrack.getTitle());
             context.notifyObservers(); 
         }
     }

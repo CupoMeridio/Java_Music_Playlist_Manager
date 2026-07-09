@@ -41,7 +41,6 @@ public class App extends Application {
             // Alert
             gestisciFileCorrotto(e);
         }
-        System.out.print("Caricamento persistenza andato bene");
         // Caricamento della vista principale tramite il percorso relativo alle risorse.
         // La configurazione utilizza percorsi assoluti rispetto alla root delle risorse
         // per garantire la compatibilità con SceneBuilder e diversi IDE.
@@ -88,7 +87,6 @@ public class App extends Application {
                 }
             } catch (Exception e) {
                 // Se un'icona specifica manca, continuiamo con le altre
-                System.err.println("Impossibile caricare l'icona: " + name);
             }
         }
     }
@@ -112,7 +110,6 @@ public class App extends Application {
 
             // Rinomina il file (sposta i dati rotti al sicuro)
             corruptedFile.renameTo(backupFile);
-            System.err.println("File corrotto rinominato in: " + backupName); // Log per debug
         }
         UndoManager.getInstance().clearHistory();
         // Mostra l'avviso all'utente
