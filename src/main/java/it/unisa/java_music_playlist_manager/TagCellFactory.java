@@ -50,7 +50,15 @@ public class TagCellFactory implements Callback<TableColumn<Track, Set<Tag>>, Ta
                     tags.forEach(tag -> {
                         if (tag == null) return;
                         
-                        Label badge = new Label(tag.getIcon());
+                        Label badge = new Label();
+                        try {
+                            org.kordamp.ikonli.javafx.FontIcon icon = new org.kordamp.ikonli.javafx.FontIcon(tag.getIcon());
+                            icon.setIconColor(javafx.scene.paint.Color.WHITE);
+                            icon.setIconSize(11);
+                            badge.setGraphic(icon);
+                        } catch (Exception e) {
+                            badge.setText(tag.getIcon());
+                        }
                         badge.setStyle("-fx-background-color: #4A4A4A; -fx-text-fill: white; -fx-background-radius: 10; -fx-padding: 2 7; -fx-font-size: 11px; -fx-font-weight: bold;");
                         
                         Tooltip tooltip = new Tooltip("Tag: " + tag.getName());

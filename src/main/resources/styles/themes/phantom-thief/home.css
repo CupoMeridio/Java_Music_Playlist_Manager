@@ -1,17 +1,19 @@
 /* Phantom Thief — home.css */
 
 .stat-card {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #000000, #FFFFFF;
+    -fx-background-insets: 5 -9 -5 9, 0;
     -fx-background-radius: 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
     -fx-padding: 18px 22px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
     -fx-rotate: -5deg;
 }
 
 .stat-card:hover {
-    -fx-background-color: #FFFF00;
+    -fx-background-color: #000000, #FFFF00;
+    -fx-background-insets: 3 -13 -3 13, 0;
+    -fx-rotate: -3deg;
 }
 
 .stat-card .label-title {

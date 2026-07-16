@@ -399,6 +399,11 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         // Inizializza la vista iniziale come "Musica"
         handleMusicLibraryAction();
         updatePlayerUI();
+
+        if (actionButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(actionButton);
+        if (undoButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(undoButton);
+        if (playPlaylistButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPlaylistButton);
+        if (reorderButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(reorderButton);
     }
 
     private boolean isClickOnSelectedTableRow(MouseEvent event, Object selectedItem) {

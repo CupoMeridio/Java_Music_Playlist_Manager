@@ -267,6 +267,14 @@ public class PlayerController implements Observer {
                 }
             });
         }
+
+        if (shuffleButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(shuffleButton);
+        if (prevButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(prevButton);
+        if (playPauseButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPauseButton);
+        if (nextButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(nextButton);
+        if (repeatButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(repeatButton);
+        if (volumeButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(volumeButton);
+        if (coverContainer != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(coverContainer);
     }
 
     /**

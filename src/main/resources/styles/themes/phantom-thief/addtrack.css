@@ -5,11 +5,11 @@
     -fx-font-weight: 900;
     -fx-text-fill: #FFFFFF;
     -fx-padding: 8px 14px 8px 18px;
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 5 -9 -5 9, 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
-    -fx-rotate: -5deg;
+    -fx-rotate: -6deg;
 }
 
 .text-field {
@@ -99,7 +99,8 @@
 }
 
 #saveTrackButton {
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 4 -8 -4 8, 0;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 900;
     -fx-background-radius: 0;
@@ -108,18 +109,21 @@
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
     -fx-border-radius: 0;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
-    -fx-rotate: -5deg;
+    -fx-rotate: -4deg;
 }
 
 #saveTrackButton:hover {
-    -fx-background-color: #FFFF00;
+    -fx-background-color: #000000, #FFFF00;
+    -fx-background-insets: 3 -12 -3 12, 0;
     -fx-text-fill: #000000;
+    -fx-rotate: -2deg;
 }
 
 #saveTrackButton:pressed {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
+    -fx-rotate: -5deg;
 }
 
 #loadingOverlay {

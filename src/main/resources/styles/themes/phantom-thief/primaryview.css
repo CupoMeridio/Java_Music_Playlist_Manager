@@ -1,5 +1,29 @@
 /* Phantom Thief — primaryview.css */
 
+/*
+ * ============================================================
+ *  TECNICA "OMBRA STORTA" (P5-style hard shadow)
+ * ============================================================
+ * JavaFX CSS non ha il box-shadow del web, ma i background
+ * multipli sì: si può impilare un layer "ombra" (nero, senza
+ * blur) DIETRO al layer vero, spostato via -fx-background-insets.
+ * Usando dx diverso da dy si ottiene l'ombra "storta" e non
+ * un banale offset diagonale 45°.
+ *
+ *   -fx-background-color:  #000000, <colore vero>;
+ *   -fx-background-insets: dy -dx -dy dx, 0;
+ *
+ * (dy=alto/basso, dx=sinistra/destra — se dx>dy l'ombra si
+ * "allunga" in orizzontale, tipico delle card di P5R)
+ *
+ * Per elementi con -fx-shape (poligoni tipo i tasti del player)
+ * questo trucco deforma la forma, quindi lì si resta su
+ * dropshadow(three-pass-box, colore, 0, 1, dx, dy) con dx != dy:
+ * radius 0 + spread massimo = ombra dura, non sfocata, ma
+ * comunque "vera" silhouette del path.
+ * ============================================================
+ */
+
 .root {
     -fx-background-color:
         radial-gradient(center 50% 50%, radius 16px, #111111 0%, #111111 12%, transparent 13%),
@@ -13,12 +37,12 @@
 }
 
 .dialog-pane {
-    -fx-background-color: #111111;
+    -fx-background-color: #000000, #111111;
+    -fx-background-insets: 6 -9 -6 9, 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
     -fx-border-radius: 0;
     -fx-background-radius: 0;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
     -fx-padding: 10px;
 }
 
@@ -52,15 +76,16 @@
 #viewTitleLabel {
     -fx-text-fill: #FFFFFF;
     -fx-padding: 8px 14px 8px 18px;
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 5 -10 -5 10, 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
-    -fx-rotate: -5deg;
+    -fx-rotate: -6deg;
 }
 
 .button {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 4 -7 -4 7, 0;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 900;
     -fx-padding: 8px 16px;
@@ -69,28 +94,31 @@
     -fx-border-width: 2px;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
-    -fx-rotate: -5deg;
+    -fx-rotate: -4deg;
 }
 
 .button:hover {
-    -fx-background-color: #FFFF00;
+    -fx-background-color: #000000, #FFFF00;
+    -fx-background-insets: 3 -11 -3 11, 0;
     -fx-text-fill: #000000;
+    -fx-rotate: -2deg;
 }
 
 .button:pressed {
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
+    -fx-rotate: -5deg;
 }
 
 .button:disabled {
     -fx-opacity: 0.55;
-    -fx-effect: null;
+    -fx-background-insets: 0, 0;
 }
 
 #actionButton, #playPlaylistButton, #reorderButton {
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 4 -7 -4 7, 0;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 900;
     -fx-border-color: #FFFFFF;
@@ -98,17 +126,20 @@
 }
 
 #actionButton:hover, #playPlaylistButton:hover, #reorderButton:hover {
-    -fx-background-color: #FFFF00;
+    -fx-background-color: #000000, #FFFF00;
+    -fx-background-insets: 3 -11 -3 11, 0;
     -fx-text-fill: #000000;
 }
 
 #actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
 }
 
 #reorderButton:selected {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
     -fx-effect: innershadow(gaussian, #FFFFFF, 8, 0, 0, 2);
 }
@@ -125,13 +156,13 @@
 }
 
 .combo-box {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 3 -5 -3 5, 0;
     -fx-background-radius: 0;
     -fx-border-color: #FFFFFF;
     -fx-border-radius: 0;
     -fx-border-width: 2px;
     -fx-padding: 3px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 3, 3);
 }
 
 .combo-box .cell {
@@ -141,12 +172,12 @@
 }
 
 .combo-box-popup .list-view {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 6 -9 -6 9, 0;
     -fx-border-color: #D11A2A;
     -fx-border-radius: 0;
     -fx-background-radius: 0;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
 }
 
 .combo-box-popup .list-cell {
@@ -166,12 +197,12 @@
 }
 
 .table-view {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #000000, #FFFFFF;
+    -fx-background-insets: 5 -8 -5 8, 0;
     -fx-background-radius: 0;
     -fx-table-cell-border-color: #000000;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
 }
 
 .table-view.reorder-mode .table-row-cell {
@@ -222,11 +253,11 @@
 }
 
 .list-view {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #000000, #FFFFFF;
+    -fx-background-insets: 5 -8 -5 8, 0;
     -fx-background-radius: 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
 }
 
 .list-cell {
