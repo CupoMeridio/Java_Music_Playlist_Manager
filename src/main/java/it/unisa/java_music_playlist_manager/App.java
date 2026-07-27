@@ -68,6 +68,7 @@ public class App extends Application {
             Alert alert = new Alert(Alert.AlertType.ERROR,
                     "Impossibile salvare la libreria precedente.\nDettagli: " + ex.getMessage(),
                     ButtonType.OK);
+            ThemeManager.getInstance().applyActiveThemeToScene(alert.getDialogPane().getScene());
             alert.showAndWait();
         }
     }
@@ -119,6 +120,7 @@ public class App extends Application {
                         "L'applicazione verrà avviata con una nuova libreria vuota.\n\n" +
                         "Dettagli errore: " + e.getMessage(),
                 ButtonType.OK);
+        ThemeManager.getInstance().applyActiveThemeToScene(alert.getDialogPane().getScene());
         alert.showAndWait();
     }
 

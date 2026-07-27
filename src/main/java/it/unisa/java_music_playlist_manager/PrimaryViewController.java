@@ -514,6 +514,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         confirmAlert.setContentText("Stai per eliminare \"" + selectedTrack.getTitle()
                 + "\" dalla libreria.\nVerrà rimosso anche da tutte le playlist.");
 
+        ThemeManager.getInstance().applyActiveThemeToScene(confirmAlert.getDialogPane().getScene());
         Optional<ButtonType> result = confirmAlert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             Command removeCmd = new RemoveTrackCommand(Library.getInstance(), selectedTrack);
@@ -553,6 +554,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         confirmAlert.setHeaderText("Eliminare la playlist selezionata?");
         confirmAlert.setContentText("I brani resteranno disponibili nella libreria musicale.");
 
+        ThemeManager.getInstance().applyActiveThemeToScene(confirmAlert.getDialogPane().getScene());
         if (confirmAlert.showAndWait().filter(r -> r == ButtonType.OK).isPresent()) {
             Command deletePlaylistCmd = new RemovePlaylistCommand(Library.getInstance(), selectedPlaylist);
             UndoManager.getInstance().executeCommand(deletePlaylistCmd);
