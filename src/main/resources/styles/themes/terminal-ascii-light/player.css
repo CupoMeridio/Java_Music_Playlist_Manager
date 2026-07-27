@@ -59,7 +59,7 @@
     -fx-icon-color: #F2F5F3;
 }
 
-/* --- Stati speciali da Java --- */
+/* Stati speciali da Java */
 .player-button:active .ikonli-font-icon {
     -fx-icon-color: #555555;
 }

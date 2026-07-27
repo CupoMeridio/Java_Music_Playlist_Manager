@@ -58,7 +58,7 @@
     -fx-icon-color: #FFFFFF;
 }
 
-/* --- Stati speciali da Java --- */
+/* Stati speciali da Java */
 .player-button:active .ikonli-font-icon {
     -fx-icon-color: #FF5C5C; /* Rosso Neo-Pop */
 }

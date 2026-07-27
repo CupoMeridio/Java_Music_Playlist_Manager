@@ -73,7 +73,7 @@ public class SidebarController {
         }
     }
 
-    // --- Gestori eventi UI ---
+    // Gestori eventi UI
 
     @FXML
     private void handleHomeAction() {

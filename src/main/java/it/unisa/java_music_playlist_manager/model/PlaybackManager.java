@@ -76,7 +76,7 @@ public class PlaybackManager implements Subject {
         return instance;
     }
 
-    // ---- GESTIONE DELLO STATO (Pattern State - Deleghe) ----
+    // GESTIONE DELLO STATO (Pattern State - Deleghe)
 
     /**
      * Cambia lo stato corrente del manager.
@@ -137,7 +137,7 @@ public class PlaybackManager implements Subject {
         currentState.previousPlayable(this);
     }
 
-    // ---- GESTIONE DELLA CODA (Pattern Composite) ----
+    // GESTIONE DELLA CODA (Pattern Composite)
 
     /**
      * Aggiunge un elemento alla fine della coda.
@@ -260,7 +260,7 @@ public class PlaybackManager implements Subject {
         return new ArrayList<>(queue);
     }
 
-    // ---- LOGICA DI NAVIGAZIONE INTERNA ----
+    // LOGICA DI NAVIGAZIONE INTERNA
 
     /**
      * Avanza alla traccia successiva. Se il Playable corrente è terminato, 
@@ -516,7 +516,7 @@ public class PlaybackManager implements Subject {
         }
     }
 
-    // ---- LOGICA DI INTERAZIONE CON IL MEDIA PLAYER REALE ----
+    // LOGICA DI INTERAZIONE CON IL MEDIA PLAYER REALE
 
     /**
      * Gestisce l'avvio o la ripresa effettiva dell'audio tramite MediaPlayer.
@@ -529,7 +529,7 @@ public class PlaybackManager implements Subject {
         }
 
         if (!audioEnabled) {
-            // --- GESTIONE ANALYTICS (modalità test, senza audio reale)
+            // GESTIONE ANALYTICS (modalità test, senza audio reale)
             if (!resumingFromPause) {
                 countCurrentPlaylistIfPresent();
                 incrementTrackPlayCount(current);
@@ -610,7 +610,7 @@ public class PlaybackManager implements Subject {
         }
     }
 
-    // ---- METODI DI SUPPORTO E OBSERVER ----
+    // METODI DI SUPPORTO E OBSERVER
 
     public void setAudioEnabled(boolean enabled) {
         this.audioEnabled = enabled;

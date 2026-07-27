@@ -269,7 +269,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         }
     }
 
-    // --- Componenti iniettati da FXML ---
+    // Componenti iniettati da FXML
 
     /** Controller della barra laterale (iniettato tramite fx:include) */
     @FXML
@@ -691,7 +691,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         // Gestito separatamente da showOnlyTrackTable e showOnlyPlaylistTable
     }
 
-    // --- Metodi per la configurazione dinamica delle colonne della TableView ---
+    // Metodi per la configurazione dinamica delle colonne della TableView
 
     private void showQueueColumns() {
         if (trackTableView != null) {
@@ -799,7 +799,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         updatePlayPlaylistButtonState();
     }
 
-    // --- Metodi di utilità per la creazione di componenti UI ---
+    // Metodi di utilità per la creazione di componenti UI
 
     private <S> TableColumn<S, String> createColumn(String title, double width,
             java.util.function.Function<S, String> mapper) {

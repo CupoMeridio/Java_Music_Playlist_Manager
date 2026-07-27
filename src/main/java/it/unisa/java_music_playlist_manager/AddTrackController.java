@@ -289,7 +289,7 @@ public class AddTrackController {
         addTrackTitleField.setText(lastDot > 0 ? fileName.substring(0, lastDot) : fileName);
 
         new Thread(() -> {
-            // --- 1. Lettura tag ID3 con jaudiotagger (sincrona) ---
+            // 1. Lettura tag ID3 con jaudiotagger (sincrona)
             String title = null, artist = null, album = null, genre = null, year = null;
             try {
                 // Silenzia il logger verboso di jaudiotagger
@@ -315,7 +315,7 @@ public class AddTrackController {
             final String fGenre  = genre;
             final String fYear   = year;
 
-            // --- 2. Aggiorna i campi UI con i tag letti ---
+            // 2. Aggiorna i campi UI con i tag letti
             Platform.runLater(() -> {
                 if (fTitle != null && !fTitle.isEmpty()) {
                     addTrackTitleField.setText(fTitle);
@@ -350,7 +350,7 @@ public class AddTrackController {
                 }
             });
 
-            // --- 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) ---
+            // 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto)
             Platform.runLater(() -> {
                 try {
                     Media media = new Media(file.toURI().toString());

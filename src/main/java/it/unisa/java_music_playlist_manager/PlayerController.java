@@ -80,7 +80,7 @@ public class PlayerController implements Observer {
         updatePlayerUI();
     }
 
-    // --- Elementi UI iniettati da FXML ---
+    // Elementi UI iniettati da FXML
     @FXML
     private Label currentTimeLabel;
     @FXML
@@ -108,7 +108,7 @@ public class PlayerController implements Observer {
     @FXML
     private Slider volumeSlider;
 
-    // --- FontIcon iniettati da FXML (fx:id) ---
+    // FontIcon iniettati da FXML (fx:id)
     /** Icona play/pause: cambia literale a runtime */
     @FXML
     private FontIcon playPauseIcon;
@@ -116,7 +116,7 @@ public class PlayerController implements Observer {
     @FXML
     private FontIcon volumeIcon;
 
-    // --- Vista copertina ---
+    // Vista copertina
     /** Vista standard: ImageView quadrata */
     private ImageView albumCoverImageView;
     /** Vista vinile: cerchio che ruota */
@@ -286,14 +286,14 @@ public class PlayerController implements Observer {
         if (coverContainer == null)
             return;
 
-        // --- Vista standard: ImageView quadrata con bordo ---
+        // Vista standard: ImageView quadrata con bordo
         albumCoverImageView = new ImageView();
         albumCoverImageView.setFitWidth(COVER_CONTENT_SIZE);
         albumCoverImageView.setFitHeight(COVER_CONTENT_SIZE);
         albumCoverImageView.setPreserveRatio(true);
         albumCoverImageView.setPickOnBounds(true);
 
-        // --- Vista vinile: cerchio con solchi disegnati via Canvas ---
+        // Vista vinile: cerchio con solchi disegnati via Canvas
         vinylCircle = new Circle(COVER_CONTENT_SIZE / 2);
         drawVinyl(null); // disegna il disco senza copertina inizialmente
 
@@ -451,7 +451,7 @@ public class PlayerController implements Observer {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
-    // --- Gestori eventi UI ---
+    // Gestori eventi UI
 
     /**
      * Alterna la strategia di riproduzione tra Sequenziale e Shuffle.

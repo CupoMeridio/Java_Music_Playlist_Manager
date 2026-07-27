@@ -1,7 +1,5 @@
-/* =============================================================
-   PRIMARY VIEW — TEMA BASE
-   Stile neutro condiviso dalle sezioni principali
-   ============================================================= */
+/* PRIMARY VIEW — TEMA BASE
+   Stile neutro condiviso dalle sezioni principali */
 
 .root {
     -fx-background-color: #F5F5F7;
@@ -20,7 +18,7 @@
     -fx-padding: 8 0 8 0;
 }
 
-/* --- PULSANTI STANDARD --- */
+/* PULSANTI STANDARD */
 .button {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 8px;
@@ -79,7 +77,7 @@
     -fx-text-fill: #0071E3;
 }
 
-/* --- COMBOBOX --- */
+/* COMBOBOX */
 .combo-box {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 8px;
@@ -112,7 +110,7 @@
     -fx-text-fill: #ffffff;
 }
 
-/* --- TABELLA BRANI --- */
+/* TABELLA BRANI */
 .table-view {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 10px;
