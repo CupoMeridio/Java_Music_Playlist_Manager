@@ -19,15 +19,18 @@ import it.unisa.java_music_playlist_manager.model.RemoveElementFromPlaylistComma
 import it.unisa.java_music_playlist_manager.model.UndoManager;
 import java.util.ArrayList;
 import java.util.List;
-import javafx.fxml.FXMLLoader;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import org.controlsfx.control.GridView;
+import org.controlsfx.control.GridCell;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -35,7 +38,6 @@ import javafx.stage.Stage;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import java.util.Optional;
@@ -162,6 +164,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                     LibrarySearchService.filterTracks(currentOpenedPlaylist.getTracks(), searchQuery));
             if (trackTableView != null)
                 trackTableView.setItems(trackList);
+            if (isCardView)
+                updateTrackCards(trackList);
         } else if (currentViewType == ViewType.QUEUE) {
             List<QueueItem> items = new ArrayList<>();
             List<Playable> queue = PlaybackManager.getInstance().getCurrentQueue();
@@ -186,6 +190,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                     LibrarySearchService.filterTracks(Library.getInstance().getTracks(), searchQuery));
             if (trackTableView != null)
                 trackTableView.setItems(trackList);
+            if (isCardView)
+                updateTrackCards(trackList);
         }
 
         restoreSortState(sortState);
@@ -248,13 +254,32 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     }
 
     private void showOnlyTrackTable() {
-        if (trackTableView != null) {
-            trackTableView.setVisible(true);
-            trackTableView.setManaged(true);
-        }
         if (playlistTableView != null) {
             playlistTableView.setVisible(false);
             playlistTableView.setManaged(false);
+        }
+        if (viewToggleButton != null) {
+            viewToggleButton.setVisible(true);
+            viewToggleButton.setManaged(true);
+        }
+        if (isCardView) {
+            if (trackTableView != null) {
+                trackTableView.setVisible(false);
+                trackTableView.setManaged(false);
+            }
+            if (trackCardGridView != null) {
+                trackCardGridView.setVisible(true);
+                trackCardGridView.setManaged(true);
+            }
+        } else {
+            if (trackCardGridView != null) {
+                trackCardGridView.setVisible(false);
+                trackCardGridView.setManaged(false);
+            }
+            if (trackTableView != null) {
+                trackTableView.setVisible(true);
+                trackTableView.setManaged(true);
+            }
         }
     }
 
@@ -266,6 +291,14 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (trackTableView != null) {
             trackTableView.setVisible(false);
             trackTableView.setManaged(false);
+        }
+        if (trackCardGridView != null) {
+            trackCardGridView.setVisible(false);
+            trackCardGridView.setManaged(false);
+        }
+        if (viewToggleButton != null) {
+            viewToggleButton.setVisible(false);
+            viewToggleButton.setManaged(false);
         }
     }
 
@@ -299,6 +332,11 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     private Button playPlaylistButton;
     @FXML
     private ToggleButton reorderButton;
+    @FXML
+    private ToggleButton viewToggleButton;
+    @FXML
+    private GridView<Track> trackCardGridView;
+    private boolean isCardView = false;
 
     /** Tabella principale per la visualizzazione di Track o Playlist */
     @FXML
@@ -307,20 +345,6 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     private TableView<Playlist> playlistTableView;
 
     private ViewType currentViewType = ViewType.HOME;
-    @FXML
-    private TableColumn<?, ?> titleColumn;
-    @FXML
-    private TableColumn<?, ?> artistColumn;
-    @FXML
-    private TableColumn<?, ?> albumColumn;
-    @FXML
-    private TableColumn<?, ?> yearColumn;
-    @FXML
-    private TableColumn<?, ?> genreColumn;
-    @FXML
-    private TableColumn<?, ?> durationColumn;
-    @FXML
-    private TableColumn<?, ?> tagColumn;
 
     /**
      * Metodo di inizializzazione chiamato automaticamente da JavaFX.
@@ -338,7 +362,9 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
 
         if (trackTableView != null)
             trackTableView.getSelectionModel().selectedItemProperty()
-                    .addListener((obs, oldVal, newVal) -> updatePlayPlaylistButtonState());
+                    .addListener((obs, oldVal, newVal) -> {
+                        updatePlayPlaylistButtonState();
+                    });
         if (playlistTableView != null)
             playlistTableView.getSelectionModel().selectedItemProperty()
                     .addListener((obs, oldVal, newVal) -> updatePlayPlaylistButtonState());
@@ -358,6 +384,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         }
 
         setupQueueListView();
+        setupTrackCardGridView();
+
         ContextMenuManager.setupTrackContextMenu(trackTableView, this);
         ContextMenuManager.setupPlaylistContextMenu(playlistTableView, this);
 
@@ -400,10 +428,14 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         handleMusicLibraryAction();
         updatePlayerUI();
 
-        if (actionButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(actionButton);
-        if (undoButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(undoButton);
-        if (playPlaylistButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPlaylistButton);
-        if (reorderButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(reorderButton);
+        if (actionButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(actionButton);
+        if (undoButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(undoButton);
+        if (playPlaylistButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPlaylistButton);
+        if (reorderButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(reorderButton);
     }
 
     private boolean isClickOnSelectedTableRow(MouseEvent event, Object selectedItem) {
@@ -759,7 +791,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             return new SimpleStringProperty(String.format("%02d:%02d", seconds / 60, seconds % 60));
         });
 
-        // Risoluzione conflitto: Reintroduzione colonna e cellFactory custom per i Tag
+        // Configurazione della colonna e della cellFactory custom per i Tag
         TableColumn<Track, Set<Tag>> tagCol = new TableColumn<>("Tag");
         tagCol.setPrefWidth(180);
         tagCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTags()));
@@ -1030,4 +1062,116 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         }
     }
 
+    private void setupTrackCardGridView() {
+        if (trackCardGridView == null)
+            return;
+
+        // Recupero il singleton UNA volta sola qui nella factory,
+        // non ad ogni singola chiamata updateItem().
+        final it.unisa.java_music_playlist_manager.ui.CoverImageService imageService = it.unisa.java_music_playlist_manager.ui.CoverImageService
+                .getInstance();
+
+        trackCardGridView.setCellFactory(gridView -> new GridCell<Track>() {
+            private it.unisa.java_music_playlist_manager.ui.TrackCardView card;
+            private java.util.concurrent.CompletableFuture<javafx.scene.image.Image> pendingLoadTask;
+
+            // Forte reference necessaria affinché il WeakChangeListener non venga
+            // garbage-collected mentre la cella è ancora in uso nel pool di ControlsFX.
+            private final javafx.beans.value.ChangeListener<Track> selectionListener;
+
+            {
+                setStyle("-fx-padding: 0; -fx-background-color: transparent;");
+
+                selectionListener = (obs, oldVal, newVal) -> {
+                    if (card != null) {
+                        card.setSelected(newVal != null && newVal.equals(getItem()));
+                    }
+                };
+                trackTableView.getSelectionModel().selectedItemProperty().addListener(
+                        new javafx.beans.value.WeakChangeListener<>(selectionListener));
+
+                // I click vengono gestiti qui sulla GridCell, non nella TrackCardView,
+                // perché ControlsFX garantisce la consegna degli eventi mouse alle celle.
+                setOnMouseClicked(event -> {
+                    if (event.getButton() != javafx.scene.input.MouseButton.PRIMARY)
+                        return;
+                    Track t = getItem();
+                    if (t == null)
+                        return;
+                    if (event.getClickCount() == 2) {
+                        handleStartTrackPlayback(t);
+                    } else if (event.getClickCount() == 1) {
+                        trackTableView.getSelectionModel().select(t);
+                        updatePlayPlaylistButtonState();
+                    }
+                });
+
+                setOnContextMenuRequested(event -> {
+                    Track t = getItem();
+                    if (t == null)
+                        return;
+                    trackTableView.getSelectionModel().select(t);
+                    updatePlayPlaylistButtonState();
+                    ContextMenu menu = trackTableView.getContextMenu();
+                    if (menu != null) {
+                        menu.show(trackCardGridView.getScene().getWindow(),
+                                event.getScreenX(), event.getScreenY());
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Track item, boolean empty) {
+                super.updateItem(item, empty);
+
+                // Se la cella viene svuotata o riciclata, cancella l'eventuale task I/O in
+                // corso
+                if (pendingLoadTask != null) {
+                    pendingLoadTask.cancel(true);
+                    pendingLoadTask = null;
+                }
+
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    // Lazy init: la TrackCardView è ora una pura dumb view,
+                    // senza handlers — li gestisce la GridCell sovrastante.
+                    if (card == null) {
+                        card = new it.unisa.java_music_playlist_manager.ui.TrackCardView();
+                    }
+
+                    card.updateData(item, imageService.getCachedCoverOrDefault(item.getFilePath()));
+
+                    Track selectedTrack = trackTableView.getSelectionModel().getSelectedItem();
+                    card.setSelected(selectedTrack != null && selectedTrack.equals(item));
+
+                    // Snapshot dell'item al momento della sottomissione del task asincrono:
+                    // quando il task torna, verifichiamo che la cella mostri ancora la
+                    // stessa traccia (equals basato su ID) prima di aggiornare la cover.
+                    final Track itemSnapshot = item;
+                    pendingLoadTask = imageService.loadCoverAsync(item.getFilePath());
+                    pendingLoadTask.thenAcceptAsync(image -> {
+                        if (image != null && itemSnapshot.equals(card.getTrack())) {
+                            card.updateData(itemSnapshot, image);
+                        }
+                    }, javafx.application.Platform::runLater);
+
+                    setGraphic(card);
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void handleViewToggleAction() {
+        isCardView = viewToggleButton.isSelected();
+        showOnlyTrackTable();
+        refreshTableData();
+    }
+
+    private void updateTrackCards(ObservableList<Track> tracks) {
+        if (trackCardGridView == null)
+            return;
+        trackCardGridView.setItems(tracks);
+    }
 }

@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Phantom Thief — primaryview.css */
 
 /*
@@ -308,4 +310,48 @@
 
 .progress-indicator .determinate-indicator .indicator {
     -fx-background-color: #D11A2A;
+}
+
+/* Toggle button: strutturali in shared; qui cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+/* #viewToggleButton — Phantom Thief: bg-insets offset + font-weight: 900. */
+#viewToggleButton {
+    -fx-background-color: #000000, #D11A2A; -fx-background-insets: 4 -7 -4 7, 0; -fx-text-fill: #FFFFFF; -fx-font-weight: 900; -fx-border-color: #FFFFFF; -fx-border-width: 2px;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #000000, #000000; -fx-background-insets: 1 -2 -1 2, 0; -fx-text-fill: #FFFFFF; -fx-effect: innershadow(gaussian, #FFFFFF, 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; qui cromatismi tema. */
+.track-card {
+    -fx-background-color: #111111;
+    -fx-border-color: #FFFFFF;
+}
+
+.track-card:hover {
+    -fx-border-color: #FFFF00;
+}
+
+.track-card-selected {
+    -fx-background-color: #D11A2A;
+    -fx-border-color: #FFFF00;
+}
+
+.track-card-title {
+    -fx-text-fill: #FFFFFF;
+}
+
+.track-card-artist {
+    -fx-text-fill: #FFFFFF;
 }

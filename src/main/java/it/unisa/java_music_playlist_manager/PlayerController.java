@@ -1,5 +1,6 @@
 package it.unisa.java_music_playlist_manager;
 
+import it.unisa.java_music_playlist_manager.model.AudioState;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
@@ -16,41 +17,31 @@ import javafx.scene.control.Slider;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.images.Artwork;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Controller per la gestione della barra di riproduzione (PlayerBarView.fxml).
- * Estratto da PrimaryViewController per separare la responsabilità del player
- * dalla gestione della vista principale.
- */
-/**
+ * Separato per isolare la responsabilità del player dalla gestione della vista principale.
+ *
  * PlayerController gestisce l'interfaccia della barra di riproduzione
- * inferiore.
- * Si occupa di visualizzare i metadati del brano corrente, controllare il
- * volume,
- * gestire la barra di avanzamento e inviare comandi al {@link PlaybackManager}.
+ * inferiore. Si occupa di visualizzare i metadati del brano corrente,
+ * controllare il volume, gestire la barra di avanzamento e inviare comandi
+ * al {@link PlaybackManager}.
  *
  * Ruolo nel progetto:
- * - Implementa {@link Observer} per aggiornare la barra quando il player cambia
- * traccia.
- * - Sincronizza lo stato visivo (Play/Pause, Slider, Timer) con il
- * {@link MediaPlayer} di JavaFX.
+ * - Implementa {@link Observer} per aggiornare la barra quando il player
+ *   cambia traccia.
+ * - Sincronizza lo stato visivo (Play/Pause, Slider, Timer) tramite la
+ *   <i>facade API</i> di {@link PlaybackManager} (metodi playAudioDirect,
+ *   seekAudio, setAudioVolume, getAudioState ...).
+ *   In questo modo il controller NON dipende direttamente da
+ *   JavaFX MediaPlayer — disaccoppiamento dal layer Model.
  * - Comunica con {@link PrimaryViewController} tramite callback Runnable per
- * mantenere l'UI coerente.
+ *   mantenere l'UI coerente.
  */
 public class PlayerController implements Observer {
 
@@ -74,9 +65,9 @@ public class PlayerController implements Observer {
     @Override
     public void update() {
         checkCurrentTrackValidity();
-        // Riconfigura i listener sul nuovo oggetto MediaPlayer creato nel manager
-        setupMediaPlayerListeners();
-        // Aggiorna i testi e lo stato dei pulsanti
+        // I listener per l'audio (ready, time update) sono registrati una sola
+        // volta in initialize() sul PlaybackManager tramite facade API — non
+        // serve ri-registrarli ad ogni cambiamento di traccia.
         updatePlayerUI();
     }
 
@@ -96,11 +87,15 @@ public class PlayerController implements Observer {
     @FXML
     private Button shuffleButton;
     @FXML
+    private Button prevPlayableButton;
+    @FXML
     private Button prevButton;
     @FXML
     private Button playPauseButton;
     @FXML
     private Button nextButton;
+    @FXML
+    private Button nextPlayableButton;
     @FXML
     private Button repeatButton;
     @FXML
@@ -153,13 +148,12 @@ public class PlayerController implements Observer {
             System.out
                     .println("[PLAYER] Il brano in riproduzione è stato rimosso dalla libreria (Undo). Stop forzato.");
             needsStop = true;
-        } else if (currentTrack == null && manager.getMediaPlayer() != null
-                && manager.getMediaPlayer().getStatus() != MediaPlayer.Status.STOPPED
-                && manager.getMediaPlayer().getStatus() != MediaPlayer.Status.DISPOSED) {
-            // Caso 2: il brano è stato rimosso dalla playlist in coda (undo di un
-            // inserimento),
-            // getCurrentTrack() torna null ma il MediaPlayer sta ancora suonando l'audio
-            // precedente.
+        } else if (currentTrack == null
+                && manager.getAudioState() != AudioState.STOPPED
+                && manager.getAudioState() != AudioState.DISPOSED) {
+            // Caso 2: il brano è stato rimosso dalla playlist in coda (undo di
+            // un inserimento): getCurrentTrack() torna null ma l'audio reale
+            // sta ancora riproducendo il brano precedente.
             needsStop = true;
         }
 
@@ -227,12 +221,9 @@ public class PlayerController implements Observer {
         if (volumeSlider != null) {
             volumeSlider.setValue(50);
             volumeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-                MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
                 double volume = newVal.doubleValue();
-                if (mp != null) {
-                    mp.setVolume(volume / 100.0);
-                }
-                
+                PlaybackManager.getInstance().setAudioVolume(volume / 100.0);
+
                 // Aggiorna dinamicamente l'icona in base al volume impostato dallo slider
                 if (volumeIcon != null) {
                     boolean isMuted = volume == 0;
@@ -250,31 +241,58 @@ public class PlayerController implements Observer {
             final boolean[] wasPlaying = { false };
 
             progressSlider.setOnMousePressed(e -> {
-                MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-                if (mp != null) {
-                    wasPlaying[0] = (mp.getStatus() == MediaPlayer.Status.PLAYING);
-                    mp.pause();
-                }
+                PlaybackManager manager = PlaybackManager.getInstance();
+                wasPlaying[0] = (manager.getAudioState() == AudioState.PLAYING);
+                manager.pauseAudioDirect();
             });
             progressSlider.setOnMouseReleased(e -> {
-                MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-                if (mp != null) {
-                    mp.seek(Duration.seconds(progressSlider.getValue()));
-                    // Riprende la riproduzione solo se era in play prima del drag
-                    if (wasPlaying[0]) {
-                        mp.play();
-                    }
+                PlaybackManager manager = PlaybackManager.getInstance();
+                manager.seekAudio(progressSlider.getValue());
+                // Riprende la riproduzione solo se era in play prima del drag
+                if (wasPlaying[0]) {
+                    manager.playAudioDirect();
                 }
             });
         }
 
-        if (shuffleButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(shuffleButton);
-        if (prevButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(prevButton);
-        if (playPauseButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPauseButton);
-        if (nextButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(nextButton);
-        if (repeatButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(repeatButton);
-        if (volumeButton != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(volumeButton);
-        if (coverContainer != null) it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(coverContainer);
+        if (shuffleButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(shuffleButton);
+        if (prevPlayableButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(prevPlayableButton);
+        if (prevButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(prevButton);
+        if (playPauseButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPauseButton);
+        if (nextButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(nextButton);
+        if (nextPlayableButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(nextPlayableButton);
+        if (repeatButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(repeatButton);
+        if (volumeButton != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(volumeButton);
+        if (coverContainer != null)
+            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(coverContainer);
+
+        // Registra i listener audio sul PlaybackManager per l'intero ciclo di vita del controller.
+        PlaybackManager manager = PlaybackManager.getInstance();
+        manager.setAudioReadyListener(() -> javafx.application.Platform.runLater(() -> {
+            if (volumeSlider != null) {
+                manager.setAudioVolume(volumeSlider.getValue() / 100.0);
+            }
+            double totalSec = manager.getAudioTotalDuration();
+            if (totalTimeLabel != null)
+                totalTimeLabel.setText(formatTime(totalSec));
+            if (progressSlider != null)
+                progressSlider.setMax(totalSec);
+        }));
+        manager.setAudioTimeListener(timeSec -> javafx.application.Platform.runLater(() -> {
+            if (progressSlider != null && !progressSlider.isValueChanging()) {
+                progressSlider.setValue(timeSec);
+            }
+            if (currentTimeLabel != null)
+                currentTimeLabel.setText(formatTime(timeSec));
+        }));
     }
 
     /**
@@ -413,41 +431,16 @@ public class PlayerController implements Observer {
     }
 
     /**
-     * Configura i listener sull'istanza corrente di MediaPlayer.
-     * Gestisce l'aggiornamento automatico dei timer e della barra di progresso
-     * durante la riproduzione.
+     * Formatta un tempo in secondi come {@code mm:ss}.
+     * <p>
+     * Accetta un {@code double} invece di {@code Duration} per rimanere
+     * disaccoppiato da qualsiasi libreria UI (DIP).
+     *
+     * @param totalSeconds tempo in secondi
+     * @return stringa formattata {@code mm:ss}
      */
-    private void setupMediaPlayerListeners() {
-        MediaPlayer mp = PlaybackManager.getInstance().getMediaPlayer();
-        if (mp == null)
-            return;
-
-        // Sincronizza il volume del nuovo player con lo slider corrente
-        if (volumeSlider != null)
-            mp.setVolume(volumeSlider.getValue() / 100.0);
-
-        // Quando il file audio è caricato e pronto
-        mp.setOnReady(() -> {
-            Duration totalDuration = mp.getTotalDuration();
-            if (totalTimeLabel != null)
-                totalTimeLabel.setText(formatTime(totalDuration));
-            if (progressSlider != null)
-                progressSlider.setMax(totalDuration.toSeconds());
-        });
-
-        // Aggiornamento continuo dei timer (ogni volta che il tempo di riproduzione
-        // avanza)
-        mp.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-            if (progressSlider != null && !progressSlider.isValueChanging()) {
-                progressSlider.setValue(newTime.toSeconds());
-            }
-            if (currentTimeLabel != null)
-                currentTimeLabel.setText(formatTime(newTime));
-        });
-    }
-
-    private String formatTime(Duration duration) {
-        int seconds = (int) duration.toSeconds();
+    private String formatTime(double totalSeconds) {
+        int seconds = (int) totalSeconds;
         return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
@@ -536,7 +529,8 @@ public class PlayerController implements Observer {
         if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.SequentialStrategy) {
             manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatStrategy());
             setButtonActiveState(repeatButton, true);
-            // Si potrebbe usare un'altra pseudoclasse (es. :active-track) per il repeat-track
+            // Si potrebbe usare un'altra pseudoclasse (es. :active-track) per il
+            // repeat-track
             repeatButton.pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("repeat-track"), false);
         } else if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.RepeatStrategy) {
             manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatTrackStrategy());
@@ -606,32 +600,13 @@ public class PlayerController implements Observer {
         if (filePath == null)
             return;
 
-        new Thread(() -> {
-            Image cover = null;
-            try {
-                Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
-                AudioFile audioFile = AudioFileIO.read(new File(filePath));
-                org.jaudiotagger.tag.Tag tag = audioFile.getTag();
-                if (tag != null) {
-                    Artwork artwork = tag.getFirstArtwork();
-                    if (artwork != null) {
-                        byte[] data = artwork.getBinaryData();
-                        if (data != null && data.length > 0) {
-                            cover = new Image(new ByteArrayInputStream(data));
-                        }
-                    }
-                }
-            } catch (Exception ignored) {
-            }
-
-            final Image finalCover = cover;
-            javafx.application.Platform.runLater(() -> {
-                // Aggiorna vista standard
-                if (albumCoverImageView != null)
-                    albumCoverImageView.setImage(finalCover);
-                // Ridisegna il vinile con la nuova copertina
-                drawVinyl(finalCover);
-            });
-        }).start();
+        it.unisa.java_music_playlist_manager.ui.CoverImageService.getInstance().loadCoverAsync(filePath)
+                .thenAcceptAsync(image -> {
+                    Image finalCover = it.unisa.java_music_playlist_manager.ui.CoverImageService.getInstance()
+                            .isDefaultCover(image) ? null : image;
+                    if (albumCoverImageView != null)
+                        albumCoverImageView.setImage(finalCover);
+                    drawVinyl(finalCover);
+                }, javafx.application.Platform::runLater);
     }
 }

@@ -85,11 +85,14 @@
             <version>12.4.0</version>
         </dependency>
 
-        <!-- JUnit 5 per i test unitari -->
+        <!-- JUnit 5 per i test unitari.
+             Versione ALLINEATA: 5.10.3 per jupiter aggregator, api, params, engine.
+             Non mischiare versioni minor diverse (es. 5.10.2 aggregatore + 5.10.3 moduli)
+             per evitare ClassNotFoundException o incompatibilità in CI. -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.2</version>
+            <version>5.10.3</version>
             <scope>test</scope>
         </dependency>
         <dependency>

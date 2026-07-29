@@ -6,6 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Prodotto concreto di {@link Playlist} automatica che raggruppa dinamicamente le tracce
+ * che possiedono uno specifico {@link Tag}.
+ */
 public class AutomaticPlaylistByTag extends Playlist {
     private Tag filterTag;
     
@@ -29,8 +33,8 @@ public class AutomaticPlaylistByTag extends Playlist {
 
    @Override
     public List<Track> getTracks() {
-        // Interroga la libreria centrale in tempo reale
-        return Library.getInstance().getTracks().stream()
+        // Interroga la library risolta (o il Singleton di fallback) in tempo reale
+        return resolveLibrary().getTracks().stream()
                 // Evita NullPointerException se una traccia non ha il set di tag inizializzato
                 .filter(track -> track.getTags() != null)
                 // Verifica se il tag cercato è presente tra quelli della traccia

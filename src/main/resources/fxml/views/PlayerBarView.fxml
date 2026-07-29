@@ -61,7 +61,7 @@
                   <Button fx:id="shuffleButton" styleClass="player-button" onAction="#handleShuffleToggle">
                      <graphic><FontIcon iconLiteral="fas-random" /></graphic>
                   </Button>
-                  <Button styleClass="player-button" onAction="#handlePreviousPlayableAction">
+                  <Button fx:id="prevPlayableButton" styleClass="player-button" onAction="#handlePreviousPlayableAction">
                      <graphic><FontIcon iconLiteral="fas-fast-backward" /></graphic>
                   </Button>
                   <Button fx:id="prevButton" styleClass="player-button" onAction="#handlePrevAction">
@@ -73,7 +73,7 @@
                   <Button fx:id="nextButton" styleClass="player-button" onAction="#handleNextAction">
                      <graphic><FontIcon iconLiteral="fas-step-forward" /></graphic>
                   </Button>
-                  <Button styleClass="player-button" onAction="#handleNextPlayableAction">
+                  <Button fx:id="nextPlayableButton" styleClass="player-button" onAction="#handleNextPlayableAction">
                      <graphic><FontIcon iconLiteral="fas-fast-forward" /></graphic>
                   </Button>
                   <Button fx:id="repeatButton" styleClass="player-button" onAction="#handleRepeatToggle">

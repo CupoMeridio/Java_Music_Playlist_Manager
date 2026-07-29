@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Neo-Pop Brutal — primaryview.css */
 
 .root {
@@ -212,4 +214,48 @@
 
 .scroll-pane {
     -fx-background-color: #FDF9F5;
+}
+
+/* Toggle button: strutturali in shared; qui cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #FF5C5C;
+    -fx-text-fill: #000000;
+}
+
+/* #viewToggleButton — Neo-Pop: radius ZERO; border-width 2px. */
+#viewToggleButton {
+    -fx-background-color: #FFDE47; -fx-text-fill: #000000; -fx-font-weight: bold; -fx-border-color: #000000; -fx-border-width: 2px; -fx-background-radius: 0; -fx-border-radius: 0;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #000000; -fx-text-fill: #FFFFFF; -fx-effect: innershadow(gaussian, #FFDE47, 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; qui solo cromatismi tema. */
+.track-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+}
+
+.track-card:hover {
+    -fx-border-color: #FF5C5C;
+}
+
+.track-card-selected {
+    -fx-background-color: #FFDE47;
+    -fx-border-color: #FF5C5C;
+}
+
+.track-card-title {
+    -fx-text-fill: #000000;
+}
+
+.track-card-artist {
+    -fx-text-fill: #000000;
 }

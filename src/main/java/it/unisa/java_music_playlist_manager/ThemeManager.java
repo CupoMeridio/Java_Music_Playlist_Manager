@@ -154,8 +154,9 @@ public class ThemeManager {
             var resource = getClass().getResource(cssPath);
             if (resource != null) {
                 targetScene.getStylesheets().add(resource.toExternalForm());
-            } else {
             }
+            // Nota: se resource è null il CSS non esiste nel jar → skip silenzioso
+            // (non serve else vuoto).
         }
     }
 

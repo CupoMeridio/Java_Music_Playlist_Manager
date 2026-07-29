@@ -3,8 +3,8 @@ package it.unisa.java_music_playlist_manager.ui;
 import it.unisa.java_music_playlist_manager.ThemeManager;
 import it.unisa.java_music_playlist_manager.model.AddElementToPlaylistCommand;
 import it.unisa.java_music_playlist_manager.model.AddPlaylistCommand;
-import it.unisa.java_music_playlist_manager.model.AutomaticPlaylistGenerator;
 import it.unisa.java_music_playlist_manager.model.Command;
+import it.unisa.java_music_playlist_manager.model.GenrePlaylistGenerator;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import it.unisa.java_music_playlist_manager.model.ManualPlaylistGenerator;
@@ -12,8 +12,10 @@ import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.PlaylistGenerator;
 import it.unisa.java_music_playlist_manager.model.RenamePlaylistCommand;
 import it.unisa.java_music_playlist_manager.model.Tag;
+import it.unisa.java_music_playlist_manager.model.TagPlaylistGenerator;
 import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.UndoManager;
+import it.unisa.java_music_playlist_manager.model.YearPlaylistGenerator;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.Dialog;
@@ -230,10 +232,7 @@ public class PlaylistDialogService {
     }
 
     private void generateAutomaticPlaylistByGenre(String genre, String title) {
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.GENRE,
-                genre
-        );
+        PlaylistGenerator generator = new GenrePlaylistGenerator(genre);
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per genere: ");
     }
@@ -282,19 +281,13 @@ public class PlaylistDialogService {
     }
 
     private void generateAutomaticPlaylistByYear(Integer year, String title) {
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.YEAR,
-                year
-        );
+        PlaylistGenerator generator = new YearPlaylistGenerator(year);
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per anno: ");
     }
 
     private void generateAutomaticPlaylistByTag(Tag tag, String title) {
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.TAG,
-                tag
-        );
+        PlaylistGenerator generator = new TagPlaylistGenerator(tag);
         Playlist playlist = (Playlist) generator.createPlaylist(title);
         saveGeneratedPlaylist(playlist, "Playlist automatica creata per tag: ");
     }

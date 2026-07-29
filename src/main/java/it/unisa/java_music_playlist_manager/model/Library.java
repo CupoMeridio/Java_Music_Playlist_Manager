@@ -4,7 +4,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Library implements Subject{
+/**
+ * Rappresenta la libreria musicale principale dell'applicazione (Pattern Singleton).
+ * Mantiene il catalogo globale dei brani e delle playlist, notificando gli osservatori
+ * ad ogni modifica della collezione.
+ */
+public class Library implements Subject {
     
     private static Library instance;
 
@@ -21,6 +26,11 @@ public class Library implements Subject{
         this.observers = new ArrayList<>();
     }
     
+    /**
+     * Restituisce l'istanza singleton della libreria musicale.
+     *
+     * @return L'istanza condivisa di {@link Library}.
+     */
     public static synchronized Library getInstance() {
         if (instance == null) {
             instance = new Library();

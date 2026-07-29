@@ -17,8 +17,10 @@ module it.unisa.java_music_playlist_manager {
     requires jaudiotagger;
     
     opens it.unisa.java_music_playlist_manager to javafx.fxml;
+    opens it.unisa.java_music_playlist_manager.ui to javafx.fxml;
     opens it.unisa.java_music_playlist_manager.model to javafx.base, com.fasterxml.jackson.databind;
     exports it.unisa.java_music_playlist_manager;
+    exports it.unisa.java_music_playlist_manager.ui;
     exports it.unisa.java_music_playlist_manager.model;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;

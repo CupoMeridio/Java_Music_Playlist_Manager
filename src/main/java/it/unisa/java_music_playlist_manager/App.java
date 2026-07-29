@@ -3,7 +3,9 @@ package it.unisa.java_music_playlist_manager;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.LibraryDAO;
 import it.unisa.java_music_playlist_manager.model.JsonLibraryDAO;
+import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.UndoManager;
+import it.unisa.java_music_playlist_manager.ui.JavaFXAudioEngine;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,7 +18,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 
 /**
- * JavaFX App
+ * JavaFX App — bootstrap dell'applicazione.
+ * <p>
+ * Qui avviene l'<i>Composition Root</i> (Punto di Composizione)
+ * in cui iniettiamo le dipendenze concrete nel layer Model (Dependency Injection).
+ * Es. assegniamo {@code JavaFXAudioEngine} (layer UI) al
+ * {@link PlaybackManager} (layer Model), rispettando il
+ * <i>Dependency Inversion Principle</i> e la Ports &amp; Adapters (Hexagonal).
  */
 public class App extends Application {
 
@@ -34,7 +42,13 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        // Carico il salvataggio vecchio
+        // --- COMPOSITION ROOT: iniezione dipendenze ---
+        // L'adapter concreto JavaFXAudioEngine viene creato nel layer UI
+        // e iniettato nel Model Singleton. Il Model NON importa nessuna classe
+        // di JavaFX Media — DIP & Hexagonal Architecture rispettati.
+        PlaybackManager.getInstance().setAudioEngine(new JavaFXAudioEngine());
+
+        // Caricamento dello stato salvato della libreria
         try {
             saveDAO.load();
         } catch (Exception e) {

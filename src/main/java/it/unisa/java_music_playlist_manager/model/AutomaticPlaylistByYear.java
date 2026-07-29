@@ -6,6 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Prodotto concreto di {@link Playlist} automatica che raggruppa dinamicamente le tracce
+ * pubblicate in uno specifico anno.
+ */
 public class AutomaticPlaylistByYear extends Playlist {
     
     private final int yearFilter;
@@ -26,7 +30,7 @@ public class AutomaticPlaylistByYear extends Playlist {
 
    @Override
     public List<Track> getTracks() {
-        return Library.getInstance().getTracks().stream()
+        return resolveLibrary().getTracks().stream()
                 .filter(track -> track.getYear() != null)
                 .filter(track -> track.getYear() == yearFilter)
                 .collect(Collectors.toList());

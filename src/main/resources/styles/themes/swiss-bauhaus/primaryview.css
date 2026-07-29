@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Swiss Bauhaus — primaryview.css */
 
 .root {
@@ -203,4 +205,49 @@
 
 .scroll-pane {
     -fx-background-color: #F9F9F9;
+}
+
+/* Toggle button: strutturali in shared; qui cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #F9F9F9;
+    -fx-text-fill: #111111;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #111111;
+    -fx-text-fill: #ffffff;
+}
+
+/* Bottone "Vista a schede" — Swiss Bauhaus: radius ZERO,
+   colori primari blu/rosso. */
+#viewToggleButton {
+    -fx-background-color: #0000FF; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-border-color: #0000FF; -fx-border-width: 1px; -fx-background-radius: 0; -fx-border-radius: 0;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #FF0000; -fx-text-fill: #FFFFFF; -fx-effect: innershadow(gaussian, #111111, 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; qui cromatismi tema. */
+.track-card {
+    -fx-background-color: #F9F9F9;
+    -fx-border-color: #111111;
+}
+
+.track-card:hover {
+    -fx-border-color: #FF0000;
+}
+
+.track-card-selected {
+    -fx-background-color: #0000FF;
+    -fx-border-color: #FF0000;
+}
+
+.track-card-title {
+    -fx-text-fill: #111111;
+}
+
+.track-card-artist {
+    -fx-text-fill: #111111;
 }

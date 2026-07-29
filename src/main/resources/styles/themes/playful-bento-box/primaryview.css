@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Playful Bento Box — primaryview.css */
 
 .root {
@@ -201,4 +203,49 @@
 
 .scroll-pane {
     -fx-background-color: #F0F2F5;
+}
+
+/* Toggle button: strutturali in shared; qui cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #1F2937;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: #ffffff;
+}
+
+/* Bottone "Vista a schede" — Playful Bento: radius 18px,
+   border-width 1.5px, blu moderno. */
+#viewToggleButton {
+    -fx-background-color: #3B82F6; -fx-text-fill: #FFFFFF; -fx-font-weight: bold; -fx-border-color: #3B82F6; -fx-border-width: 1.5px; -fx-background-radius: 18px; -fx-border-radius: 18px;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #1D4ED8; -fx-text-fill: #FFFFFF; -fx-effect: innershadow(gaussian, rgba(37, 99, 235, 0.75), 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; cromatismi tema qui. */
+.track-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E4E7EB;
+}
+
+.track-card:hover {
+    -fx-border-color: #2563EB;
+}
+
+.track-card-selected {
+    -fx-background-color: #3B82F6;
+    -fx-border-color: #2563EB;
+}
+
+.track-card-title {
+    -fx-text-fill: #1F2937;
+}
+
+.track-card-artist {
+    -fx-text-fill: #1F2937;
 }
