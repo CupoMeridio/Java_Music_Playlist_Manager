@@ -96,33 +96,42 @@ public class JavaFXAudioEngine implements AudioEngine {
             return;
         }
 
-        Media media = new Media(f.toURI().toString());
-        MediaPlayer mp = new MediaPlayer(media);
-        // Imposta subito volume a 0 per evitare il pop legato al valore 1.0 di default in JavaFX
-        mp.setVolume(0.0);
+        try {
+            Media media = new Media(f.toURI().toString());
+            MediaPlayer mp = new MediaPlayer(media);
+            // Imposta subito volume a 0 per evitare il pop legato al valore 1.0 di default in JavaFX
+            mp.setVolume(0.0);
 
-        mp.setOnReady(() -> {
-            if (onReady != null) {
-                onReady.run();
-            }
-        });
+            mp.setOnReady(() -> {
+                if (onReady != null) {
+                    onReady.run();
+                }
+            });
 
-        mp.currentTimeProperty().addListener((obs, oldD, newD) -> {
-            if (timeUpdateCallback != null && newD != null) {
-                timeUpdateCallback.accept(newD.toSeconds());
-            }
-        });
+            mp.currentTimeProperty().addListener((obs, oldD, newD) -> {
+                if (timeUpdateCallback != null && newD != null) {
+                    timeUpdateCallback.accept(newD.toSeconds());
+                }
+            });
 
-        mp.setOnEndOfMedia(() -> {
-            if (onEndOfMedia != null) {
-                onEndOfMedia.run();
-            }
-        });
+            mp.setOnEndOfMedia(() -> {
+                if (onEndOfMedia != null) {
+                    onEndOfMedia.run();
+                }
+            });
 
-        // Aggiungi fallback su error: salta il brano se non caricabile
-        mp.setOnError(onEndOfMedia);
+            // Aggiungi fallback su error: salta il brano se non caricabile durante la riproduzione
+            mp.setOnError(() -> {
+                if (onEndOfMedia != null) {
+                    onEndOfMedia.run();
+                }
+            });
 
-        this.player = mp;
+            this.player = mp;
+        } catch (Exception e) {
+            System.err.println("Impossibile caricare il file audio " + filePath + ": " + e.getMessage());
+            this.player = null;
+        }
     }
 
     @Override

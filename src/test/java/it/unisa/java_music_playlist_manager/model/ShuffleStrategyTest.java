@@ -40,33 +40,39 @@ class ShuffleStrategyTest {
      */
     @Test
     void testShuffleRimescolaLaCoda() {
-        manager.setQueue(testTracks);
-        manager.setStrategy(new ShuffleStrategy());
-        manager.pressPlay(); // Attiva lo stato di riproduzione
+        boolean mescolato = false;
+        // Eseguiamo fino a 3 tentativi per eliminare i falsi positivi stocastici (1 probabilità su 120 che uno shuffle dia l'ordine identico [0,1,2,3,4])
+        for (int attempt = 0; attempt < 3; attempt++) {
+            manager.resetQueue();
+            manager.setQueue(testTracks);
+            manager.setStrategy(new ShuffleStrategy());
+            manager.pressPlay(); // Attiva lo stato di riproduzione
 
-        List<Integer> indiciEstratti = new ArrayList<>();
-        indiciEstratti.add(manager.getCurrentPlayableIndex());
-
-        // Avanziamo per raccogliere l'intero mazzo iniziale di riproduzione
-        for (int i = 1; i < testTracks.size(); i++) {
-            manager.advanceTrack();
+            List<Integer> indiciEstratti = new ArrayList<>();
             indiciEstratti.add(manager.getCurrentPlayableIndex());
-        }
 
-        // 1. Verifichiamo l'integrità dei dati (nessun brano deve essere andato smarrito)
-        for (int i = 0; i < testTracks.size(); i++) {
-            assertTrue(indiciEstratti.contains(i), "Lo shuffle ha smarrito la traccia all'indice reale: " + i);
-        }
-
-        // 2. Verifichiamo che l'ordine sia diverso da quello prettamente sequenziale [0, 1, 2, 3, 4]
-        boolean sequenziale = true;
-        for (int i = 0; i < indiciEstratti.size(); i++) {
-            if (indiciEstratti.get(i) != i) {
-                sequenziale = false;
-                break;
+            // Avanziamo per raccogliere l'intero mazzo iniziale di riproduzione
+            for (int i = 1; i < testTracks.size(); i++) {
+                manager.advanceTrack();
+                indiciEstratti.add(manager.getCurrentPlayableIndex());
             }
+
+            // 1. Verifichiamo l'integrità dei dati (nessun brano deve essere andato smarrito)
+            for (int i = 0; i < testTracks.size(); i++) {
+                assertTrue(indiciEstratti.contains(i), "Lo shuffle ha smarrito la traccia all'indice reale: " + i);
+            }
+
+            // 2. Verifichiamo che l'ordine sia diverso da quello prettamente sequenziale [0, 1, 2, 3, 4]
+            for (int i = 0; i < indiciEstratti.size(); i++) {
+                if (indiciEstratti.get(i) != i) {
+                    mescolato = true;
+                    break;
+                }
+            }
+            if (mescolato) break;
         }
-        assertFalse(sequenziale, "Errore: Lo shuffle non ha mescolato la coda (stesso ordine di SequentialStrategy)");
+
+        assertTrue(mescolato, "Errore: Lo shuffle non ha mescolato la coda (stesso ordine di SequentialStrategy)");
     }
 
     /**

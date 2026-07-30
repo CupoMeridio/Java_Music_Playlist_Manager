@@ -157,9 +157,7 @@
     -fx-shape: "M10 0 L62 0 L62 52 L52 62 L0 62 L0 10 Z";
 }
 
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: #000000;

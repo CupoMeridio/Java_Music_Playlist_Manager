@@ -647,6 +647,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             trackTableView.setVisible(false);
             trackTableView.setManaged(false);
         }
+        if (trackCardGridView != null) {
+            trackCardGridView.setVisible(false);
+            trackCardGridView.setManaged(false);
+        }
         if (playlistTableView != null) {
             playlistTableView.setVisible(false);
             playlistTableView.setManaged(false);
@@ -731,6 +735,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (trackTableView != null) {
             trackTableView.setVisible(false);
             trackTableView.setManaged(false);
+        }
+        if (trackCardGridView != null) {
+            trackCardGridView.setVisible(false);
+            trackCardGridView.setManaged(false);
         }
         if (playlistTableView != null) {
             playlistTableView.setVisible(false);

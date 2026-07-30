@@ -122,9 +122,7 @@
     -fx-icon-color: #F2F5F3;
 }
 
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: #1B2A22;

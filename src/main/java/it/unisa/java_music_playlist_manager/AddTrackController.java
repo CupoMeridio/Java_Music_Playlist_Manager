@@ -177,6 +177,7 @@ public class AddTrackController {
         addTrackGenreComboBox.setValue(null);
         selectedFilePath = null;
         filePathLabel.setText("Nessun file selezionato");
+        if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
         if (addTrackTagComboBox != null) addTrackTagComboBox.getCheckModel().clearChecks();
     }
 
@@ -258,6 +259,7 @@ public class AddTrackController {
         if (file != null) {
             selectedFilePath = file.getAbsolutePath();
             filePathLabel.setText(file.getName());
+            if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
             setFieldsDisable(false);
             setLoading(true);
 
@@ -350,7 +352,7 @@ public class AddTrackController {
                 }
             });
 
-            // 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto)
+            // 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) e validazione formato
             Platform.runLater(() -> {
                 try {
                     Media media = new Media(file.toURI().toString());
@@ -364,14 +366,32 @@ public class AddTrackController {
                     });
                     tempPlayer.setOnError(() -> {
                         setLoading(false);
+                        invalidateUnsupportedAudioFile("Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
                         tempPlayer.dispose();
                     });
                     startAnalysisTimeout(tempPlayer);
                 } catch (Exception e) {
                     setLoading(false);
+                    invalidateUnsupportedAudioFile("Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
                 }
             });
         }).start();
+    }
+
+    /**
+     * Resetta il file selezionato e mostra un errore bloccante se il formato audio non è supportato da JavaFX.
+     */
+    private void invalidateUnsupportedAudioFile(String errorMsg) {
+        selectedFilePath = null;
+        Platform.runLater(() -> {
+            if (filePathLabel != null) {
+                filePathLabel.setText("File non supportato");
+            }
+            if (addTrackErrorLabel != null) {
+                addTrackErrorLabel.setText(errorMsg);
+            }
+            setFieldsDisable(true);
+        });
     }
 
     /**

@@ -71,9 +71,7 @@
     -fx-background-color: #C94500;
 }
 
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: #D4D4D4;

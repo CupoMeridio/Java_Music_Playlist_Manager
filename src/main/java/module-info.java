@@ -18,7 +18,7 @@ module it.unisa.java_music_playlist_manager {
     
     opens it.unisa.java_music_playlist_manager to javafx.fxml;
     opens it.unisa.java_music_playlist_manager.ui to javafx.fxml;
-    opens it.unisa.java_music_playlist_manager.model to javafx.base, com.fasterxml.jackson.databind;
+    opens it.unisa.java_music_playlist_manager.model to javafx.base, com.fasterxml.jackson.databind, org.junit.platform.commons;
     exports it.unisa.java_music_playlist_manager;
     exports it.unisa.java_music_playlist_manager.ui;
     exports it.unisa.java_music_playlist_manager.model;

@@ -14,8 +14,10 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
+import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
@@ -237,15 +239,19 @@ public class PlayerController implements Observer {
 
         // Configurazione seeking manuale sulla barra di progresso
         if (progressSlider != null) {
-            // Variabile per ricordare se il player stava suonando prima del drag
             final boolean[] wasPlaying = { false };
+            final boolean[] isDragging = { false };
 
             progressSlider.setOnMousePressed(e -> {
+                if (!isTrackOrThumbClick(e)) return;
+                isDragging[0] = true;
                 PlaybackManager manager = PlaybackManager.getInstance();
                 wasPlaying[0] = (manager.getAudioState() == AudioState.PLAYING);
                 manager.pauseAudioDirect();
             });
             progressSlider.setOnMouseReleased(e -> {
+                if (!isDragging[0]) return;
+                isDragging[0] = false;
                 PlaybackManager manager = PlaybackManager.getInstance();
                 manager.seekAudio(progressSlider.getValue());
                 // Riprende la riproduzione solo se era in play prima del drag
@@ -608,5 +614,20 @@ public class PlayerController implements Observer {
                         albumCoverImageView.setImage(finalCover);
                     drawVinyl(finalCover);
                 }, javafx.application.Platform::runLater);
+    }
+
+    /**
+     * Verifica se l'evento mouse è avvenuto effettivamente sulla traccia (.track)
+     * o sulla manopola (.thumb) dello Slider, ignorando il padding esterno.
+     */
+    private boolean isTrackOrThumbClick(MouseEvent e) {
+        Node target = (Node) e.getTarget();
+        while (target != null && target != progressSlider) {
+            if (target.getStyleClass().contains("track") || target.getStyleClass().contains("thumb")) {
+                return true;
+            }
+            target = target.getParent();
+        }
+        return false;
     }
 }

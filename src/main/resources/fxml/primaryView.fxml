@@ -4,6 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.controlsfx.control.GridView?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <!-- 
     File FXML generato e gestito tramite SceneBuilder.
@@ -48,7 +49,11 @@
                   <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" text="Riproduci Playlist" />
                   <ToggleButton fx:id="reorderButton" managed="false" text="Riordina" visible="false" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <ToggleButton fx:id="viewToggleButton" onAction="#handleViewToggleAction" text="Vista a schede ☷" />
+                  <ToggleButton fx:id="viewToggleButton" onAction="#handleViewToggleAction" text="  Vista a schede">
+                     <graphic>
+                        <FontIcon iconLiteral="fas-th" />
+                     </graphic>
+                  </ToggleButton>
                </children>
             </HBox>
             

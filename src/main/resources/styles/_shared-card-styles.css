@@ -19,6 +19,10 @@
     -fx-opacity: 0.85;
 }
 
+#viewToggleButton .ikonli-font-icon {
+    -fx-icon-color: -fx-text-fill;
+}
+
 /* ControlsFX CardGridView container & cells. */
 .card-grid-view {
     -fx-background-color: transparent;
@@ -71,4 +75,13 @@
     -fx-text-alignment: center;
     -fx-font-size: 11px;
     -fx-opacity: 0.65;
+}
+
+/* Player Slider — structural cursor invariants shared across all themes. */
+.slider {
+    -fx-cursor: default;
+}
+
+.slider .track, .slider .thumb {
+    -fx-cursor: hand;
 }

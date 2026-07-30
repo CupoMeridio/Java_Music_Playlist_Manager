@@ -71,9 +71,7 @@
     -fx-background-color: linear-gradient(to bottom, #ffb3d1, #e080a0);
 }
 
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: linear-gradient(to right, #ffd6e8, #e8b4f8);
