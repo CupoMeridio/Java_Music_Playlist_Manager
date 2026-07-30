@@ -7,6 +7,7 @@
             </packagings>
             <goals>
                 <goal>clean</goal>
+                <goal>test</goal>
                 <goal>javafx:run</goal>
             </goals>
         </action>
@@ -14,6 +15,7 @@
             <actionName>debug</actionName>
             <goals>
                 <goal>clean</goal>
+                <goal>test</goal>
                 <goal>javafx:run@ide-debug</goal>
             </goals>
             <properties>
@@ -24,6 +26,7 @@
             <actionName>profile</actionName>
             <goals>
                 <goal>clean</goal>
+                <goal>test</goal>
                 <goal>javafx:run@ide-profile</goal>
             </goals>
         </action>

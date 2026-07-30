@@ -13,10 +13,17 @@ public class Library implements Subject {
     
     private static Library instance;
 
-    private final List<Track> tracks;
-    
-    private final List<Playlist> playlists;
-    
+    // Jackson deve riscrivere questi campi tramite reflection durante la
+    // deserializzazione JSON roundtrip (JsonLibraryDAOTest). Sono NON-finali
+    // per evitare i warning "Final field X has been mutated reflectively" e
+    // la futura incompatibilità con JDK dove la mutazione di campi finali
+    // verrà bloccata per default. L'immutabilità della referenza è comunque
+    // garantita dalla visibilità privata e dall'assenza di setter; il
+    // costruttore privato le inizializza sempre a ArrayList vuoti.
+    private List<Track> tracks;
+
+    private List<Playlist> playlists;
+
     @JsonIgnore
     private final List<Observer> observers;
 
