@@ -134,9 +134,10 @@ public class AddTrackController {
                 String g = t.getGenre();
                 if (g != null && !g.isBlank()) allGenres.add(g);
             });
-            // setItems(null) + setItems(nuova lista) forza il refresh visivo della skin JavaFX
-            addTrackGenreComboBox.setItems(null);
-            addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList(allGenres));
+            if (addTrackGenreComboBox.getItems() == null) {
+                addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList());
+            }
+            addTrackGenreComboBox.getItems().setAll(allGenres);
         }
 
         if (currentEditingTrack != null) {
@@ -307,7 +308,9 @@ public class AddTrackController {
                     year   = safeGet(id3Tag, FieldKey.YEAR);
                 }
             } catch (Exception e) {
-                // File non supportato da jaudiotagger (es. WAV senza tag): si procede con campi vuoti
+                // File non supportato da jaudiotagger (es. WAV senza tag) o errore di parsing: logga l'eccezione e procedi con campi vuoti
+                Logger.getLogger(AddTrackController.class.getName()).log(Level.WARNING,
+                        "Lettura metadati jaudiotagger fallita per: " + file.getName(), e);
             }
 
             // Cattura variabili final per il lambda del Platform.runLater
@@ -340,13 +343,14 @@ public class AddTrackController {
                     if (matched != null) {
                         addTrackGenreComboBox.getSelectionModel().select(matched);
                     } else {
-                        // Genere custom non in lista: ricostruisci la lista ordinata con il nuovo genere incluso
+                        // Genere custom non in lista: aggiorna la lista osservabile in-place mantenendo l'ordinamento
                         TreeSet<String> sorted = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
                         sorted.addAll(addTrackGenreComboBox.getItems());
                         sorted.add(fGenre);
-                        // Forza il refresh visivo della skin del ComboBox staccando e riattaccando la lista
-                        addTrackGenreComboBox.setItems(null);
-                        addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList(sorted));
+                        if (addTrackGenreComboBox.getItems() == null) {
+                            addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList());
+                        }
+                        addTrackGenreComboBox.getItems().setAll(sorted);
                         addTrackGenreComboBox.getSelectionModel().select(fGenre);
                     }
                 }

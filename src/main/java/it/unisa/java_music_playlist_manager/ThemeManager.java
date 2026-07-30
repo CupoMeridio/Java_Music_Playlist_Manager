@@ -160,6 +160,19 @@ public class ThemeManager {
         }
     }
 
+    /**
+     * Mostra un Dialog o Alert applicando il tema attivo non appena la scena viene creata.
+     * Necessario per garantire l'applicazione dei CSS ai dialoghi JavaFX che istanziano
+     * la Scena solo al momento di showAndWait().
+     */
+    public <T> java.util.Optional<T> showThemedDialog(javafx.scene.control.Dialog<T> dialog) {
+        if (dialog != null) {
+            dialog.setOnShown(event -> applyActiveThemeToScene(dialog.getDialogPane().getScene()));
+            return dialog.showAndWait();
+        }
+        return java.util.Optional.empty();
+    }
+
     /** Legge la preferenza salvata. */
     private void loadPreference() {
         File file = new File(PREFS_PATH);

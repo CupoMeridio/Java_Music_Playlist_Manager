@@ -84,7 +84,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
      */
     private Track currentEditingTrack = null;
 
-    private final PlaylistDialogService dialogService = new PlaylistDialogService(this::showPlaylistColumns);
+    private final PlaylistDialogService dialogService = new PlaylistDialogService(this::refreshTableData);
 
     /** Playlist attualmente aperta nella vista dettaglio */
     private Playlist currentOpenedPlaylist = null;
@@ -116,15 +116,11 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     @Override
     public void update() {
         javafx.application.Platform.runLater(() -> {
-            if (currentViewType == ViewType.PLAYLISTS) {
-                showPlaylistColumns();
-                if (playlistTableView != null)
-                    playlistTableView.refresh();
-            } else {
-                refreshTableData();
-                if (trackTableView != null)
-                    trackTableView.refresh();
-            }
+            refreshTableData();
+            if (playlistTableView != null)
+                playlistTableView.refresh();
+            if (trackTableView != null)
+                trackTableView.refresh();
             syncTableSelection();
             updatePlayPlaylistButtonState();
 
@@ -184,6 +180,11 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             }
             if (queueListView != null) {
                 queueListView.setItems(FXCollections.observableArrayList(items));
+            }
+        } else if (currentViewType == ViewType.PLAYLISTS) {
+            if (playlistTableView != null) {
+                playlistTableView.setItems(javafx.collections.FXCollections.observableArrayList(
+                        LibrarySearchService.filterPlaylists(Library.getInstance().getPlaylists(), searchQuery)));
             }
         } else if (currentViewType == ViewType.MUSIC) {
             ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(
@@ -442,7 +443,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         Node node = event.getPickResult().getIntersectedNode();
         while (node != null) {
             if (node instanceof TableRow<?> row) {
-                return row.getItem() != null && row.getItem() == selectedItem;
+                return row.getItem() != null && java.util.Objects.equals(row.getItem(), selectedItem);
             }
             node = node.getParent();
         }
@@ -546,8 +547,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         confirmAlert.setContentText("Stai per eliminare \"" + selectedTrack.getTitle()
                 + "\" dalla libreria.\nVerrà rimosso anche da tutte le playlist.");
 
-        ThemeManager.getInstance().applyActiveThemeToScene(confirmAlert.getDialogPane().getScene());
-        Optional<ButtonType> result = confirmAlert.showAndWait();
+        Optional<ButtonType> result = ThemeManager.getInstance().showThemedDialog(confirmAlert);
         if (result.isPresent() && result.get() == ButtonType.OK) {
             Command removeCmd = new RemoveTrackCommand(Library.getInstance(), selectedTrack);
             UndoManager.getInstance().executeCommand(removeCmd);
@@ -586,11 +586,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         confirmAlert.setHeaderText("Eliminare la playlist selezionata?");
         confirmAlert.setContentText("I brani resteranno disponibili nella libreria musicale.");
 
-        ThemeManager.getInstance().applyActiveThemeToScene(confirmAlert.getDialogPane().getScene());
-        if (confirmAlert.showAndWait().filter(r -> r == ButtonType.OK).isPresent()) {
+        if (ThemeManager.getInstance().showThemedDialog(confirmAlert).filter(r -> r == ButtonType.OK).isPresent()) {
             Command deletePlaylistCmd = new RemovePlaylistCommand(Library.getInstance(), selectedPlaylist);
             UndoManager.getInstance().executeCommand(deletePlaylistCmd);
-            showPlaylistColumns();
+            refreshTableData();
         }
     }
 
@@ -618,11 +617,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
 
     private void handleSearchQueryChange(String query) {
         searchQuery = query == null ? "" : query;
-        if (currentViewType == ViewType.PLAYLISTS) {
-            showPlaylistColumns();
-        } else {
-            refreshTableData();
-        }
+        refreshTableData();
         updateTablePlaceholder();
     }
 
@@ -835,9 +830,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                 p -> formatDuration(p.getDuration()));
 
         playlistTableView.getColumns().addAll(nameCol, countCol, durationCol);
-        playlistTableView.setItems(javafx.collections.FXCollections.observableArrayList(
-                LibrarySearchService.filterPlaylists(Library.getInstance().getPlaylists(), searchQuery)));
         updateTablePlaceholder();
+        refreshTableData();
         updatePlayPlaylistButtonState();
     }
 

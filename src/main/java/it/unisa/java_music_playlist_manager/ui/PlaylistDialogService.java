@@ -300,8 +300,7 @@ public class PlaylistDialogService {
     }
 
     private <T> Optional<T> showThemedDialog(Dialog<T> dialog) {
-        dialog.setOnShown(event -> ThemeManager.getInstance().applyActiveThemeToScene(dialog.getDialogPane().getScene()));
-        return dialog.showAndWait();
+        return ThemeManager.getInstance().showThemedDialog(dialog);
     }
 
     private void showInfoAlert(String title, String header, String content) {
