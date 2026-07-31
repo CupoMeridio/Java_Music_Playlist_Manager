@@ -64,7 +64,7 @@ public class PlayingState implements PlaybackState {
             context.triggerRealStop();
             context.resetQueue();
             context.changeState(new StoppedState());
-            context.notifyObservers(); // ← AGGIUNGI ANCHE QUA!
+            context.notifyObservers();
         }
     }
 
