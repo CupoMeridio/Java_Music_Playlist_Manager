@@ -36,65 +36,65 @@
       <HBox alignment="CENTER" spacing="20.0">
          <children>
             
-            <!-- Lato Sinistro: Copertina e Info Traccia -->
-            <HBox alignment="CENTER_LEFT" prefWidth="250.0" spacing="10.0" HBox.hgrow="NEVER">
-               <children>
-                  <!-- Copertina del Brano / Vista Vinile (cliccabile per alternare) -->
-                  <StackPane fx:id="coverContainer" prefHeight="62.0" prefWidth="62.0" style="-fx-cursor: hand;" onMouseClicked="#handleCoverClick" />
-                  
-                  <!-- Metadati del Brano (Titolo e Artista) -->
-                  <VBox alignment="CENTER_LEFT" spacing="3.0">
-                     <children>
-                        <Label fx:id="currentTrackTitle" text="" />
-                        <Label fx:id="currentTrackDetails" text="" textOverrun="ELLIPSIS" />
-                     </children>
-                  </VBox>
-               </children>
-            </HBox>
-            
-            <!-- Spaziatore a sinistra per centrare i controlli -->
-            <Region HBox.hgrow="ALWAYS" />
-            
-            <!-- Centro: Controlli Riproduzione (Casuale, Indietro, Play/Pausa, Avanti, Ciclo) -->
-            <HBox alignment="CENTER" spacing="15.0" HBox.hgrow="NEVER">
-               <children>
-                  <Button fx:id="shuffleButton" styleClass="player-button" onAction="#handleShuffleToggle">
-                     <graphic><FontIcon iconLiteral="fas-random" /></graphic>
-                  </Button>
-                  <Button fx:id="prevPlayableButton" styleClass="player-button" onAction="#handlePreviousPlayableAction">
-                     <graphic><FontIcon iconLiteral="fas-fast-backward" /></graphic>
-                  </Button>
-                  <Button fx:id="prevButton" styleClass="player-button" onAction="#handlePrevAction">
-                     <graphic><FontIcon iconLiteral="fas-step-backward" /></graphic>
-                  </Button>
-                  <Button fx:id="playPauseButton" styleClass="player-button" onAction="#handlePlayPauseAction">
-                     <graphic><FontIcon fx:id="playPauseIcon" iconLiteral="fas-play" /></graphic>
-                  </Button>
-                  <Button fx:id="nextButton" styleClass="player-button" onAction="#handleNextAction">
-                     <graphic><FontIcon iconLiteral="fas-step-forward" /></graphic>
-                  </Button>
-                  <Button fx:id="nextPlayableButton" styleClass="player-button" onAction="#handleNextPlayableAction">
-                     <graphic><FontIcon iconLiteral="fas-fast-forward" /></graphic>
-                  </Button>
-                  <Button fx:id="repeatButton" styleClass="player-button" onAction="#handleRepeatToggle">
-                     <graphic><FontIcon iconLiteral="fas-redo" /></graphic>
-                  </Button>
-               </children>
-            </HBox>
-            
-            <!-- Spaziatore a destra per spingere il volume a destra -->
-            <Region HBox.hgrow="ALWAYS" />
-            
-            <!-- Lato Destro: Volume -->
-            <HBox alignment="CENTER_RIGHT" prefWidth="250.0" spacing="10.0" HBox.hgrow="NEVER">
-               <children>
-                  <!-- Controllo Volume -->
-                  <Button fx:id="volumeButton" styleClass="player-button" onAction="#handleVolumeMuteToggle">
-                     <graphic><FontIcon fx:id="volumeIcon" iconLiteral="fas-volume-up" /></graphic>
-                  </Button>
-                  <Slider fx:id="volumeSlider" max="100.0" prefWidth="100.0" value="50.0" />
-               </children>
-            </HBox>
+             <!-- Lato Sinistro: Copertina e Info Traccia (flessibile e protetta contro collisioni) -->
+             <HBox alignment="CENTER_LEFT" minWidth="0.0" prefWidth="240.0" maxWidth="320.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                <children>
+                   <!-- Copertina del Brano / Vista Vinile (cliccabile per alternare) -->
+                   <StackPane fx:id="coverContainer" minHeight="62.0" minWidth="62.0" prefHeight="62.0" prefWidth="62.0" style="-fx-cursor: hand;" onMouseClicked="#handleCoverClick" />
+                   
+                   <!-- Metadati del Brano (Titolo e Artista) -->
+                   <VBox alignment="CENTER_LEFT" spacing="3.0" minWidth="0.0" HBox.hgrow="ALWAYS">
+                      <children>
+                         <Label fx:id="currentTrackTitle" maxWidth="Infinity" text="" textOverrun="ELLIPSIS" />
+                         <Label fx:id="currentTrackDetails" maxWidth="Infinity" text="" textOverrun="ELLIPSIS" />
+                      </children>
+                   </VBox>
+                </children>
+             </HBox>
+             
+             <!-- Spaziatore a sinistra per centrare i controlli -->
+             <Region HBox.hgrow="ALWAYS" />
+             
+             <!-- Centro: Controlli Riproduzione (Centrati, dimensione fissa e protetta) -->
+             <HBox alignment="CENTER" spacing="15.0" HBox.hgrow="NEVER">
+                <children>
+                   <Button fx:id="shuffleButton" styleClass="player-button" onAction="#handleShuffleToggle">
+                      <graphic><FontIcon iconLiteral="fas-random" /></graphic>
+                   </Button>
+                   <Button fx:id="prevPlayableButton" styleClass="player-button" onAction="#handlePreviousPlayableAction">
+                      <graphic><FontIcon iconLiteral="fas-fast-backward" /></graphic>
+                   </Button>
+                   <Button fx:id="prevButton" styleClass="player-button" onAction="#handlePrevAction">
+                      <graphic><FontIcon iconLiteral="fas-step-backward" /></graphic>
+                   </Button>
+                   <Button fx:id="playPauseButton" styleClass="player-button" onAction="#handlePlayPauseAction">
+                      <graphic><FontIcon fx:id="playPauseIcon" iconLiteral="fas-play" /></graphic>
+                   </Button>
+                   <Button fx:id="nextButton" styleClass="player-button" onAction="#handleNextAction">
+                      <graphic><FontIcon iconLiteral="fas-step-forward" /></graphic>
+                   </Button>
+                   <Button fx:id="nextPlayableButton" styleClass="player-button" onAction="#handleNextPlayableAction">
+                      <graphic><FontIcon iconLiteral="fas-fast-forward" /></graphic>
+                   </Button>
+                   <Button fx:id="repeatButton" styleClass="player-button" onAction="#handleRepeatToggle">
+                      <graphic><FontIcon iconLiteral="fas-redo" /></graphic>
+                   </Button>
+                </children>
+             </HBox>
+             
+             <!-- Spaziatore a destra per spingere il volume a destra -->
+             <Region HBox.hgrow="ALWAYS" />
+             
+             <!-- Lato Destro: Volume (adattivo) -->
+             <HBox alignment="CENTER_RIGHT" minWidth="140.0" prefWidth="180.0" maxWidth="240.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                <children>
+                   <!-- Controllo Volume -->
+                   <Button fx:id="volumeButton" styleClass="player-button" onAction="#handleVolumeMuteToggle">
+                      <graphic><FontIcon fx:id="volumeIcon" iconLiteral="fas-volume-up" /></graphic>
+                   </Button>
+                   <Slider fx:id="volumeSlider" max="100.0" minWidth="60.0" prefWidth="100.0" maxWidth="120.0" value="50.0" HBox.hgrow="ALWAYS" />
+                </children>
+             </HBox>
             
          </children>
       </HBox>

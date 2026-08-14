@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 
 public class PlaylistDialogService {
 
@@ -180,15 +181,10 @@ public class PlaylistDialogService {
         dialog.setGraphic(null);
 
         Optional<String> genreResult = showThemedDialog(dialog);
-        genreResult.ifPresent(genre -> {
-            TextInputDialog titleDialog = new TextInputDialog("Playlist per " + genre);
-            titleDialog.setTitle("Nome playlist");
-            titleDialog.setHeaderText("Inserisci il nome della playlist");
-            titleDialog.setContentText("Nome:");
-            titleDialog.setGraphic(null);
-
-            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByGenre(genre, title));
-        });
+        genreResult.ifPresent(genre -> askPlaylistName(
+                "Playlist per " + genre,
+                title -> generateAutomaticPlaylistByGenre(genre, title)
+        ));
     }
 
     private void openAutomaticPlaylistByYearDialog() {
@@ -220,15 +216,10 @@ public class PlaylistDialogService {
         dialog.setGraphic(null);
 
         Optional<Integer> yearResult = showThemedDialog(dialog);
-        yearResult.ifPresent(year -> {
-            TextInputDialog titleDialog = new TextInputDialog("Playlist del " + year);
-            titleDialog.setTitle("Nome playlist");
-            titleDialog.setHeaderText("Inserisci il nome della playlist");
-            titleDialog.setContentText("Nome:");
-            titleDialog.setGraphic(null);
-
-            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByYear(year, title));
-        });
+        yearResult.ifPresent(year -> askPlaylistName(
+                "Playlist del " + year,
+                title -> generateAutomaticPlaylistByYear(year, title)
+        ));
     }
 
     private void generateAutomaticPlaylistByGenre(String genre, String title) {
@@ -269,15 +260,10 @@ public class PlaylistDialogService {
         dialog.setGraphic(null);
 
         Optional<Tag> tagResult = showThemedDialog(dialog);
-        tagResult.ifPresent(tag -> {
-            TextInputDialog titleDialog = new TextInputDialog("Playlist " + tag.getName());
-            titleDialog.setTitle("Nome playlist");
-            titleDialog.setHeaderText("Inserisci il nome della playlist");
-            titleDialog.setContentText("Nome:");
-            titleDialog.setGraphic(null);
-
-            showThemedDialog(titleDialog).ifPresent(title -> generateAutomaticPlaylistByTag(tag, title));
-        });
+        tagResult.ifPresent(tag -> askPlaylistName(
+                "Playlist " + tag.getName(),
+                title -> generateAutomaticPlaylistByTag(tag, title)
+        ));
     }
 
     private void generateAutomaticPlaylistByYear(Integer year, String title) {
@@ -297,6 +283,16 @@ public class PlaylistDialogService {
         UndoManager.getInstance().executeCommand(addPlaylistCmd);
 
         if (onPlaylistChanged != null) onPlaylistChanged.run();
+    }
+
+    private void askPlaylistName(String defaultName, Consumer<String> onConfirmed) {
+        TextInputDialog titleDialog = new TextInputDialog(defaultName);
+        titleDialog.setTitle("Nome playlist");
+        titleDialog.setHeaderText("Inserisci il nome della playlist");
+        titleDialog.setContentText("Nome:");
+        titleDialog.setGraphic(null);
+
+        showThemedDialog(titleDialog).ifPresent(onConfirmed);
     }
 
     private <T> Optional<T> showThemedDialog(Dialog<T> dialog) {

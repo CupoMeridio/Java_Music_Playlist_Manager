@@ -28,7 +28,7 @@
          <children>
 
             <!-- Card: Totale brani -->
-            <VBox fx:id="cardTotalTracks" styleClass="stat-card" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
+            <VBox fx:id="cardTotalTracks" styleClass="stat-card" minWidth="160.0" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="label-title" text="Brani in libreria" />
                   <Label fx:id="totalTracksLabel" styleClass="label-value" text="0" />
@@ -36,7 +36,7 @@
             </VBox>
 
             <!-- Card: Totale playlist -->
-            <VBox fx:id="cardTotalPlaylists" styleClass="stat-card" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
+            <VBox fx:id="cardTotalPlaylists" styleClass="stat-card" minWidth="160.0" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="label-title" text="Playlist create" />
                   <Label fx:id="totalPlaylistsLabel" styleClass="label-value" text="0" />
@@ -44,7 +44,7 @@
             </VBox>
 
             <!-- Card: Brani riprodotti -->
-            <VBox fx:id="cardTotalPlays" styleClass="stat-card" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
+            <VBox fx:id="cardTotalPlays" styleClass="stat-card" minWidth="160.0" maxWidth="Infinity" spacing="6.0" HBox.hgrow="ALWAYS">
                <children>
                   <Label styleClass="label-title" text="Riproduzioni totali" />
                   <Label fx:id="totalPlaysLabel" styleClass="label-value" text="0" />

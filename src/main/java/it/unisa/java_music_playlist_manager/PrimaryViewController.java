@@ -46,6 +46,9 @@ import java.io.IOException;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TableRow;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -437,6 +440,18 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPlaylistButton);
         if (reorderButton != null)
             it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(reorderButton);
+
+        // Registra Ctrl+Z come shortcut globale sulla scena non appena essa è disponibile
+        if (undoButton != null) {
+            undoButton.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    newScene.getAccelerators().put(
+                        new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+                        this::handleUndoAction
+                    );
+                }
+            });
+        }
     }
 
     private boolean isClickOnSelectedTableRow(MouseEvent event, Object selectedItem) {
@@ -596,16 +611,17 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     /**
      * Gestisce gli eventi di navigazione provenienti dalla barra laterale.
      */
-    private void handleNavigate(String viewId) {
-        if (null != viewId)
-            switch (viewId) {
-                case "Home" -> handleHomeAction();
-                case "Musica" -> handleMusicLibraryAction();
-                case "Coda" -> handlePlayQueueAction();
-                case "Playlist" -> handlePlaylistAction();
+    private void handleNavigate(ViewType viewType) {
+        if (viewType != null) {
+            switch (viewType) {
+                case HOME -> handleHomeAction();
+                case MUSIC -> handleMusicLibraryAction();
+                case QUEUE -> handlePlayQueueAction();
+                case PLAYLISTS -> handlePlaylistAction();
                 default -> {
                 }
             }
+        }
     }
 
     @FXML
@@ -621,6 +637,34 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         updateTablePlaceholder();
     }
 
+    /**
+     * Aggiorna la visibilità di tutti i pulsanti contestuali in base alla sezione
+     * corrente. È l'unica fonte di verità per la visibilità dei controlli della
+     * barra superiore: chiamare una sola volta dopo aver impostato currentViewType
+     * in ogni metodo di navigazione.
+     *
+     * Regole:
+     *   - undoButton: visibile solo dove esistono operazioni reversibili
+     *     (Libreria, Playlist, Dettaglio Playlist).
+     *   - playPlaylistButton: visibile solo nell'elenco Playlist, l'unico contesto
+     *     in cui selezionare una playlist e avviarla senza entrarci è significativo.
+     */
+    private void updateContextualUI() {
+        boolean isEditableSection = currentViewType == ViewType.MUSIC
+                || currentViewType == ViewType.PLAYLISTS
+                || currentViewType == ViewType.PLAYLIST_DETAIL;
+        boolean isPlaylistListSection = currentViewType == ViewType.PLAYLISTS;
+
+        if (undoButton != null) {
+            undoButton.setVisible(isEditableSection);
+            undoButton.setManaged(isEditableSection);
+        }
+        if (playPlaylistButton != null) {
+            playPlaylistButton.setVisible(isPlaylistListSection);
+            playPlaylistButton.setManaged(isPlaylistListSection);
+        }
+    }
+
     /** Configura la vista per mostrare la schermata Home con le statistiche. */
     private void handleHomeAction() {
         currentOpenedPlaylist = null;
@@ -630,6 +674,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         actionButton.setManaged(false);
         controlsBar.setVisible(false);
         controlsBar.setManaged(false);
+        updateContextualUI();
         updatePlayPlaylistButtonState();
         if (reorderButton != null) {
             reorderButton.setVisible(false);
@@ -674,6 +719,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         actionButton.setManaged(true);
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
+        updateContextualUI();
         showSongsColumns();
     }
 
@@ -687,6 +733,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         actionButton.setManaged(false);
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
+        updateContextualUI();
         showQueueColumns();
     }
 
@@ -701,6 +748,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         actionButton.setManaged(true);
         controlsBar.setVisible(true);
         controlsBar.setManaged(true);
+        updateContextualUI();
         showPlaylistColumns();
         updatePlayPlaylistButtonState();
     }
@@ -743,9 +791,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             queueListView.setVisible(true);
             queueListView.setManaged(true);
         }
-        updateTablePlaceholder();
-        refreshTableData();
-        updatePlayPlaylistButtonState();
+        afterViewSwitch();
     }
 
     @SuppressWarnings("unchecked")
@@ -760,19 +806,24 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         trackTableView.getColumns().clear();
 
         TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
-        titleCol.setPrefWidth(200);
+        titleCol.setMinWidth(160);
+        titleCol.setPrefWidth(220);
         titleCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTitle()));
 
         TableColumn<Track, String> artistCol = new TableColumn<>("Artista");
-        artistCol.setPrefWidth(150);
+        artistCol.setMinWidth(120);
+        artistCol.setPrefWidth(160);
         artistCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAuthor()));
 
         TableColumn<Track, String> albumCol = new TableColumn<>("Album");
-        albumCol.setPrefWidth(150);
+        albumCol.setMinWidth(120);
+        albumCol.setPrefWidth(160);
         albumCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getAlbum()));
 
         TableColumn<Track, String> yearCol = new TableColumn<>("Anno");
-        yearCol.setPrefWidth(80);
+        yearCol.setMinWidth(60);
+        yearCol.setPrefWidth(70);
+        yearCol.setMaxWidth(80);
         yearCol.setCellValueFactory(data -> {
             Integer year = data.getValue().getYear();
 
@@ -784,11 +835,14 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         });
 
         TableColumn<Track, String> genreCol = new TableColumn<>("Genere");
-        genreCol.setPrefWidth(120);
+        genreCol.setMinWidth(90);
+        genreCol.setPrefWidth(110);
         genreCol.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getGenre()));
 
         TableColumn<Track, String> durationCol = new TableColumn<>("Durata");
-        durationCol.setPrefWidth(80);
+        durationCol.setMinWidth(65);
+        durationCol.setPrefWidth(75);
+        durationCol.setMaxWidth(85);
         durationCol.setCellValueFactory(data -> {
             int seconds = data.getValue().getDuration();
             return new SimpleStringProperty(String.format("%02d:%02d", seconds / 60, seconds % 60));
@@ -796,7 +850,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
 
         // Configurazione della colonna e della cellFactory custom per i Tag
         TableColumn<Track, Set<Tag>> tagCol = new TableColumn<>("Tag");
-        tagCol.setPrefWidth(180);
+        tagCol.setMinWidth(120);
+        tagCol.setPrefWidth(160);
         tagCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTags()));
         tagCol.setCellFactory(new TagCellFactory());
 
@@ -807,9 +862,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                 () -> currentOpenedPlaylist,
                 this::updatePlayerUI));
 
-        updateTablePlaceholder();
-        refreshTableData();
-        updatePlayPlaylistButtonState();
+        afterViewSwitch();
     }
 
     @SuppressWarnings("unchecked")
@@ -822,14 +875,29 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (playlistTableView == null)
             return;
         playlistTableView.getColumns().clear();
-        TableColumn<Playlist, String> nameCol = createColumn("Nome Playlist", 300, p -> p.getTitle());
+        TableColumn<Playlist, String> nameCol = createColumn("Nome Playlist", 350, p -> p.getTitle());
+        nameCol.setMinWidth(200);
+
         TableColumn<Playlist, Integer> countCol = new TableColumn<>("Numero Brani");
-        countCol.setPrefWidth(150);
+        countCol.setMinWidth(90);
+        countCol.setPrefWidth(110);
+        countCol.setMaxWidth(130);
         countCol.setCellValueFactory(data -> new SimpleIntegerProperty(data.getValue().getTrackCount()).asObject());
-        TableColumn<Playlist, String> durationCol = createColumn("Durata Totale", 150,
+
+        TableColumn<Playlist, String> durationCol = createColumn("Durata Totale", 100,
                 p -> formatDuration(p.getDuration()));
+        durationCol.setMinWidth(85);
+        durationCol.setMaxWidth(120);
 
         playlistTableView.getColumns().addAll(nameCol, countCol, durationCol);
+        afterViewSwitch();
+    }
+
+    /**
+     * Aggiorna lo stato dei componenti grafici dopo la riconfigurazione
+     * o il cambio delle colonne della tabella (placeholder, refresh dati, stato bottoni).
+     */
+    private void afterViewSwitch() {
         updateTablePlaceholder();
         refreshTableData();
         updatePlayPlaylistButtonState();
@@ -858,6 +926,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         viewTitleLabel.setText(playlist.getTitle());
         actionButton.setVisible(false);
         actionButton.setManaged(false);
+        updateContextualUI();
         if (playlist.isManuallyEditable() && reorderButton != null) {
             reorderButton.setVisible(true);
             reorderButton.setManaged(true);
@@ -888,6 +957,9 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             stage.setScene(new Scene(root));
             ThemeManager.getInstance().applyActiveThemeToScene(stage.getScene());
             stage.initModality(Modality.APPLICATION_MODAL);
+            // Vincoli di sicurezza: corrispondono ai prefWidth/prefHeight dichiarati in addTrackView.fxml
+            stage.setMinWidth(400);
+            stage.setMinHeight(500);
             stage.showAndWait();
 
             // Resetta lo stato in modo da non precompilare form futuri erroneamente

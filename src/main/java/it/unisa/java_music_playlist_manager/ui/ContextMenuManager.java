@@ -23,80 +23,61 @@ public class ContextMenuManager {
 
     public static void setupTrackContextMenu(TableView<Track> table, ContextMenuActions actions) {
         ContextMenu contextMenu = new ContextMenu();
-        
-        MenuItem editItem = new MenuItem("Modifica brano");
-        editItem.setOnAction(e -> actions.onEditTrack(table.getSelectionModel().getSelectedItem()));
-
-        MenuItem deleteItem = new MenuItem("Elimina brano");
-        deleteItem.setOnAction(e -> actions.onDeleteTrack(table.getSelectionModel().getSelectedItem()));
-
-        MenuItem addToPlaylistItem = new MenuItem("Aggiungi a playlist");
-        addToPlaylistItem.setOnAction(e -> actions.onAddTrackToPlaylist(table.getSelectionModel().getSelectedItem()));
-
-        MenuItem addTrackToQueueItem = new MenuItem("Aggiungi brano alla coda");
-        addTrackToQueueItem.setOnAction(e -> actions.onAddTrackToQueue(table.getSelectionModel().getSelectedItem()));
-
-        MenuItem removeFromPlaylistItem = new MenuItem("Rimuovi dalla playlist");
-        removeFromPlaylistItem.setOnAction(e -> actions.onRemoveFromPlaylist(
-            table.getSelectionModel().getSelectedItem(),
-            actions.getCurrentOpenedPlaylist()
-        ));
-
-        contextMenu.getItems().addAll(
-                editItem,
-                deleteItem,
-                addToPlaylistItem,
-                addTrackToQueueItem,
-                removeFromPlaylistItem
-        );
         table.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {
+            contextMenu.getItems().clear();
             Track selectedTrack = table.getSelectionModel().getSelectedItem();
-            boolean noTrackSelected = selectedTrack == null;
-            boolean isQueueView = actions.isQueueView();
+            if (selectedTrack == null || actions.isQueueView()) {
+                e.consume();
+                return;
+            }
 
-            editItem.setVisible(!noTrackSelected && !isQueueView);
-            deleteItem.setVisible(!noTrackSelected && !isQueueView);
-            addToPlaylistItem.setVisible(!noTrackSelected && !isQueueView);
-            addTrackToQueueItem.setVisible(!noTrackSelected && !isQueueView);
+            MenuItem editItem = new MenuItem("Modifica brano");
+            editItem.setOnAction(ev -> actions.onEditTrack(selectedTrack));
+
+            MenuItem deleteItem = new MenuItem("Elimina brano");
+            deleteItem.setOnAction(ev -> actions.onDeleteTrack(selectedTrack));
+
+            MenuItem addToPlaylistItem = new MenuItem("Aggiungi a playlist");
+            addToPlaylistItem.setOnAction(ev -> actions.onAddTrackToPlaylist(selectedTrack));
+
+            MenuItem addTrackToQueueItem = new MenuItem("Aggiungi brano alla coda");
+            addTrackToQueueItem.setOnAction(ev -> actions.onAddTrackToQueue(selectedTrack));
+
+            contextMenu.getItems().addAll(editItem, deleteItem, addToPlaylistItem, addTrackToQueueItem);
 
             Playlist currentOpenedPlaylist = actions.getCurrentOpenedPlaylist();
-            boolean isPlaylistDetailView = currentOpenedPlaylist != null;
-            boolean isEditable = currentOpenedPlaylist != null && currentOpenedPlaylist.isManuallyEditable();
-            
-            removeFromPlaylistItem.setDisable(noTrackSelected || !isPlaylistDetailView || !isEditable);
-            removeFromPlaylistItem.setVisible(!noTrackSelected && isPlaylistDetailView && isEditable);
+            if (currentOpenedPlaylist != null && currentOpenedPlaylist.isManuallyEditable()) {
+                MenuItem removeFromPlaylistItem = new MenuItem("Rimuovi dalla playlist");
+                removeFromPlaylistItem.setOnAction(ev -> actions.onRemoveFromPlaylist(selectedTrack, currentOpenedPlaylist));
+                contextMenu.getItems().add(removeFromPlaylistItem);
+            }
         });
     }
 
     public static void setupPlaylistContextMenu(TableView<Playlist> table, ContextMenuActions actions) {
         ContextMenu contextMenu = new ContextMenu();
-        
-        MenuItem editPlaylistItem = new MenuItem("Modifica playlist");
-        editPlaylistItem.setOnAction(e -> actions.onEditPlaylist(table.getSelectionModel().getSelectedItem()));
-
-        MenuItem deletePlaylistItem = new MenuItem("Elimina playlist");
-        deletePlaylistItem.setOnAction(e -> actions.onDeletePlaylist(table.getSelectionModel().getSelectedItem()));
-
-        MenuItem addPlaylistToQueueItem = new MenuItem("Aggiungi playlist alla coda");
-        addPlaylistToQueueItem.setOnAction(e -> actions.onAddPlaylistToQueue(table.getSelectionModel().getSelectedItem()));
-
-        contextMenu.getItems().addAll(
-                editPlaylistItem,
-                deletePlaylistItem,
-                addPlaylistToQueueItem
-        );
         table.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {
+            contextMenu.getItems().clear();
             Playlist selectedPlaylist = table.getSelectionModel().getSelectedItem();
-            boolean noPlaylistSelected = selectedPlaylist == null;
-            boolean isQueueView = actions.isQueueView();
+            if (selectedPlaylist == null || actions.isQueueView()) {
+                e.consume();
+                return;
+            }
 
-            editPlaylistItem.setVisible(!noPlaylistSelected && !isQueueView);
-            deletePlaylistItem.setVisible(!noPlaylistSelected && !isQueueView);
-            addPlaylistToQueueItem.setVisible(!noPlaylistSelected && !isQueueView);
+            MenuItem editPlaylistItem = new MenuItem("Modifica playlist");
+            editPlaylistItem.setOnAction(ev -> actions.onEditPlaylist(selectedPlaylist));
+
+            MenuItem deletePlaylistItem = new MenuItem("Elimina playlist");
+            deletePlaylistItem.setOnAction(ev -> actions.onDeletePlaylist(selectedPlaylist));
+
+            MenuItem addPlaylistToQueueItem = new MenuItem("Aggiungi playlist alla coda");
+            addPlaylistToQueueItem.setOnAction(ev -> actions.onAddPlaylistToQueue(selectedPlaylist));
+
+            contextMenu.getItems().addAll(editPlaylistItem, deletePlaylistItem, addPlaylistToQueueItem);
         });
     }
 }

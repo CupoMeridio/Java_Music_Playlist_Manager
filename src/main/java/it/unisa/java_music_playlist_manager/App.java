@@ -63,8 +63,13 @@ public class App extends Application {
         ThemeManager.getInstance().setScene(scene);
         ThemeManager.getInstance().applyActiveTheme();
 
+        // Vincoli di sicurezza per garantire leggibilità ed ergonomia su qualsiasi risoluzione.
+        // I valori tengono conto delle decorazioni OS (barra del titolo ~35px, bordi ~8px per lato)
+        // sommati al minWidth=900 e minHeight=600 dichiarati nel BorderPane di primaryView.fxml.
+        stage.setMinWidth(940);   // 900 (BorderPane minWidth) + ~40px decorazioni OS
+        stage.setMinHeight(680);  // 600 (BorderPane minHeight) + ~80px decorazioni OS (titolo + barra delle applicazioni)
+
         // Caricamento delle icone dell'applicazione in diverse dimensioni.
-        // Il sistema operativo sceglierà automaticamente la dimensione più adatta.
         loadAppIcons(stage);
 
         stage.setScene(scene);
