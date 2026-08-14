@@ -12,9 +12,8 @@
 .player-bar {
     -fx-background-color: #000000;
     -fx-border-color: #D11A2A transparent transparent transparent;
-    -fx-border-width: 4px 0 0 0;
+    -fx-border-width: 1.5px 0 0 0;
     -fx-padding: 10px 20px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 0, -9);
 }
 
 #currentTrackTitle {

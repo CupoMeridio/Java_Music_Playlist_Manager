@@ -963,6 +963,13 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         }
     }
 
+    private List<Track> getVisibleLibraryTracks() {
+        if (trackTableView != null && !trackTableView.getItems().isEmpty()) {
+            return new ArrayList<>(trackTableView.getItems());
+        }
+        return new ArrayList<>(Library.getInstance().getTracks());
+    }
+
     /**
      * Gestisce ESCLUSIVAMENTE il toggle Play/Pausa sul brano attualmente in
      * riproduzione.
@@ -982,9 +989,11 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (manager.getCurrentQueue().isEmpty()) {
             if (currentOpenedPlaylist != null && !currentOpenedPlaylist.getTracks().isEmpty()) {
                 manager.selectAndLoadTrack(currentOpenedPlaylist.getTracks().get(0), List.of(currentOpenedPlaylist));
-            } else if (!Library.getInstance().getTracks().isEmpty()) {
-                Track firstTrack = Library.getInstance().getTracks().get(0);
-                manager.selectAndLoadTrack(firstTrack, List.of(firstTrack));
+            } else {
+                List<Track> visibleTracks = getVisibleLibraryTracks();
+                if (!visibleTracks.isEmpty()) {
+                    manager.selectAndLoadTrack(visibleTracks.get(0), visibleTracks);
+                }
             }
         }
 
@@ -1010,8 +1019,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             // Da una playlist aperta: il contesto è l'intera playlist
             manager.selectAndLoadTrack(selectedTrack, List.of(currentOpenedPlaylist));
         } else {
-            // Dalla libreria: avvia solo il brano selezionato
-            manager.selectAndLoadTrack(selectedTrack, List.of(selectedTrack));
+            // Dalla libreria: carica l'intera lista dei brani visibili come contesto
+            manager.selectAndLoadTrack(selectedTrack, getVisibleLibraryTracks());
         }
 
         manager.forcePlayCurrent();
