@@ -16,11 +16,11 @@
     Collegata al controller PlayerController.
 -->
 
-<VBox spacing="10.0" styleClass="player-bar"
+<VBox spacing="8.0" styleClass="player-bar"
       xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="it.unisa.java_music_playlist_manager.PlayerController">
    <padding>
-      <Insets bottom="15.0" left="15.0" right="15.0" top="10.0" />
+      <Insets bottom="10.0" left="15.0" right="15.0" top="8.0" />
    </padding>
    <children>
       <!-- Riga 1: Barra di Progresso (Timeline) con Tempi -->
@@ -37,10 +37,10 @@
          <children>
             
              <!-- Lato Sinistro: Copertina e Info Traccia (flessibile e protetta contro collisioni) -->
-             <HBox alignment="CENTER_LEFT" minWidth="0.0" prefWidth="240.0" maxWidth="320.0" spacing="10.0" HBox.hgrow="ALWAYS">
+             <HBox alignment="CENTER_LEFT" minWidth="0.0" prefWidth="250.0" maxWidth="330.0" spacing="12.0" HBox.hgrow="ALWAYS">
                 <children>
                    <!-- Copertina del Brano / Vista Vinile (cliccabile per alternare) -->
-                   <StackPane fx:id="coverContainer" minHeight="62.0" minWidth="62.0" prefHeight="62.0" prefWidth="62.0" style="-fx-cursor: hand;" onMouseClicked="#handleCoverClick" />
+                   <StackPane fx:id="coverContainer" minHeight="68.0" minWidth="68.0" prefHeight="68.0" prefWidth="68.0" style="-fx-cursor: hand;" onMouseClicked="#handleCoverClick" />
                    
                    <!-- Metadati del Brano (Titolo e Artista) -->
                    <VBox alignment="CENTER_LEFT" spacing="3.0" minWidth="0.0" HBox.hgrow="ALWAYS">

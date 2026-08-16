@@ -127,6 +127,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                 playlistTableView.refresh();
             if (trackTableView != null)
                 trackTableView.refresh();
+            if (queueListView != null)
+                queueListView.refresh();
             syncTableSelection();
             updatePlayPlaylistButtonState();
 
@@ -495,27 +497,58 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (queueListView == null)
             return;
         queueListView.setCellFactory(lv -> new ListCell<>() {
+            private final FontIcon playingIcon = new FontIcon("fas-volume-up");
+            {
+                playingIcon.getStyleClass().add("queue-playing-icon");
+                playingIcon.setIconSize(12);
+            }
+
             @Override
             protected void updateItem(QueueItem item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
                     setGraphic(null);
+                    getStyleClass().remove("queue-cell-playing");
+                    getStyleClass().remove("queue-cell-playlist-header");
                 } else {
+                    Track currentTrack = PlaybackManager.getInstance().getCurrentTrack();
+                    int currentQueueIndex = PlaybackManager.getInstance().getCurrentPlayableIndex();
+                    boolean isCurrentQueuePlayable = (item.queueIndex == currentQueueIndex);
+
+                    boolean isPlaying = false;
+                    if (item.track != null) {
+                        isPlaying = isCurrentQueuePlayable && item.track.equals(currentTrack);
+                    } else if (item.parentPlayable instanceof Playlist) {
+                        isPlaying = isCurrentQueuePlayable;
+                    }
+
+                    if (isPlaying) {
+                        if (!getStyleClass().contains("queue-cell-playing")) {
+                            getStyleClass().add("queue-cell-playing");
+                        }
+                        setGraphic(playingIcon);
+                    } else {
+                        getStyleClass().remove("queue-cell-playing");
+                        setGraphic(null);
+                    }
+
                     if (item.parentPlayable instanceof Playlist && item.track == null) {
                         Playlist p = (Playlist) item.parentPlayable;
                         boolean expanded = expandedPlaylists.contains(p);
                         String indicator = expanded ? "[-]" : "[+]";
                         setText(indicator + " " + p.getTitle() + " (" + p.getTrackCount() + " brani)");
-                        setStyle("-fx-font-weight: bold;");
+                        if (!getStyleClass().contains("queue-cell-playlist-header")) {
+                            getStyleClass().add("queue-cell-playlist-header");
+                        }
                     } else if (item.parentPlayable instanceof Playlist && item.track != null) {
+                        getStyleClass().remove("queue-cell-playlist-header");
                         setText("    " + item.track.getTitle() + " - " + item.track.getAuthor() + " ("
                                 + formatDuration(item.track.getDuration()) + ")");
-                        setStyle("-fx-font-weight: normal;");
                     } else if (item.parentPlayable instanceof Track) {
+                        getStyleClass().remove("queue-cell-playlist-header");
                         Track t = (Track) item.parentPlayable;
                         setText(t.getTitle() + " - " + t.getAuthor() + " (" + formatDuration(t.getDuration()) + ")");
-                        setStyle("-fx-font-weight: normal;");
                     }
                 }
             }
@@ -852,6 +885,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                 playBtn.setMaxSize(22, 22);
                 FontIcon playIcon = new FontIcon("fas-play");
                 playIcon.getStyleClass().add("table-play-icon");
+                playIcon.setMouseTransparent(true);
                 playBtn.setGraphic(playIcon);
                 playBtn.setOnAction(event -> {
                     event.consume();
@@ -860,7 +894,15 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                         handleStartTrackPlayback(track);
                     }
                 });
-                playBtn.setOnMouseClicked(javafx.event.Event::consume);
+                playBtn.setOnMouseClicked(event -> {
+                    event.consume();
+                    if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
+                        Track track = getTableRow() != null ? getTableRow().getItem() : null;
+                        if (track != null) {
+                            handleStartTrackPlayback(track);
+                        }
+                    }
+                });
                 setAlignment(javafx.geometry.Pos.CENTER);
             }
 

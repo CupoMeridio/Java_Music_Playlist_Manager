@@ -274,3 +274,64 @@
 .scroll-bar .thumb:hover {
     -fx-background-color: #0000FF;
 }
+
+/* Play Buttons — Swiss Bauhaus */
+.button.card-play-button,
+.button.card-play-button:hover,
+.button.card-play-button:pressed {
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-padding: 0;
+    -fx-rotate: 0deg;
+}
+
+.button.card-play-button {
+    -fx-background-color: #E30613;
+    -fx-border-color: #111111;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+}
+
+.button.card-play-button .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.card-play-button:hover {
+    -fx-background-color: #0000FF;
+    -fx-border-color: #111111;
+}
+
+.button.card-play-button:hover .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.table-play-button,
+.button.table-play-button:hover,
+.button.table-play-button:pressed {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-rotate: 0deg;
+}
+
+.button.table-play-button .table-play-icon {
+    -fx-icon-color: #111111;
+}
+
+.button.table-play-button:hover .table-play-icon {
+    -fx-icon-color: #E30613;
+}
+
+/* Queue List View — Swiss Bauhaus */
+#queueListView .list-cell.queue-cell-playing {
+    -fx-background-color: #F0F0F0;
+    -fx-text-fill: #E30613;
+    -fx-border-color: transparent transparent transparent #E30613;
+    -fx-border-width: 0 0 0 5px;
+}
+
+#queueListView .list-cell.queue-cell-playing .queue-playing-icon {
+    -fx-icon-color: #E30613;
+}

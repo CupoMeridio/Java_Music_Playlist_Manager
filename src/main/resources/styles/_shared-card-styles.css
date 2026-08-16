@@ -101,9 +101,14 @@
     -fx-alignment: bottom-right;
 }
 
-.card-play-button {
+.button.card-play-button {
     -fx-background-color: #1DB954;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
     -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
     -fx-min-width: 24px;
     -fx-min-height: 24px;
     -fx-max-width: 24px;
@@ -113,24 +118,33 @@
     -fx-padding: 0;
     -fx-cursor: hand;
     -fx-opacity: 0.92;
+    -fx-rotate: 0deg;
+    -fx-alignment: center;
     -fx-translate-x: -5px;
     -fx-translate-y: -5px;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.3), 4, 0, 0, 1);
 }
 
-.card-play-button:hover {
+.button.card-play-button:hover {
+    -fx-background-color: #1ED760;
     -fx-opacity: 1.0;
     -fx-scale-x: 1.15;
     -fx-scale-y: 1.15;
+    -fx-rotate: 0deg;
 }
 
-.card-play-button .card-play-icon {
+.button.card-play-button:pressed {
+    -fx-background-color: #169C46;
+    -fx-rotate: 0deg;
+}
+
+.button.card-play-button .card-play-icon {
     -fx-icon-size: 10px;
-    -fx-icon-color: white;
+    -fx-icon-color: #FFFFFF;
 }
 
 /* Table Play Button */
-.table-play-button {
+.button.table-play-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
     -fx-border-color: transparent;
@@ -148,13 +162,14 @@
     -fx-alignment: center;
 }
 
-.table-play-button:hover {
+.button.table-play-button:hover {
+    -fx-background-color: transparent;
     -fx-opacity: 0.85;
     -fx-scale-x: 1.25;
     -fx-scale-y: 1.25;
 }
 
-.table-play-button .table-play-icon {
+.button.table-play-button .table-play-icon {
     -fx-icon-size: 11px;
     -fx-icon-color: -fx-text-fill;
 }
@@ -209,4 +224,31 @@
 .scroll-bar .decrement-arrow {
     -fx-shape: " ";
     -fx-padding: 0;
+}
+
+/* Queue List View — Shared Base */
+#queueListView {
+    -fx-background-color: transparent;
+    -fx-padding: 4px;
+}
+
+#queueListView .list-cell {
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 4px;
+    -fx-graphic-text-gap: 8px;
+}
+
+#queueListView .list-cell.queue-cell-playlist-header {
+    -fx-font-weight: bold;
+}
+
+#queueListView .list-cell.queue-cell-playing {
+    -fx-font-weight: bold;
+    -fx-border-color: transparent transparent transparent #1DB954;
+    -fx-border-width: 0 0 0 4px;
+}
+
+#queueListView .list-cell.queue-cell-playing .queue-playing-icon {
+    -fx-icon-color: #1DB954;
+    -fx-icon-size: 12px;
 }

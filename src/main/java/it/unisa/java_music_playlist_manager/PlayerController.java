@@ -22,6 +22,8 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
@@ -124,8 +126,8 @@ public class PlayerController implements Observer {
     private boolean vinylViewActive = false;
 
     /** Dimensione fissa del widget copertina */
-    private static final double COVER_SIZE = 62.0;
-    private static final double COVER_INSET = 5.0;
+    private static final double COVER_SIZE = 68.0;
+    private static final double COVER_INSET = 2.0;
     private static final double COVER_CONTENT_SIZE = COVER_SIZE - (COVER_INSET * 2.0);
 
     /**
@@ -208,6 +210,8 @@ public class PlayerController implements Observer {
         // Costruisce le due viste copertina e mostra quella standard
         buildCoverViews();
         showStandardView();
+        updateThemeClip(ThemeManager.getInstance().getActiveTheme());
+        ThemeManager.getInstance().addThemeChangeListener(this::updateThemeClip);
 
         // Reset testi iniziali
         if (currentTimeLabel != null)
@@ -310,12 +314,17 @@ public class PlayerController implements Observer {
         if (coverContainer == null)
             return;
 
-        // Vista standard: ImageView quadrata con bordo
+        // Vista standard: ImageView quadrata con bordo arrotondato
         albumCoverImageView = new ImageView();
         albumCoverImageView.setFitWidth(COVER_CONTENT_SIZE);
         albumCoverImageView.setFitHeight(COVER_CONTENT_SIZE);
         albumCoverImageView.setPreserveRatio(true);
         albumCoverImageView.setPickOnBounds(true);
+
+        Rectangle clip = new Rectangle(COVER_CONTENT_SIZE, COVER_CONTENT_SIZE);
+        clip.setArcWidth(8);
+        clip.setArcHeight(8);
+        albumCoverImageView.setClip(clip);
 
         // Vista vinile: cerchio con solchi disegnati via Canvas
         vinylCircle = new Circle(COVER_CONTENT_SIZE / 2);
@@ -328,6 +337,35 @@ public class PlayerController implements Observer {
         vinylRotation.setInterpolator(javafx.animation.Interpolator.LINEAR);
 
         coverContainer.getChildren().addAll(albumCoverImageView, vinylCircle);
+    }
+
+    /**
+     * Aggiorna la maschera di ritaglio (clip) della copertina in base al tema attivo.
+     * Nel tema Phantom Thief ritaglia con precisione gli angoli diagonali (taglio manga).
+     * Negli altri temi applica il bordo arrotondato standard.
+     */
+    private void updateThemeClip(String themeName) {
+        if (albumCoverImageView == null)
+            return;
+
+        if ("Phantom Thief".equalsIgnoreCase(themeName)) {
+            // Maschera esagonale ad angoli tagliati diagonali matching lo stile Persona 5
+            Polygon phantomClip = new Polygon(
+                10.0, 0.0,
+                COVER_CONTENT_SIZE, 0.0,
+                COVER_CONTENT_SIZE, COVER_CONTENT_SIZE - 10.0,
+                COVER_CONTENT_SIZE - 10.0, COVER_CONTENT_SIZE,
+                0.0, COVER_CONTENT_SIZE,
+                0.0, 10.0
+            );
+            albumCoverImageView.setClip(phantomClip);
+        } else {
+            // Standard: ritaglio moderno ad angoli arrotondati
+            Rectangle standardClip = new Rectangle(COVER_CONTENT_SIZE, COVER_CONTENT_SIZE);
+            standardClip.setArcWidth(8);
+            standardClip.setArcHeight(8);
+            albumCoverImageView.setClip(standardClip);
+        }
     }
 
     /**
@@ -352,15 +390,15 @@ public class PlayerController implements Observer {
         gc.setFill(Color.web("#1a1a1a"));
         gc.fillOval(0, 0, diameter, diameter);
 
-        // Solchi concentrici (cerchi grigi a distanze regolari)
+        // Solchi concentrici (cerchi grigi a distanze regolari lungo la corona esterna)
         gc.setStroke(Color.web("#3a3a3a"));
         gc.setLineWidth(0.5);
-        for (double groove = r * 0.45; groove < r * 0.92; groove += 3.0) {
+        for (double groove = r * 0.64; groove < r * 0.94; groove += 2.5) {
             gc.strokeOval(r - groove, r - groove, groove * 2, groove * 2);
         }
 
-        // Etichetta centrale: copertina circolare o cerchio colorato
-        double labelRadius = r * 0.38;
+        // Etichetta centrale: copertina circolare ingrandita o cerchio colorato
+        double labelRadius = r * 0.58;
         if (cover != null) {
             // Ritaglia la copertina in un cerchio centrale
             gc.save();
@@ -372,6 +410,11 @@ public class PlayerController implements Observer {
                     r - labelRadius, r - labelRadius,
                     labelRadius * 2, labelRadius * 2);
             gc.restore();
+
+            // Sottile anello di finitura attorno all'etichetta
+            gc.setStroke(Color.web("#2a2a2a"));
+            gc.setLineWidth(0.8);
+            gc.strokeOval(r - labelRadius, r - labelRadius, labelRadius * 2, labelRadius * 2);
         } else {
             // Etichetta colorata generica
             gc.setFill(Color.web("#cc3333"));
@@ -379,7 +422,7 @@ public class PlayerController implements Observer {
         }
 
         // Buco centrale del vinile
-        double holeRadius = r * 0.06;
+        double holeRadius = r * 0.08;
         gc.setFill(Color.web("#111111"));
         gc.fillOval(r - holeRadius, r - holeRadius, holeRadius * 2, holeRadius * 2);
 

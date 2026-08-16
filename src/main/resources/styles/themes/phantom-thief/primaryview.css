@@ -316,6 +316,26 @@
     -fx-text-fill: #FFFFFF;
 }
 
+#queueListView .list-cell.queue-cell-playing {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFF00;
+    -fx-border-color: transparent transparent transparent #D11A2A;
+    -fx-border-width: 0 0 0 5px;
+}
+
+#queueListView .list-cell.queue-cell-playing .queue-playing-icon {
+    -fx-icon-color: #FFFF00;
+}
+
+#queueListView .list-cell.queue-cell-playing:selected {
+    -fx-background-color: #D11A2A;
+    -fx-text-fill: #FFFF00;
+}
+
+#queueListView .list-cell.queue-cell-playing:selected .queue-playing-icon {
+    -fx-icon-color: #FFFF00;
+}
+
 .scroll-pane {
     -fx-background-color: transparent;
 }
@@ -398,7 +418,17 @@
     -fx-text-fill: #FFFFFF;
 }
 
-.card-play-button {
+/* Play Buttons — Phantom Thief */
+.button.card-play-button,
+.button.card-play-button:hover,
+.button.card-play-button:pressed {
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-rotate: 0deg;
+    -fx-padding: 0;
+}
+
+.button.card-play-button {
     -fx-background-color: #D11A2A;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 1px;
@@ -406,17 +436,22 @@
     -fx-background-radius: 50%;
 }
 
-.card-play-button:hover {
-    -fx-background-color: #FFFF00;
+.button.card-play-button .card-play-icon {
+    -fx-icon-color: #FFFFFF;
 }
 
-.card-play-button:hover .card-play-icon {
+.button.card-play-button:hover {
+    -fx-background-color: #FFFF00;
+    -fx-border-color: #FFFFFF;
+}
+
+.button.card-play-button:hover .card-play-icon {
     -fx-icon-color: #000000;
 }
 
-.table-play-button,
-.table-play-button:hover,
-.table-play-button:pressed {
+.button.table-play-button,
+.button.table-play-button:hover,
+.button.table-play-button:pressed {
     -fx-background-color: transparent, transparent;
     -fx-background-insets: 0, 0;
     -fx-border-color: transparent;
@@ -425,10 +460,18 @@
     -fx-padding: 0;
 }
 
-.table-play-button .table-play-icon {
+.button.table-play-button .table-play-icon {
+    -fx-icon-color: #000000;
+}
+
+.button.table-play-button:hover .table-play-icon {
+    -fx-icon-color: #D11A2A;
+}
+
+.table-row-cell:filled:selected .button.table-play-button .table-play-icon {
     -fx-icon-color: #FFFFFF;
 }
 
-.table-play-button:hover .table-play-icon {
+.table-row-cell:filled:selected .button.table-play-button:hover .table-play-icon {
     -fx-icon-color: #FFFF00;
 }

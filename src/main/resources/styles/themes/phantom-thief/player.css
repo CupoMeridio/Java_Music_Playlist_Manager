@@ -149,11 +149,17 @@
     -fx-background-color: #D11A2A;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-padding: 5px;
+    -fx-padding: 2px;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
     -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 8, 3);
-    -fx-shape: "M10 0 L62 0 L62 52 L52 62 L0 62 L0 10 Z";
+    -fx-shape: "M10 0 L68 0 L68 58 L58 68 L0 68 L0 10 Z";
+    -fx-alignment: center;
+}
+
+#coverContainer:hover {
+    -fx-background-color: #FFFF00;
+    -fx-border-color: #FFFFFF;
 }
 
 

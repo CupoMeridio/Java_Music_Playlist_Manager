@@ -12,7 +12,7 @@
         <ImageView fx:id="coverImageView" fitWidth="140" fitHeight="140" preserveRatio="true" styleClass="track-card-image" />
         <Button fx:id="playButton" styleClass="card-play-button" StackPane.alignment="BOTTOM_RIGHT">
             <graphic>
-                <FontIcon iconLiteral="fas-play" styleClass="card-play-icon" />
+                <FontIcon iconLiteral="fas-play" styleClass="card-play-icon" mouseTransparent="true" />
             </graphic>
         </Button>
     </StackPane>

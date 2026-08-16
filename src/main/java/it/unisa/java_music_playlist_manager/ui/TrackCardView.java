@@ -1,7 +1,6 @@
 package it.unisa.java_music_playlist_manager.ui;
 
 import it.unisa.java_music_playlist_manager.model.Track;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
@@ -14,9 +13,11 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
- * Componente UI personalizzato per visualizzare un brano musicale come una "Scheda" (Card).
+ * Componente UI personalizzato per visualizzare un brano musicale come una
+ * "Scheda" (Card).
  * Estende VBox e incapsula la logica grafica usando il pattern fx:root.
- * Questo componente è una "Dumb View" in ottica MVC: non accede ai Service esterni
+ * Questo componente è una "Dumb View" in ottica MVC: non accede ai Service
+ * esterni
  * per i dati (es. CoverImageService), ma aspetta che gli vengano passati.
  */
 public class TrackCardView extends VBox {
@@ -37,8 +38,10 @@ public class TrackCardView extends VBox {
     private Label artistLabel;
 
     /**
-     * Costruttore "dumb view": carica l'FXML senza registrare handler di interazione.
-     * Gli eventi mouse sono gestiti esternamente dalla GridCell che ospita questa view.
+     * Costruttore "dumb view": carica l'FXML senza registrare handler di
+     * interazione.
+     * Gli eventi mouse sono gestiti esternamente dalla GridCell che ospita questa
+     * view.
      */
     public TrackCardView() {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/fxml/components/TrackCardView.fxml"));
@@ -54,19 +57,30 @@ public class TrackCardView extends VBox {
     @FXML
     private void initialize() {
         if (playButton != null) {
+            playButton.setMinSize(24, 24);
+            playButton.setPrefSize(24, 24);
+            playButton.setMaxSize(24, 24);
             playButton.setOnAction(event -> {
                 event.consume();
                 if (onPlayHandler != null && track != null) {
                     onPlayHandler.accept(track);
                 }
             });
-            // Evita che il click sul bottone si propaghi alla GridCell come click di selezione
-            playButton.setOnMouseClicked(Event::consume);
+            // Evita che il click sul bottone si propaghi alla GridCell come click di
+            // selezione
+            playButton.setOnMouseClicked(event -> {
+                event.consume();
+                if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY && onPlayHandler != null
+                        && track != null) {
+                    onPlayHandler.accept(track);
+                }
+            });
         }
     }
 
     /**
-     * Imposta il callback per l'avvio della riproduzione tramite il tasto play della card.
+     * Imposta il callback per l'avvio della riproduzione tramite il tasto play
+     * della card.
      */
     public void setOnPlayAction(Consumer<Track> onPlayHandler) {
         this.onPlayHandler = onPlayHandler;
@@ -74,6 +88,7 @@ public class TrackCardView extends VBox {
 
     /**
      * Aggiorna i dati mostrati dalla View, senza ricreare il nodo.
+     * 
      * @param track Il brano da visualizzare
      * @param cover L'immagine di copertina passata dal Controller
      */

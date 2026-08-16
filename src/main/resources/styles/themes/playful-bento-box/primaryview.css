@@ -264,3 +264,65 @@
 .scroll-bar .thumb:hover {
     -fx-background-color: #2563EB;
 }
+
+/* Play Buttons — Playful Bento Box */
+.button.card-play-button,
+.button.card-play-button:hover,
+.button.card-play-button:pressed {
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-padding: 0;
+    -fx-rotate: 0deg;
+}
+
+.button.card-play-button {
+    -fx-background-color: #3B82F6;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+}
+
+.button.card-play-button .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.card-play-button:hover {
+    -fx-background-color: #2563EB;
+    -fx-border-color: #FFFFFF;
+}
+
+.button.card-play-button:hover .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.table-play-button,
+.button.table-play-button:hover,
+.button.table-play-button:pressed {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-rotate: 0deg;
+}
+
+.button.table-play-button .table-play-icon {
+    -fx-icon-color: #1F2937;
+}
+
+.button.table-play-button:hover .table-play-icon {
+    -fx-icon-color: #3B82F6;
+}
+
+/* Queue List View — Playful Bento Box */
+#queueListView .list-cell.queue-cell-playing {
+    -fx-background-color: #EFF6FF;
+    -fx-text-fill: #2563EB;
+    -fx-border-color: transparent transparent transparent #3B82F6;
+    -fx-border-width: 0 0 0 4px;
+    -fx-background-radius: 8px;
+}
+
+#queueListView .list-cell.queue-cell-playing .queue-playing-icon {
+    -fx-icon-color: #3B82F6;
+}

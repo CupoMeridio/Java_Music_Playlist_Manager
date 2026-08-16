@@ -265,3 +265,65 @@
 .scroll-bar .thumb:hover {
     -fx-background-color: #c46ee5;
 }
+
+/* Play Buttons — Pastel Kawaii */
+.button.card-play-button,
+.button.card-play-button:hover,
+.button.card-play-button:pressed {
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+    -fx-padding: 0;
+    -fx-rotate: 0deg;
+}
+
+.button.card-play-button {
+    -fx-background-color: #d48ef5;
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+}
+
+.button.card-play-button .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.card-play-button:hover {
+    -fx-background-color: #c46ee5;
+    -fx-border-color: #FFFFFF;
+}
+
+.button.card-play-button:hover .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.table-play-button,
+.button.table-play-button:hover,
+.button.table-play-button:pressed {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-rotate: 0deg;
+}
+
+.button.table-play-button .table-play-icon {
+    -fx-icon-color: #8a5c70;
+}
+
+.button.table-play-button:hover .table-play-icon {
+    -fx-icon-color: #d48ef5;
+}
+
+/* Queue List View — Pastel Kawaii */
+#queueListView .list-cell.queue-cell-playing {
+    -fx-background-color: #fff0f7;
+    -fx-text-fill: #a44ecc;
+    -fx-border-color: transparent transparent transparent #d48ef5;
+    -fx-border-width: 0 0 0 4px;
+    -fx-background-radius: 8px;
+}
+
+#queueListView .list-cell.queue-cell-playing .queue-playing-icon {
+    -fx-icon-color: #d48ef5;
+}
