@@ -4,6 +4,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Comando per l'aggiornamento dei metadati di una traccia musicale {@link Track}.
+ * Memorizza lo stato precedente di tutti i metadati per consentire il ripristino in Undo.
+ */
 public class UpdateTrackCommand implements Command {
     private final Track track;
 

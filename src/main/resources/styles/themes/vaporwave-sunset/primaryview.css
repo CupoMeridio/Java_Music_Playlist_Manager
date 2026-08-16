@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Vaporwave Sunset — primaryview.css */
 
 .root {
@@ -154,6 +156,7 @@
 .table-view {
     -fx-background-color: rgba(255, 248, 245, 0.72);
     -fx-background-radius: 24px;
+    -fx-border-radius: 24px;
     -fx-table-cell-border-color: rgba(200, 120, 150, 0.25);
     -fx-border-color: rgba(200, 120, 150, 0.25);
     -fx-border-width: 1px;
@@ -182,7 +185,7 @@
 
 .table-row-cell {
     -fx-background-color: rgba(255, 248, 245, 0.72);
-    -fx-padding: 5px 0;
+    -fx-padding: 4px 0;
     -fx-border-color: transparent transparent rgba(200, 120, 150, 0.25) transparent;
 }
 
@@ -201,4 +204,48 @@
 
 .scroll-pane {
     -fx-background-color: transparent;
+}
+
+/* Toggle button: strutturali in shared; qui solo cromatismi tema. */
+.toggle-button {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-text-fill: #3d1a2e;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #ff6b35;
+    -fx-text-fill: #ffffff;
+}
+
+/* Bottone "Vista a schede" — tema Vaporwave: gradienti, radius 18px. */
+#viewToggleButton {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe); -fx-text-fill: #ffffff; -fx-font-weight: bold; -fx-border-color: rgba(200, 120, 150, 0.25); -fx-border-width: 1px; -fx-background-radius: 18px; -fx-border-radius: 18px;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #ff6b35; -fx-text-fill: #ffffff; -fx-effect: innershadow(gaussian, rgba(200, 120, 150, 0.75), 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; cromatismi e gradienti qui. */
+.track-card {
+    -fx-background-color: rgba(255, 248, 245, 0.72);
+    -fx-border-color: rgba(200, 120, 150, 0.25);
+}
+
+.track-card:hover {
+    -fx-border-color: #ff6b35;
+}
+
+.track-card-selected {
+    -fx-background-color: linear-gradient(to right, #b967ff, #01cdfe);
+    -fx-border-color: #ff6b35;
+}
+
+.track-card-title {
+    -fx-text-fill: #3d1a2e;
+}
+
+.track-card-artist {
+    -fx-text-fill: #3d1a2e;
 }

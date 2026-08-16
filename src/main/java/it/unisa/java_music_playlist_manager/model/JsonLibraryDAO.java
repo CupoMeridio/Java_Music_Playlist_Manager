@@ -1,15 +1,11 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package it.unisa.java_music_playlist_manager.model;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.File;
 import java.io.IOException;
 /**
- *
- * @author Mattia Sanzari
+ * Implementazione concreta di {@link LibraryDAO} che persiste la Library
+ * tramite Jackson su file JSON (Adapter di persistenza).
  */
 public class JsonLibraryDAO implements LibraryDAO{
 
@@ -20,10 +16,10 @@ public class JsonLibraryDAO implements LibraryDAO{
     public JsonLibraryDAO(String path) {
         this.path = path;
         mapper = new ObjectMapper();
-        // Questo serve a Jackson per le date come LocalDate
+        // Registra il modulo Jackson per la gestione dei tipi di data Java Time (es. LocalDate)
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
-                // rendo leggibile agli umani
-       mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // Abilita la formattazione formattata (indent) dell'output JSON per la leggibilità
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
     public void setPath(String path) {

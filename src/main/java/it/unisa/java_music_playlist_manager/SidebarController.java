@@ -1,6 +1,7 @@
 package it.unisa.java_music_playlist_manager;
 
 import java.util.function.Consumer;
+import it.unisa.java_music_playlist_manager.model.ViewType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;
@@ -14,7 +15,7 @@ import javafx.scene.control.TextField;
  */
 public class SidebarController {
 
-    private Consumer<String> onNavigate;
+    private Consumer<ViewType> onNavigate;
     private Consumer<String> onSearchQueryChange;
 
     @FXML private TextField searchField;
@@ -27,7 +28,7 @@ public class SidebarController {
     /** Menu contestuale con l'elenco dei temi disponibili */
     private ContextMenu themeMenu;
 
-    public void setOnNavigate(Consumer<String> callback) {
+    public void setOnNavigate(Consumer<ViewType> callback) {
         this.onNavigate = callback;
     }
 
@@ -73,26 +74,26 @@ public class SidebarController {
         }
     }
 
-    // --- Gestori eventi UI ---
+    // Gestori eventi UI
 
     @FXML
     private void handleHomeAction() {
-        if (onNavigate != null) onNavigate.accept("Home");
+        if (onNavigate != null) onNavigate.accept(ViewType.HOME);
     }
 
     @FXML
     private void handleMusicLibraryAction() {
-        if (onNavigate != null) onNavigate.accept("Musica");
+        if (onNavigate != null) onNavigate.accept(ViewType.MUSIC);
     }
 
     @FXML
     private void handlePlayQueueAction() {
-        if (onNavigate != null) onNavigate.accept("Coda");
+        if (onNavigate != null) onNavigate.accept(ViewType.QUEUE);
     }
 
     @FXML
     private void handlePlaylistAction() {
-        if (onNavigate != null) onNavigate.accept("Playlist");
+        if (onNavigate != null) onNavigate.accept(ViewType.PLAYLISTS);
     }
 
     /** Mostra il menu dei temi sotto il pulsante 🎨. */

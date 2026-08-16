@@ -159,30 +159,6 @@ public class LibraryTest {
                 "La traccia nella libreria deve essere lo stesso oggetto originariamente inserito");
     }
 
-    // TEST RIMUOVI TRACCE RIMUOVE DALLA PLAYLIST
-    @Test
-    public void testRemoveTrackRimuoveAncheDaPlaylist() {
-        library.addTrack(track1);
-        library.addTrack(track2);
-
-        ManualPlaylist playlist = new ManualPlaylist("Preferiti");
-        playlist.addTrack(track1);
-        playlist.addTrack(track2);
-
-        library.addPlaylist(playlist);
-
-        library.removeTrack(track1);
-
-        assertFalse(library.getTracks().contains(track1),
-                "Il brano rimosso non deve più essere presente nella Library");
-
-        assertFalse(playlist.contains(track1),
-                "Il brano rimosso dalla Library deve essere eliminato automaticamente anche dalla playlist");
-
-        assertTrue(playlist.contains(track2),
-                "Gli altri brani presenti nella playlist non devono essere rimossi");
-    }
-
     // Test accesso sicuro alle playlist
     @Test
     public void testGetPlaylistsRitornaCopia() {

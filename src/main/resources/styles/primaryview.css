@@ -1,7 +1,6 @@
-/* =============================================================
-   PRIMARY VIEW — TEMA BASE
-   Stile neutro condiviso dalle sezioni principali
-   ============================================================= */
+/* PRIMARY VIEW — TEMA BASE
+   Stile neutro condiviso dalle sezioni principali */
+@import "_shared-card-styles.css";
 
 .root {
     -fx-background-color: #F5F5F7;
@@ -20,8 +19,8 @@
     -fx-padding: 8 0 8 0;
 }
 
-/* --- PULSANTI STANDARD --- */
-.button {
+/* PULSANTI STANDARD */
+.button, .toggle-button {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 8px;
     -fx-text-fill: #1D1D1F;
@@ -33,19 +32,19 @@
     -fx-border-radius: 8px;
 }
 
-.button:hover {
+.button:hover, .toggle-button:hover {
     -fx-background-color: #F5F5F7;
     -fx-border-color: #0071E3;
     -fx-text-fill: #0071E3;
 }
 
-.button:pressed {
+.button:pressed, .toggle-button:pressed {
     -fx-background-color: #e8f0fb;
     -fx-border-color: #0071E3;
 }
 
 /* Pulsanti azione principali */
-#actionButton, #playPlaylistButton, #reorderButton {
+#actionButton, #playPlaylistButton, #reorderButton, #viewToggleButton {
     -fx-background-color: #0071E3;
     -fx-text-fill: #ffffff;
     -fx-font-weight: 600;
@@ -53,16 +52,16 @@
     -fx-background-radius: 8px;
 }
 
-#actionButton:hover, #playPlaylistButton:hover, #reorderButton:hover {
+#actionButton:hover, #playPlaylistButton:hover, #reorderButton:hover, #viewToggleButton:hover {
     -fx-background-color: #0077ED;
     -fx-border-color: transparent;
 }
 
-#actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed {
+#actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed, #viewToggleButton:pressed {
     -fx-background-color: #005bbf;
 }
 
-#reorderButton:selected {
+#reorderButton:selected, #viewToggleButton:selected {
     -fx-background-color: #005bbf;
     -fx-text-fill: #ffffff;
     -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.35), 8, 0, 0, 2);
@@ -79,14 +78,14 @@
     -fx-text-fill: #0071E3;
 }
 
-/* --- COMBOBOX --- */
+/* COMBOBOX */
 .combo-box {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 8px;
     -fx-border-color: #D2D2D7;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
-    -fx-padding: 3px;
+    -fx-padding: 0 4px 0 8px;
 }
 
 .combo-box .cell {
@@ -112,7 +111,7 @@
     -fx-text-fill: #ffffff;
 }
 
-/* --- TABELLA BRANI --- */
+/* TABELLA BRANI */
 .table-view {
     -fx-background-color: #FFFFFF;
     -fx-background-radius: 10px;
@@ -159,3 +158,33 @@
     -fx-text-fill: #0071E3;
     -fx-font-weight: 600;
 }
+
+/* Card view — strutturali in _shared-card-styles.css.
+ * Qui solo le differenze del tema base (radius 12px + cromatismi). */
+
+.track-card {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-border-color: #D2D2D7;
+}
+
+.track-card:hover {
+    -fx-border-color: #0071E3;
+}
+
+.track-card-selected {
+    -fx-background-color: #e8f0fb;
+    -fx-border-color: #0071E3;
+}
+
+/* Tipografia: strutturale in shared; solo text-fill qui. */
+
+.track-card-title {
+    -fx-text-fill: #1D1D1F;
+}
+
+.track-card-artist {
+    -fx-text-fill: #86868B;
+}
+

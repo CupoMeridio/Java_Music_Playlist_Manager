@@ -1,5 +1,9 @@
 package it.unisa.java_music_playlist_manager.model;
 
+/**
+ * Comando per la rinominazione di una {@link Playlist}.
+ * Mantiene il nome precedente per consentire il ripristino in caso di Undo.
+ */
 public class RenamePlaylistCommand implements Command {
     private final Playlist playlist;
     private final String oldName;

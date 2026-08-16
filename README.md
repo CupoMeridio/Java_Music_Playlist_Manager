@@ -166,18 +166,20 @@ src/
 │   │       ├── HomeController.java
 │   │       ├── SidebarController.java
 │   │       ├── PlayerController.java
+│   │       ├── AddTrackController.java
 │   │       ├── ThemeManager.java
-│   │       └── model/
+│   │       ├── ReorderableTrackRowFactory.java
+│   │       ├── TagCellFactory.java
+│   │       ├── model/               # Entità (Track, Playlist), DAO, Pattern (Command, State, Strategy)
+│   │       └── ui/                  # Componenti UI secondari e servizi (Dialogs, Menu, animazioni)
 │   └── resources/
-│       ├── fxml/
-│       ├── styles/
-│       └── images/
+│       ├── fxml/                    # Layout grafici in FXML (View)
+│       ├── styles/                  # File CSS e temi dell'applicazione
+│       └── images/                  # Risorse grafiche e asset
 └── test/
     └── java/
-        └── it/unisa/java_music_playlist_manager/
+        └── it/unisa/java_music_playlist_manager/  # Suite di test unitari (JUnit 5)
 ```
-
-I file principali dell'interfaccia sono definiti in FXML nella cartella [`src/main/resources/fxml/`](src/main/resources/fxml/), mentre gli stili e i temi grafici sono organizzati in [`src/main/resources/styles/`](src/main/resources/styles/).
 
 ## Persistenza
 
@@ -190,4 +192,12 @@ L'applicazione salva la libreria musicale su file JSON, in modo da mantenere tra
 - contatori di riproduzione;
 - preferenze di tema.
 
-I dati di salvataggio vengono generati localmente durante l'esecuzione dell'applicazione.
+I dati vengono letti all'avvio e salvati in locale automaticamente al momento della chiusura dell'applicazione.
+
+## Warning Noti negli IDE
+
+Durante lo sviluppo o la compilazione del progetto, l'IDE (come VS Code, Eclipse o IntelliJ) potrebbe segnalare un warning nel file `module-info.java` relativo alla libreria `jaudiotagger`:
+
+> *Name of automatic module 'jaudiotagger' is unstable, it is derived from the module's file name.*
+
+Questo comportamento è noto e previsto. È dovuto al fatto che `jaudiotagger` non definisce un file `module-info.java` o un `Automatic-Module-Name` nel suo manifest, essendo stata concepita prima dell'introduzione del sistema modulare (Java 9+). Di conseguenza, Java crea un modulo automatico deducendone il nome dal nome del file `.jar`. Il warning non inficia in alcun modo la compilazione o il corretto funzionamento dell'applicazione.

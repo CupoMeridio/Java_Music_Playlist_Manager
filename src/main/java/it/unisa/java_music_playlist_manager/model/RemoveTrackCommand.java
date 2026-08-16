@@ -3,6 +3,11 @@ package it.unisa.java_music_playlist_manager.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Comando per la rimozione di un brano dalla {@link Library}.
+ * Mantiene la memoria delle playlist manuali che contenevano la traccia per consentire
+ * il ripristino completo in caso di Undo.
+ */
 public class RemoveTrackCommand implements Command {
     private final Library library;
     private final Track track;

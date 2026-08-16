@@ -305,16 +305,22 @@ public class PlaybackManagerTest {
     }
 
     @Test
-    public void testSelectAndLoadTrackFromLibraryEnqueuesSingleTrack() {
-        // Simula il nuovo comportamento: play dalla libreria carica SOLO il brano selezionato
-        manager.selectAndLoadTrack(track2, List.of(track2));
+    public void testSelectAndLoadTrackFromLibraryEnqueuesFullLibrary() {
+        // Simula il comportamento standard: play dalla libreria carica l'intera lista dei brani visibili
+        List<Track> libraryTracks = List.of(track1, track2, track3);
+        manager.selectAndLoadTrack(track2, libraryTracks);
 
-        assertEquals(1, manager.getCurrentQueue().size(),
-                "La coda deve contenere esattamente 1 elemento quando si avvia un brano dalla libreria");
+        assertEquals(3, manager.getCurrentQueue().size(),
+                "La coda deve contenere tutti e 3 i brani della libreria");
         assertEquals(track2, manager.getCurrentTrack(),
-                "La traccia corrente deve essere quella selezionata");
-        assertEquals(0, manager.getCurrentPlayableIndex());
-        assertEquals(0, manager.getCurrentTrackIndexInPlayable());
+                "La traccia corrente deve essere quella selezionata (track2)");
+        assertEquals(1, manager.getCurrentPlayableIndex(),
+                "L'indice del playable corrente nella coda deve essere 1 (track2)");
+
+        // Avanti alla traccia successiva (track3)
+        manager.advanceTrack();
+        assertEquals(track3, manager.getCurrentTrack(),
+                "Avanzando deve riprodurre la traccia successiva della libreria (track3)");
     }
 
     @Test

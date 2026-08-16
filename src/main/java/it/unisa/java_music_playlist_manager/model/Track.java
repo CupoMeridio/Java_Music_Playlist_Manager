@@ -12,6 +12,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Rappresenta una singola traccia musicale nel dominio dell'applicazione.
+ * Contiene i metadati audio (titolo, artista, album, durata, genere, anno, tag, conteggio riproduzioni)
+ * ed implementa {@link Playable} per l'inserimento in coda e {@link Subject} per la notifica dei cambiamenti.
+ */
 public final class Track implements Playable, Subject {
     
     @JsonIgnore

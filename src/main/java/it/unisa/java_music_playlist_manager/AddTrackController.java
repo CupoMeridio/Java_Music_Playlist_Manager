@@ -134,9 +134,10 @@ public class AddTrackController {
                 String g = t.getGenre();
                 if (g != null && !g.isBlank()) allGenres.add(g);
             });
-            // setItems(null) + setItems(nuova lista) forza il refresh visivo della skin JavaFX
-            addTrackGenreComboBox.setItems(null);
-            addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList(allGenres));
+            if (addTrackGenreComboBox.getItems() == null) {
+                addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList());
+            }
+            addTrackGenreComboBox.getItems().setAll(allGenres);
         }
 
         if (currentEditingTrack != null) {
@@ -177,6 +178,7 @@ public class AddTrackController {
         addTrackGenreComboBox.setValue(null);
         selectedFilePath = null;
         filePathLabel.setText("Nessun file selezionato");
+        if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
         if (addTrackTagComboBox != null) addTrackTagComboBox.getCheckModel().clearChecks();
     }
 
@@ -258,6 +260,7 @@ public class AddTrackController {
         if (file != null) {
             selectedFilePath = file.getAbsolutePath();
             filePathLabel.setText(file.getName());
+            if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
             setFieldsDisable(false);
             setLoading(true);
 
@@ -289,7 +292,7 @@ public class AddTrackController {
         addTrackTitleField.setText(lastDot > 0 ? fileName.substring(0, lastDot) : fileName);
 
         new Thread(() -> {
-            // --- 1. Lettura tag ID3 con jaudiotagger (sincrona) ---
+            // 1. Lettura tag ID3 con jaudiotagger (sincrona)
             String title = null, artist = null, album = null, genre = null, year = null;
             try {
                 // Silenzia il logger verboso di jaudiotagger
@@ -305,7 +308,9 @@ public class AddTrackController {
                     year   = safeGet(id3Tag, FieldKey.YEAR);
                 }
             } catch (Exception e) {
-                // File non supportato da jaudiotagger (es. WAV senza tag): si procede con campi vuoti
+                // File non supportato da jaudiotagger (es. WAV senza tag) o errore di parsing: logga l'eccezione e procedi con campi vuoti
+                Logger.getLogger(AddTrackController.class.getName()).log(Level.WARNING,
+                        "Lettura metadati jaudiotagger fallita per: " + file.getName(), e);
             }
 
             // Cattura variabili final per il lambda del Platform.runLater
@@ -315,7 +320,7 @@ public class AddTrackController {
             final String fGenre  = genre;
             final String fYear   = year;
 
-            // --- 2. Aggiorna i campi UI con i tag letti ---
+            // 2. Aggiorna i campi UI con i tag letti
             Platform.runLater(() -> {
                 if (fTitle != null && !fTitle.isEmpty()) {
                     addTrackTitleField.setText(fTitle);
@@ -338,19 +343,20 @@ public class AddTrackController {
                     if (matched != null) {
                         addTrackGenreComboBox.getSelectionModel().select(matched);
                     } else {
-                        // Genere custom non in lista: ricostruisci la lista ordinata con il nuovo genere incluso
+                        // Genere custom non in lista: aggiorna la lista osservabile in-place mantenendo l'ordinamento
                         TreeSet<String> sorted = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
                         sorted.addAll(addTrackGenreComboBox.getItems());
                         sorted.add(fGenre);
-                        // Forza il refresh visivo della skin del ComboBox staccando e riattaccando la lista
-                        addTrackGenreComboBox.setItems(null);
-                        addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList(sorted));
+                        if (addTrackGenreComboBox.getItems() == null) {
+                            addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList());
+                        }
+                        addTrackGenreComboBox.getItems().setAll(sorted);
                         addTrackGenreComboBox.getSelectionModel().select(fGenre);
                     }
                 }
             });
 
-            // --- 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) ---
+            // 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) e validazione formato
             Platform.runLater(() -> {
                 try {
                     Media media = new Media(file.toURI().toString());
@@ -364,14 +370,32 @@ public class AddTrackController {
                     });
                     tempPlayer.setOnError(() -> {
                         setLoading(false);
+                        invalidateUnsupportedAudioFile("Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
                         tempPlayer.dispose();
                     });
                     startAnalysisTimeout(tempPlayer);
                 } catch (Exception e) {
                     setLoading(false);
+                    invalidateUnsupportedAudioFile("Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
                 }
             });
         }).start();
+    }
+
+    /**
+     * Resetta il file selezionato e mostra un errore bloccante se il formato audio non è supportato da JavaFX.
+     */
+    private void invalidateUnsupportedAudioFile(String errorMsg) {
+        selectedFilePath = null;
+        Platform.runLater(() -> {
+            if (filePathLabel != null) {
+                filePathLabel.setText("File non supportato");
+            }
+            if (addTrackErrorLabel != null) {
+                addTrackErrorLabel.setText(errorMsg);
+            }
+            setFieldsDisable(true);
+        });
     }
 
     /**

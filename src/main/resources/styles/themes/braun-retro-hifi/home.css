@@ -1,13 +1,9 @@
 /* Braun Retro-HiFi — home.css */
 
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color: #EBEBEB;
-}
-
 .stat-card {
     -fx-background-color: #D4D4D4;
     -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
     -fx-border-color: #A8A8A8;
     -fx-border-width: 1px;
     -fx-padding: 18px 22px;
@@ -28,15 +24,4 @@
     -fx-font-size: 30px;
     -fx-font-weight: normal;
     -fx-text-fill: #FF5500;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: normal;
-    -fx-text-fill: #707070;
-    -fx-alignment: center;
 }

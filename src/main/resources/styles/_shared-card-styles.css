@@ -1,0 +1,106 @@
+/* Shared structural styles for card grid, toggle button and track cards.
+ * Imported BEFORE theme-specific overrides; themes override only chromatic props. */
+
+/* Toggle button & Sort ComboBox — Sincronizzazione altezze e proporzioni.
+ * Background / border-color / text-fill are THEMATIC → in each theme file. */
+.toggle-button {
+    -fx-cursor: hand;
+    -fx-padding: 6px 14px;
+}
+
+#sortComboBox, #viewToggleButton {
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
+}
+
+#sortComboBox {
+    -fx-cursor: hand;
+    -fx-padding: 0 4px 0 8px;
+}
+
+#sortComboBox > .list-cell {
+    -fx-padding: 0 4px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+#sortComboBox .arrow-button {
+    -fx-padding: 0 8px 0 4px;
+}
+
+.toggle-button:pressed {
+    -fx-opacity: 0.9;
+}
+
+/* #viewToggleButton: bg, gradient, border-radius, insets and innershadow
+ * vary wildly (radius 0…24px) → thematic. Only hover fade shared. */
+#viewToggleButton:hover {
+    -fx-opacity: 0.85;
+}
+
+#viewToggleButton .ikonli-font-icon {
+    -fx-icon-color: -fx-text-fill;
+}
+
+/* ControlsFX CardGridView container & cells. */
+.card-grid-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.card-grid-view .grid-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.card-grid-view .grid-cell:filled:selected,
+.card-grid-view .grid-cell:filled:hover {
+    -fx-background-color: transparent;
+}
+
+/* TrackCardView — structural invariants:
+ *   7/8 themes use radius 10px; base theme overrides to 12px.
+ *   Chromatic props (bg-color, border-color) → in each theme. */
+.track-card {
+    -fx-padding: 10px;
+    -fx-cursor: hand;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.track-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 10, 0, 0, 4);
+}
+
+.track-card-selected {
+    -fx-border-width: 2px;
+}
+
+.track-card-image {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);
+}
+
+/* Typography: size/weight invariant. Theme overrides only -fx-text-fill. */
+.track-card-title {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+}
+
+.track-card-artist {
+    -fx-alignment: center;
+    -fx-text-alignment: center;
+    -fx-font-size: 11px;
+    -fx-opacity: 0.65;
+}
+
+/* Player Slider — structural cursor invariants shared across all themes. */
+.slider {
+    -fx-cursor: default;
+}
+
+.slider .track, .slider .thumb {
+    -fx-cursor: hand;
+}

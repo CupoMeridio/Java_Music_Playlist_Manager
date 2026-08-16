@@ -3,6 +3,8 @@
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import org.controlsfx.control.GridView?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
 <!-- 
     File FXML generato e gestito tramite SceneBuilder.
@@ -10,7 +12,7 @@
     Collegato al controller it.unisa.java_music_playlist_manager.PrimaryViewController
 -->
 
-<BorderPane minHeight="600.0" minWidth="900.0" prefWidth="1132.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.PrimaryViewController">
+<BorderPane minHeight="600.0" minWidth="900.0" prefWidth="1132.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.PrimaryViewController">
    
    <!-- 1. BARRA LATERALE (LEFT) -->
    <left>
@@ -28,7 +30,7 @@
             <HBox alignment="CENTER_LEFT" spacing="20.0">
                <children>
                   <!-- Titolo Sezione Attiva -->
-                  <Label fx:id="viewTitleLabel" style="-fx-font-size: 28px; -fx-font-weight: bold;" text="Musica" />
+                  <Label fx:id="viewTitleLabel" text="Musica" />
                   
                   <!-- Spaziatore per spingere il bottone a destra -->
                   <Region HBox.hgrow="ALWAYS" />
@@ -44,22 +46,35 @@
             <!-- Barra di Controllo Playlist / Ordinamento -->
             <HBox fx:id="controlsBar" alignment="CENTER_LEFT" spacing="15.0">
                <children>
-                  <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" style="-fx-font-weight: bold;" text="Riproduci Playlist" />
+                  <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" text="Riproduci Playlist" />
                   <ToggleButton fx:id="reorderButton" managed="false" text="Riordina" visible="false" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <ComboBox fx:id="sortComboBox" promptText="Ordina per" minWidth="140.0" prefWidth="160.0" />
+                  <ToggleButton fx:id="viewToggleButton" onAction="#handleViewToggleAction" text="  Vista a schede">
+                     <graphic>
+                        <FontIcon iconLiteral="fas-th" />
+                     </graphic>
+                  </ToggleButton>
                </children>
             </HBox>
             
             <!-- Tabella per l'elenco dei Brani (TableView) -->
-            <TableView fx:id="songTableView" VBox.vgrow="ALWAYS">
-               <columns>
-                  <TableColumn fx:id="titleColumn" prefWidth="168.79995423555374" text="Titolo" />
-                  <TableColumn fx:id="artistColumn" prefWidth="160.8000030517578" text="Artista" />
-                  <TableColumn fx:id="albumColumn" prefWidth="151.99993896484375" text="Album" />
-                  <TableColumn fx:id="yearColumn" prefWidth="82.39996337890625" text="Anno" />
-                  <TableColumn fx:id="genreColumn" prefWidth="111.2000732421875" text="Genere" />
-                  <TableColumn fx:id="durationColumn" prefWidth="95.199951171875" text="Durata" />
-                  <TableColumn fx:id="TagColumn" prefWidth="90.4000244140625" text="Tag" />
-               </columns>
+            <!-- NOTA: Le colonne NON vanno definite qui nel FXML.
+                 Vengono create dinamicamente dal metodo
+                 PrimaryViewController#showSongsColumns() in Java.
+                 SceneBuilder tende a ri-aggiungerle automaticamente
+                 se si apre questo file: se capita, vanno ri-rimosse. -->
+            <TableView fx:id="trackTableView" VBox.vgrow="ALWAYS">
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
+            </TableView>
+            
+            <!-- Contenitore vista a schede per brani (ControlsFX GridView) -->
+            <GridView fx:id="trackCardGridView" VBox.vgrow="ALWAYS" visible="false" managed="false" styleClass="card-grid-view" cellWidth="160" cellHeight="220" horizontalCellSpacing="15" verticalCellSpacing="15" />
+            
+            <!-- Tabella per l'elenco delle Playlist (TableView) -->
+            <TableView fx:id="playlistTableView" VBox.vgrow="ALWAYS" visible="false" managed="false">
                <columnResizePolicy>
                   <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                </columnResizePolicy>

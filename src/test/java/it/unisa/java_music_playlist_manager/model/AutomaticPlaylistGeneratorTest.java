@@ -8,7 +8,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-
+/**
+ * Test unitari per i Concrete Creators del pattern Factory Method (GoF Puro):
+ * {@link GenrePlaylistGenerator}, {@link YearPlaylistGenerator}, {@link TagPlaylistGenerator}.
+ */
 public class AutomaticPlaylistGeneratorTest {
 
     private Library library;
@@ -37,9 +40,7 @@ public class AutomaticPlaylistGeneratorTest {
 
     @AfterEach
     public void tearDown() {
-        // PULIZIA SINGLETON
-        // la Library mantiene il suo stato tra un test e l'altro,
-        // quindi svuoto tracce e playlist dopo ogni test
+        // la Library mantiene il suo stato tra un test e l'altro, quindi svuoto tracce e playlist
         List<Track> currentTracks = library.getTracks();
         for (Track t : currentTracks) {
             library.removeTrack(t);
@@ -51,17 +52,14 @@ public class AutomaticPlaylistGeneratorTest {
         }
     }
 
-    // TEST CREAZIONE PLAYLIST AUTOMATICA PER GENERE
+    // TEST CREAZIONE PLAYLIST AUTOMATICA PER GENERE (GenrePlaylistGenerator)
 
     @Test
     public void testCreatePlaylistByGenreValida() {
         library.addTrack(trackPop2020);
         library.addTrack(trackRock1975);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.GENRE,
-                "Pop"
-        );
+        PlaylistGenerator generator = new GenrePlaylistGenerator("Pop");
         Playable playable = generator.createPlaylist("Playlist Pop");
         assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
         Playlist playlist = (Playlist) playable;
@@ -81,24 +79,19 @@ public class AutomaticPlaylistGeneratorTest {
 
     @Test
     public void testCreatePlaylistByGenreConGenereNullo() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new AutomaticPlaylistGenerator(AutomaticPlaylistGenerator.Criteria.GENRE, null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new GenrePlaylistGenerator(null);
         });
-
-        assertEquals("Criterio e valore di filtraggio non possono essere nulli.", exception.getMessage());
     }
 
-    // TEST CREAZIONE PLAYLIST AUTOMATICA PER ANNO
+    // TEST CREAZIONE PLAYLIST AUTOMATICA PER ANNO (YearPlaylistGenerator)
 
     @Test
     public void testCreatePlaylistByYearValida() {
         library.addTrack(trackPop2020);
         library.addTrack(trackRock1975);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.YEAR,
-                2020
-        );
+        PlaylistGenerator generator = new YearPlaylistGenerator(2020);
         Playable playable = generator.createPlaylist("Playlist 2020");
         assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
         Playlist playlist = (Playlist) playable;
@@ -120,10 +113,7 @@ public class AutomaticPlaylistGeneratorTest {
     public void testPlaylistGenerataPerGenereSiAggiornaDinamicamente() {
         library.addTrack(trackPop2020);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.GENRE,
-                "Pop"
-        );
+        PlaylistGenerator generator = new GenrePlaylistGenerator("Pop");
         Playable playable = generator.createPlaylist("Playlist Pop");
         assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
         Playlist playlist = (Playlist) playable;
@@ -141,10 +131,7 @@ public class AutomaticPlaylistGeneratorTest {
     public void testPlaylistGenerataPerAnnoSiAggiornaDinamicamente() {
         library.addTrack(trackPop2020);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.YEAR,
-                2020
-        );
+        PlaylistGenerator generator = new YearPlaylistGenerator(2020);
         Playable playable = generator.createPlaylist("Playlist 2020");
         assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
         Playlist playlist = (Playlist) playable;
@@ -158,21 +145,17 @@ public class AutomaticPlaylistGeneratorTest {
                 "Dopo il cambio anno, il brano non dovrebbe più essere nella playlist 2020");
     }
 
-    // TEST CREAZIONE PLAYLIST AUTOMATICA PER TAG
+    // TEST CREAZIONE PLAYLIST AUTOMATICA PER TAG (TagPlaylistGenerator)
 
     @Test
     public void testCreatePlaylistByTagValida() {
-        // Configurazione dei tag sui brani
         trackPop2020.addTag(TagPredefined.PARTY);
         trackRock1975.addTag(TagPredefined.ROCK);
 
         library.addTrack(trackPop2020);
         library.addTrack(trackRock1975);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.TAG,
-                TagPredefined.PARTY
-        );
+        PlaylistGenerator generator = new TagPlaylistGenerator(TagPredefined.PARTY);
         Playable playable = generator.createPlaylist("Playlist Party");
         assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
         Playlist playlist = (Playlist) playable;
@@ -192,11 +175,9 @@ public class AutomaticPlaylistGeneratorTest {
 
     @Test
     public void testCreatePlaylistByTagConTagNullo() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new AutomaticPlaylistGenerator(AutomaticPlaylistGenerator.Criteria.TAG, null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            new TagPlaylistGenerator(null);
         });
-
-        assertEquals("Criterio e valore di filtraggio non possono essere nulli.", exception.getMessage());
     }
 
     @Test
@@ -204,10 +185,7 @@ public class AutomaticPlaylistGeneratorTest {
         trackPop2020.addTag(TagPredefined.PARTY);
         library.addTrack(trackPop2020);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.TAG,
-                TagPredefined.PARTY
-        );
+        PlaylistGenerator generator = new TagPlaylistGenerator(TagPredefined.PARTY);
         Playable playable = generator.createPlaylist("Playlist Party Dinamica");
         assertTrue(playable instanceof Playlist, "Il risultato dovrebbe essere una Playlist");
         Playlist playlist = (Playlist) playable;
@@ -215,7 +193,6 @@ public class AutomaticPlaylistGeneratorTest {
         assertTrue(playlist.getTracks().contains(trackPop2020),
                 "Il brano con il tag PARTY dovrebbe essere inizialmente presente");
 
-        // Rimozione del tag per verificare l'aggiornamento dinamico
         trackPop2020.removeTag(TagPredefined.PARTY);
 
         assertFalse(playlist.getTracks().contains(trackPop2020),
@@ -224,19 +201,74 @@ public class AutomaticPlaylistGeneratorTest {
 
     @Test
     public void testCreatePlaylistByTagNessunRisultato() {
-        // Nessun brano possiede il tag LOFI
         library.addTrack(trackPop2020);
         library.addTrack(trackRock1975);
 
-        PlaylistGenerator generator = new AutomaticPlaylistGenerator(
-                AutomaticPlaylistGenerator.Criteria.TAG,
-                TagPredefined.LOFI
-        );
+        PlaylistGenerator generator = new TagPlaylistGenerator(TagPredefined.LOFI);
         Playlist playlist = (Playlist) generator.createPlaylist("Playlist Vuota");
 
         assertNotNull(playlist, "La playlist creata non dovrebbe essere nulla");
         assertEquals(0, playlist.getTrackCount(),
                 "La playlist dovrebbe essere vuota se nessun brano corrisponde al tag");
+    }
+
+    @Test
+    public void testSetLibraryDependencyInjectionOverrideDefaultFallback() {
+        Library singleton = Library.getInstance();
+        for (Track t : singleton.getTracks()) singleton.removeTrack(t);
+        for (Playlist p : singleton.getPlaylists()) singleton.removePlaylist(p);
+
+        Track tracciaTagParty = new Track("S", "A", "Al", 60, "Pop", 2024, "p.mp3");
+        tracciaTagParty.addTag(TagPredefined.PARTY);
+        Track tracciaTagRock = new Track("R", "A", "Al", 80, "Rock", 2020, "r.mp3");
+        tracciaTagRock.addTag(TagPredefined.ROCK);
+        singleton.addTrack(tracciaTagParty);
+        singleton.addTrack(tracciaTagRock);
+
+        PlaylistGenerator gen = new TagPlaylistGenerator(TagPredefined.PARTY);
+        AutomaticPlaylistByTag partyList = (AutomaticPlaylistByTag) gen.createPlaylist("Party DI Test");
+
+        assertEquals(1, partyList.getTrackCount(),
+                "Prima DI → fallback al Singleton che ha 1 brano PARTY");
+
+        singleton.removeTrack(tracciaTagParty);
+        partyList.setLibrary(singleton);
+
+        assertEquals(0, partyList.getTrackCount(),
+                "Dopo setLibrary() con library SENZA PARTY brani → 0 risultati.");
+
+        partyList.setLibrary(null);
+        assertEquals(0, partyList.getTrackCount(),
+                "setLibrary(null) torna al comportamento di default");
+    }
+
+    @Test
+    public void testSetLibraryFunzionaPerTuttiTipiAutomaticPlaylist() {
+        Library lib = Library.getInstance();
+        for (Track t : lib.getTracks()) lib.removeTrack(t);
+
+        Track rock2020 = new Track("R1", "A", "Al", 60, "Rock", 2020, "1.mp3");
+        Track pop2018 = new Track("P1", "A", "Al", 60, "Pop", 2018, "2.mp3");
+        lib.addTrack(rock2020);
+        lib.addTrack(pop2018);
+        rock2020.addTag(TagPredefined.ROCK);
+
+        AutomaticPlaylistByGenre genrePl = new AutomaticPlaylistByGenre("Rock", "Rock");
+        AutomaticPlaylistByYear  yearPl  = new AutomaticPlaylistByYear("2020", 2020);
+        AutomaticPlaylistByTag   tagPl   = new AutomaticPlaylistByTag("Tag", TagPredefined.ROCK);
+
+        assertEquals(1, genrePl.getTrackCount(), "default: 1 Rock");
+        assertEquals(1, yearPl.getTrackCount(),  "default: 1 Year 2020");
+        assertEquals(1, tagPl.getTrackCount(),   "default: 1 Tag ROCK");
+
+        for (Track t : lib.getTracks()) lib.removeTrack(t);
+        genrePl.setLibrary(lib);
+        yearPl.setLibrary(lib);
+        tagPl.setLibrary(lib);
+
+        assertEquals(0, genrePl.getTrackCount(), "DI genre: library vuota");
+        assertEquals(0, yearPl.getTrackCount(),  "DI year: library vuota");
+        assertEquals(0, tagPl.getTrackCount(),   "DI tag: library vuota");
     }
 
 }

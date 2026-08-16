@@ -1,10 +1,6 @@
 package it.unisa.java_music_playlist_manager.model;
 
 /**
- *
- * @author Mattia Sanzari
- */
-/**
  * Classe astratta che funge da Creator nel pattern Factory Method.
  * Definisce il metodo astratto per la generazione di playlist in modo
  * che la Library o il Controller possano usarla in modo polimorfico.

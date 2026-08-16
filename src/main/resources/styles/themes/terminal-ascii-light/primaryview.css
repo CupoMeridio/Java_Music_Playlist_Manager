@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Terminal ASCII (Light Mode) — primaryview.css */
 
 .root {
@@ -210,4 +212,48 @@
 
 .scroll-pane {
     -fx-background-color: #F2F5F3;
+}
+
+/* Toggle button: strutturali in shared; qui cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #F2F5F3;
+    -fx-text-fill: #1B2A22;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #E2EFE7;
+    -fx-text-fill: #1B2A22;
+}
+
+/* #viewToggleButton — Terminal ASCII Light: radius ZERO. */
+#viewToggleButton {
+    -fx-background-color: #1B2A22; -fx-text-fill: #F2F5F3; -fx-font-weight: bold; -fx-border-color: #1B2A22; -fx-border-width: 1px; -fx-background-radius: 0; -fx-border-radius: 0;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #F2F5F3; -fx-text-fill: #1B2A22; -fx-effect: innershadow(gaussian, rgba(27, 42, 34, 0.65), 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; qui cromatismi tema. */
+.track-card {
+    -fx-background-color: #F2F5F3;
+    -fx-border-color: #1B2A22;
+}
+
+.track-card:hover {
+    -fx-border-color: #1B2A22;
+}
+
+.track-card-selected {
+    -fx-background-color: #E2EFE7;
+    -fx-border-color: #1B2A22;
+}
+
+.track-card-title {
+    -fx-text-fill: #1B2A22;
+}
+
+.track-card-artist {
+    -fx-text-fill: #1B2A22;
 }

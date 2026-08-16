@@ -1,4 +1,4 @@
-/* Pastel Kawaii — player.css */
+/* Pastel Kawaii ? player.css */
 
 .player-bar {
     -fx-background-color: #fff5f8;
@@ -46,10 +46,10 @@
 }
 
 #playPauseButton {
-    -fx-background-color: linear-gradient(to bottom, #b8f0e0, #8eddc0);
+    -fx-background-color: linear-gradient(to bottom, #ffe8a1, #ffdf85);
     -fx-text-fill: #ffffff;
     -fx-background-radius: 50%;
-    -fx-border-color: #b8f0e0;
+    -fx-border-color: #ffe8a1;
     -fx-border-width: 1px;
     -fx-border-radius: 50%;
     -fx-min-width: 44px;
@@ -71,9 +71,7 @@
     -fx-background-color: linear-gradient(to bottom, #ffb3d1, #e080a0);
 }
 
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: linear-gradient(to right, #ffd6e8, #e8b4f8);
@@ -84,14 +82,15 @@
 .slider .thumb {
     -fx-background-color: #fff5f8;
     -fx-background-radius: 50%;
-    -fx-border-color: #b8f0e0;
+    -fx-border-color: #ffe8a1;
     -fx-border-width: 1px;
+    -fx-border-radius: 50%;
     -fx-pref-width: 18px;
     -fx-pref-height: 18px;
 }
 
 .slider:hover .thumb {
-    -fx-background-color: #b8f0e0;
+    -fx-background-color: #ffe8a1;
 }
 
 #currentTimeLabel, #totalTimeLabel {

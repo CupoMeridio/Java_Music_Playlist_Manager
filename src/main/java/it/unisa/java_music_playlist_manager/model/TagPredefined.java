@@ -7,19 +7,19 @@ package it.unisa.java_music_playlist_manager.model;
  */
 public enum TagPredefined implements Tag{
    
-    ROCK("🎸", "Energici"),
-    CHILL("🌊", "Relax"),
-    WORKOUT("💪", "Sport"),
-    STUDY("📚", "Concentrazione"),
-    PARTY("🎉", "Festa"),
-    FAVOURITE("⭐", "Preferiti"),
-    LOFI("☕", "Colazione"),
-    ROAD_TRIP("🚗", "Viaggi"),
-    ROMANTIC("💖", "Romantici"),
-    NOSTALGIA("🌙", "Nostalgia"),
-    SAD("🌧️", "Malinconici"),
-    SUMMER("☀️", "Estate"),
-    SLEEP("😴", "Buonanotte");
+    ROCK("fas-guitar", "Energici"),
+    CHILL("fas-water", "Relax"),
+    WORKOUT("fas-dumbbell", "Sport"),
+    STUDY("fas-book", "Concentrazione"),
+    PARTY("fas-glass-cheers", "Festa"),
+    FAVOURITE("fas-star", "Preferiti"),
+    LOFI("fas-coffee", "Colazione"),
+    ROAD_TRIP("fas-car", "Viaggi"),
+    ROMANTIC("fas-heart", "Romantici"),
+    NOSTALGIA("fas-moon", "Nostalgia"),
+    SAD("fas-cloud-rain", "Malinconici"),
+    SUMMER("fas-sun", "Estate"),
+    SLEEP("fas-bed", "Buonanotte");
     
     /** Icona associata alla categoria */
     private final String icon;
@@ -50,6 +50,6 @@ public enum TagPredefined implements Tag{
 
     @Override
     public String toString() {
-        return this.getIcon() + " " + this.getName();
+        return this.getName();
     }
 }

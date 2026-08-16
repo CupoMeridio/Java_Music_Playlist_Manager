@@ -1,11 +1,19 @@
 /* Phantom Thief — player.css */
 
+/*
+ * Nota: player-button, playPauseButton e coverContainer usano
+ * -fx-shape (path SVG a esagono/angolo tagliato). Il trucco dei
+ * background impilati con insets deforma quei path, quindi qui
+ * l'ombra storta resta su dropshadow(three-pass-box, colore, 0, 1, dx, dy)
+ * con dx != dy: radius 0 = niente sfocatura, è la sagoma vera
+ * del poligono, solo spostata in modo asimmetrico.
+ */
+
 .player-bar {
     -fx-background-color: #000000;
     -fx-border-color: #D11A2A transparent transparent transparent;
-    -fx-border-width: 4px 0 0 0;
+    -fx-border-width: 1.5px 0 0 0;
     -fx-padding: 10px 20px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 5, 0, -5);
 }
 
 #currentTrackTitle {
@@ -40,6 +48,7 @@
     -fx-alignment: center;
     -fx-rotate: -5deg;
     -fx-shape: "M17 0 L34 8 L34 26 L17 34 L0 26 L0 8 Z";
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 6, 2);
 }
 
 .player-button .ikonli-font-icon {
@@ -49,6 +58,8 @@
 .player-button:hover {
     -fx-background-color: #FFFF00;
     -fx-text-fill: #000000;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 9, 1);
+    -fx-rotate: -2deg;
 }
 
 .player-button:hover .ikonli-font-icon {
@@ -58,6 +69,8 @@
 .player-button:pressed {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFFFF;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 1, 1);
+    -fx-rotate: -5deg;
 }
 
 .player-button:pressed .ikonli-font-icon {
@@ -105,6 +118,7 @@
     -fx-cursor: hand;
     -fx-rotate: -5deg;
     -fx-shape: "M21 0 L42 10 L42 32 L21 42 L0 32 L0 10 Z";
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 7, 2);
 }
 
 #playPauseButton .ikonli-font-icon {
@@ -113,6 +127,8 @@
 
 #playPauseButton:hover {
     -fx-background-color: #FFFF00;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 10, 1);
+    -fx-rotate: -2deg;
 }
 
 #playPauseButton:hover .ikonli-font-icon {
@@ -121,6 +137,8 @@
 
 #playPauseButton:pressed {
     -fx-background-color: #000000;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 1, 1);
+    -fx-rotate: -5deg;
 }
 
 #playPauseButton:pressed .ikonli-font-icon {
@@ -134,13 +152,11 @@
     -fx-padding: 5px;
     -fx-background-insets: 0;
     -fx-border-insets: 0;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 8, 3);
     -fx-shape: "M10 0 L62 0 L62 52 L52 62 L0 62 L0 10 Z";
 }
 
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: #000000;

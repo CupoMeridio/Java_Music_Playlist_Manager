@@ -1,3 +1,5 @@
+@import "../../_shared-card-styles.css";
+
 /* Braun Retro-HiFi — primaryview.css */
 
 .root {
@@ -202,4 +204,48 @@
 
 .scroll-pane {
     -fx-background-color: #EBEBEB;
+}
+
+/* Toggle button: strutturali in shared; qui solo cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #D4D4D4;
+    -fx-text-fill: #2B2B2B;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #FF5500;
+    -fx-text-fill: #ffffff;
+}
+
+/* #viewToggleButton — unico tema con font-weight: normal; radius 4px. */
+#viewToggleButton {
+    -fx-background-color: #FF5500; -fx-text-fill: #FFFFFF; -fx-font-weight: normal; -fx-border-color: #A63A00; -fx-border-width: 1px; -fx-background-radius: 4px; -fx-border-radius: 4px;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #C94500; -fx-text-fill: #FFFFFF; -fx-effect: innershadow(gaussian, #2B2B2B, 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; qui solo cromatismi tema. */
+.track-card {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #A8A8A8;
+}
+
+.track-card:hover {
+    -fx-border-color: #A63A00;
+}
+
+.track-card-selected {
+    -fx-background-color: #FF5500;
+    -fx-border-color: #A63A00;
+}
+
+.track-card-title {
+    -fx-text-fill: #2B2B2B;
+}
+
+.track-card-artist {
+    -fx-text-fill: #2B2B2B;
 }
