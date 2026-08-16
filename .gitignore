@@ -31,3 +31,6 @@ Thumbs.db
 
 # Salvataggio personale (non versionare)
 salvataggio/
+
+# VS Code
+.vscode/

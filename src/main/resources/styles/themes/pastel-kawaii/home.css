@@ -1,13 +1,9 @@
-/* Pastel Kawaii — home.css */
-
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color: #fff5f8;
-}
+/* Pastel Kawaii ? home.css */
 
 .stat-card {
     -fx-background-color: linear-gradient(to bottom, #ffd6e8, #fff5f8);
     -fx-background-radius: 28px;
+    -fx-border-radius: 28px;
     -fx-border-color: #ffd6e8;
     -fx-border-width: 1px;
     -fx-padding: 18px 22px;
@@ -32,15 +28,4 @@
     -fx-font-size: 30px;
     -fx-font-weight: 900;
     -fx-text-fill: #d48ef5;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: bold;
-    -fx-text-fill: #c59bb0;
-    -fx-alignment: center;
 }

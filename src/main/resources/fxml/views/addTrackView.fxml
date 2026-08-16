@@ -71,7 +71,7 @@
                </rowConstraints>
                 </GridPane>
 
-                <Label fx:id="addTrackErrorLabel" text="" />
+                <Label fx:id="addTrackErrorLabel" maxWidth="Infinity" text="" wrapText="true" />
 
                 <Region VBox.vgrow="ALWAYS" />
 

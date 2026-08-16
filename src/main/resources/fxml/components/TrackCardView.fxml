@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<fx:root type="VBox" spacing="8" styleClass="track-card" prefWidth="160" prefHeight="220" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+    <ImageView fx:id="coverImageView" fitWidth="140" fitHeight="140" preserveRatio="true" styleClass="track-card-image" />
+    <Label fx:id="titleLabel" styleClass="track-card-title" wrapText="false" />
+    <Label fx:id="artistLabel" styleClass="track-card-artist" wrapText="false" />
+</fx:root>

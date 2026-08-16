@@ -1,4 +1,30 @@
+@import "../../_shared-card-styles.css";
+
 /* Phantom Thief — primaryview.css */
+
+/*
+ * ============================================================
+ *  TECNICA "OMBRA STORTA" (P5-style hard shadow)
+ * ============================================================
+ * JavaFX CSS non ha il box-shadow del web, ma i background
+ * multipli sì: si può impilare un layer "ombra" (nero, senza
+ * blur) DIETRO al layer vero, spostato via -fx-background-insets.
+ * Usando dx diverso da dy si ottiene l'ombra "storta" e non
+ * un banale offset diagonale 45°.
+ *
+ *   -fx-background-color:  #000000, <colore vero>;
+ *   -fx-background-insets: dy -dx -dy dx, 0;
+ *
+ * (dy=alto/basso, dx=sinistra/destra — se dx>dy l'ombra si
+ * "allunga" in orizzontale, tipico delle card di P5R)
+ *
+ * Per elementi con -fx-shape (poligoni tipo i tasti del player)
+ * questo trucco deforma la forma, quindi lì si resta su
+ * dropshadow(three-pass-box, colore, 0, 1, dx, dy) con dx != dy:
+ * radius 0 + spread massimo = ombra dura, non sfocata, ma
+ * comunque "vera" silhouette del path.
+ * ============================================================
+ */
 
 .root {
     -fx-background-color:
@@ -13,12 +39,12 @@
 }
 
 .dialog-pane {
-    -fx-background-color: #111111;
+    -fx-background-color: #000000, #111111;
+    -fx-background-insets: 6 -9 -6 9, 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
     -fx-border-radius: 0;
     -fx-background-radius: 0;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
     -fx-padding: 10px;
 }
 
@@ -52,15 +78,16 @@
 #viewTitleLabel {
     -fx-text-fill: #FFFFFF;
     -fx-padding: 8px 14px 8px 18px;
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 5 -10 -5 10, 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
-    -fx-rotate: -5deg;
+    -fx-rotate: -6deg;
 }
 
 .button {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 4 -7 -4 7, 0;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 900;
     -fx-padding: 8px 16px;
@@ -69,28 +96,31 @@
     -fx-border-width: 2px;
     -fx-background-radius: 0;
     -fx-border-radius: 0;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
-    -fx-rotate: -5deg;
+    -fx-rotate: -4deg;
 }
 
 .button:hover {
-    -fx-background-color: #FFFF00;
+    -fx-background-color: #000000, #FFFF00;
+    -fx-background-insets: 3 -11 -3 11, 0;
     -fx-text-fill: #000000;
+    -fx-rotate: -2deg;
 }
 
 .button:pressed {
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
+    -fx-rotate: -5deg;
 }
 
 .button:disabled {
     -fx-opacity: 0.55;
-    -fx-effect: null;
+    -fx-background-insets: 0, 0;
 }
 
 #actionButton, #playPlaylistButton, #reorderButton {
-    -fx-background-color: #D11A2A;
+    -fx-background-color: #000000, #D11A2A;
+    -fx-background-insets: 4 -7 -4 7, 0;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 900;
     -fx-border-color: #FFFFFF;
@@ -98,17 +128,20 @@
 }
 
 #actionButton:hover, #playPlaylistButton:hover, #reorderButton:hover {
-    -fx-background-color: #FFFF00;
+    -fx-background-color: #000000, #FFFF00;
+    -fx-background-insets: 3 -11 -3 11, 0;
     -fx-text-fill: #000000;
 }
 
 #actionButton:pressed, #playPlaylistButton:pressed, #reorderButton:pressed {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
 }
 
 #reorderButton:selected {
-    -fx-background-color: #000000;
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 1 -2 -1 2, 0;
     -fx-text-fill: #FFFFFF;
     -fx-effect: innershadow(gaussian, #FFFFFF, 8, 0, 0, 2);
 }
@@ -124,20 +157,50 @@
     -fx-text-fill: #FFFFFF;
 }
 
-.combo-box {
-    -fx-background-color: #000000;
+.combo-box, #sortComboBox {
+    -fx-background-color: #000000, #000000;
+    -fx-background-insets: 3 -5 -3 5, 0;
     -fx-background-radius: 0;
     -fx-border-color: #FFFFFF;
     -fx-border-radius: 0;
     -fx-border-width: 2px;
-    -fx-padding: 3px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 3, 3);
+    -fx-padding: 0 4px 0 8px;
 }
 
-.combo-box .cell {
+.combo-box:hover, .combo-box:showing,
+#sortComboBox:hover, #sortComboBox:showing {
+    -fx-border-color: #FFFF00;
+}
+
+.combo-box:focused,
+#sortComboBox:focused {
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+}
+
+.combo-box:focused:hover, .combo-box:focused:showing,
+#sortComboBox:focused:hover, #sortComboBox:focused:showing {
+    -fx-border-color: #FFFF00;
+}
+
+/* Cella di visualizzazione del valore selezionato (solo quella nel box chiuso,
+   cioè figlia DIRETTA). NON si applica alle celle del popup per non
+   sovrascrivere le regole di hover con specificità più bassa. */
+.combo-box > .list-cell, #sortComboBox > .list-cell {
     -fx-text-fill: #FFFFFF;
     -fx-background-color: transparent;
     -fx-font-weight: bold;
+}
+
+.combo-box .arrow-button .arrow, #sortComboBox .arrow-button .arrow {
+    -fx-background-color: #FFFFFF;
+}
+
+.combo-box:hover .arrow-button .arrow,
+.combo-box:showing .arrow-button .arrow,
+#sortComboBox:hover .arrow-button .arrow,
+#sortComboBox:showing .arrow-button .arrow {
+    -fx-background-color: #FFFF00;
 }
 
 .combo-box-popup .list-view {
@@ -146,15 +209,17 @@
     -fx-border-radius: 0;
     -fx-background-radius: 0;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 4, 5, 5);
+    -fx-effect: dropshadow(one-pass-box, #000000, 0, 1, 6, 6);
 }
 
 .combo-box-popup .list-cell {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
+    -fx-padding: 6px 10px;
 }
 
+.combo-box-popup .list-cell:filled:hover,
 .combo-box-popup .list-cell:hover {
     -fx-background-color: #FFFF00;
     -fx-text-fill: #000000;
@@ -165,13 +230,19 @@
     -fx-text-fill: #FFFFFF;
 }
 
+.combo-box-popup .list-cell:selected:hover,
+.combo-box-popup .list-cell:filled:selected:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
 .table-view {
-    -fx-background-color: #FFFFFF;
+    -fx-background-color: #000000, #FFFFFF;
+    -fx-background-insets: 5 -8 -5 8, 0;
     -fx-background-radius: 0;
     -fx-table-cell-border-color: #000000;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
 }
 
 .table-view.reorder-mode .table-row-cell {
@@ -221,26 +292,26 @@
     -fx-font-weight: 900;
 }
 
-.list-view {
-    -fx-background-color: #FFFFFF;
+#queueListView {
+    -fx-background-color: #000000, #FFFFFF;
+    -fx-background-insets: 5 -8 -5 8, 0;
     -fx-background-radius: 0;
     -fx-border-color: #FFFFFF;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(three-pass-box, #000000, 0, 3, 4, 4);
 }
 
-.list-cell {
+#queueListView .list-cell {
     -fx-background-color: #FFFFFF;
     -fx-text-fill: #000000;
     -fx-font-weight: bold;
     -fx-padding: 8px 10px;
 }
 
-.list-cell:filled:hover {
+#queueListView .list-cell:filled:hover {
     -fx-background-color: #FFFF00;
 }
 
-.list-cell:selected {
+#queueListView .list-cell:selected {
     -fx-background-color: #D11A2A;
     -fx-text-fill: #FFFFFF;
 }
@@ -277,4 +348,48 @@
 
 .progress-indicator .determinate-indicator .indicator {
     -fx-background-color: #D11A2A;
+}
+
+/* Toggle button: strutturali in shared; qui cromatismi tema. */
+.toggle-button {
+    -fx-background-color: #000000;
+    -fx-text-fill: #FFFFFF;
+}
+
+.toggle-button:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
+}
+
+/* #viewToggleButton — Phantom Thief: bg-insets offset + font-weight: 900. */
+#viewToggleButton {
+    -fx-background-color: #000000, #D11A2A; -fx-background-insets: 4 -7 -4 7, 0; -fx-text-fill: #FFFFFF; -fx-font-weight: 900; -fx-border-color: #FFFFFF; -fx-border-width: 2px;
+}
+
+#viewToggleButton:selected {
+    -fx-background-color: #000000, #000000; -fx-background-insets: 1 -2 -1 2, 0; -fx-text-fill: #FFFFFF; -fx-effect: innershadow(gaussian, #FFFFFF, 8, 0, 0, 2);
+}
+
+
+/* Track card: strutturali in shared; qui cromatismi tema. */
+.track-card {
+    -fx-background-color: #111111;
+    -fx-border-color: #FFFFFF;
+}
+
+.track-card:hover {
+    -fx-border-color: #FFFF00;
+}
+
+.track-card-selected {
+    -fx-background-color: #D11A2A;
+    -fx-border-color: #FFFF00;
+}
+
+.track-card-title {
+    -fx-text-fill: #FFFFFF;
+}
+
+.track-card-artist {
+    -fx-text-fill: #FFFFFF;
 }

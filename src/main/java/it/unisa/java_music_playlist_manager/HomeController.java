@@ -66,7 +66,7 @@ public class HomeController implements Observer {
      * Configura le cell-value-factory e le cell-factory delle colonne delle tre tabelle.
      */
     private void setupColumns() {
-        // -- Tabella brani --
+        // Tabella brani
         topTrackRankColumn.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -85,7 +85,7 @@ public class HomeController implements Observer {
         topTrackCountColumn.setCellValueFactory(
                 data -> new SimpleIntegerProperty(data.getValue().getPlayCount()).asObject());
 
-        // -- Tabella playlist --
+        // Tabella playlist
         topPlaylistRankColumn.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -104,7 +104,7 @@ public class HomeController implements Observer {
         topPlaylistDurationColumn.setCellValueFactory(
                 data -> new SimpleStringProperty(formatDuration(data.getValue().getDuration())));
 
-        // -- Tabella playlist più riprodotte --
+        // Tabella playlist più riprodotte
         topPlayedPlaylistRankColumn.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(Integer item, boolean empty) {
@@ -190,7 +190,7 @@ public class HomeController implements Observer {
         });
     }
 
-    // --- Utilità ---
+    // Utilità
 
     private String formatDuration(int seconds) {
         return String.format("%02d:%02d", seconds / 60, seconds % 60);

@@ -28,7 +28,6 @@ public class ShuffleStrategy implements PlaybackStrategy {
         currentShufflePointer++;
 
         if (currentShufflePointer >= shuffledIndices.size()) {
-            System.out.println("[SHUFFLE STRATEGY] Coda terminata. Rimescolamento automatico per riproduzione infinita!");
 
             // Rigeneriamo il mazzo passando l'indice corrente affinché non venga ripetuto subito
             initializeShuffle(queueSize, currentIndex);
@@ -44,8 +43,6 @@ public class ShuffleStrategy implements PlaybackStrategy {
         }
         // Restituisce il valore reale mappato a quella posizione casuale
         int nextRealIndex = shuffledIndices.get(currentShufflePointer);
-        System.out.println("[SHUFFLE STRATEGY] Prossimo indice casuale (Mazzo posizione "
-                + currentShufflePointer + "): Coda reale -> " + nextRealIndex);
 
         return nextRealIndex;
     }
@@ -80,6 +77,5 @@ public class ShuffleStrategy implements PlaybackStrategy {
 
         // 5. Il puntatore parte da 0 (che corrisponde all'elemento corrente)
         this.currentShufflePointer = 0;
-        System.out.println("[SHUFFLE STRATEGY] Mazzo generato. Ordine indici: " + shuffledIndices);
     }
 }

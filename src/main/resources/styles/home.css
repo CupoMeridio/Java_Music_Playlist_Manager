@@ -1,11 +1,4 @@
-/* =============================================================
-   HOME / STATISTICHE — TEMA BASE
-   ============================================================= */
-
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color: #F5F5F7;
-}
+/* HOME / STATISTICHE — TEMA BASE */
 
 /* Card statistiche: bianche su sfondo grigio, angoli arrotondati */
 .stat-card {
@@ -26,15 +19,4 @@
     -fx-font-size: 30px;
     -fx-font-weight: 800;
     -fx-text-fill: #0071E3;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: bold;
-    -fx-text-fill: #86868B;
-    -fx-alignment: center;
 }

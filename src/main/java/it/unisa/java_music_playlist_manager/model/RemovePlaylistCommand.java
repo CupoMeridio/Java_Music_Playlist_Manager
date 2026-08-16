@@ -2,6 +2,10 @@ package it.unisa.java_music_playlist_manager.model;
 
 
 
+/**
+ * Comando per l'eliminazione di una playlist dalla {@link Library}.
+ * Consente di ripristinare la playlist eliminata tramite l'operazione di Undo.
+ */
 public class RemovePlaylistCommand implements Command {
     private final Library library;
     private final Playlist playlist;

@@ -1,10 +1,5 @@
 /* Swiss Bauhaus — home.css */
 
-.home-container {
-    -fx-padding: 24px;
-    -fx-background-color: #F9F9F9;
-}
-
 .stat-card {
     -fx-background-color: #F9F9F9;
     -fx-background-radius: 0;
@@ -32,15 +27,4 @@
     -fx-font-size: 30px;
     -fx-font-weight: bold;
     -fx-text-fill: #0000FF;
-}
-
-.home-table {
-    -fx-background-color: transparent;
-    -fx-padding: 8px 0;
-}
-
-.top-rank-cell {
-    -fx-font-weight: bold;
-    -fx-text-fill: #666666;
-    -fx-alignment: center;
 }

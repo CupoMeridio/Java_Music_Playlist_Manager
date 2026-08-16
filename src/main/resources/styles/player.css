@@ -1,6 +1,4 @@
-/* =============================================================
-   PLAYER BAR — TEMA BASE
-   ============================================================= */
+/* PLAYER BAR — TEMA BASE */
 
 .player-bar {
     -fx-background-color: #FFFFFF;
@@ -69,9 +67,7 @@
 }
 
 /* Slider */
-.slider {
-    -fx-cursor: hand;
-}
+
 
 .slider .track {
     -fx-background-color: #D2D2D7;

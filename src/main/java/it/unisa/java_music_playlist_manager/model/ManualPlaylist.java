@@ -9,7 +9,7 @@ import java.util.List;
 public class ManualPlaylist extends Playlist implements MutablePlaylist {
 
     private final List<Playable> elements;
-    
+
     @JsonCreator
     public ManualPlaylist(
             @JsonProperty("id") String id,
@@ -35,22 +35,22 @@ public class ManualPlaylist extends Playlist implements MutablePlaylist {
         if (element instanceof ManualPlaylist playlist && playlist.containsRecursive(this)) {
             throw new IllegalArgumentException("Impossibile creare una dipendenza ciclica tra playlist.");
         }
-        
+
         elements.add(element);
     }
 
     @Override
     public void remove(Playable element) {
         if (element == null) {
-            return ;
+            return;
         }
         elements.remove(element);
     }
-    
+
     @Override
-    public void removeTrack(Track track){
+    public void removeTrack(Track track) {
         if (track == null) {
-            return ;
+            return;
         }
         elements.remove(track);
     }
@@ -65,7 +65,7 @@ public class ManualPlaylist extends Playlist implements MutablePlaylist {
         }
         Playable element = elements.remove(fromIndex);
         if (toIndex > fromIndex) {
-            toIndex--; 
+            toIndex--;
         }
         elements.add(toIndex, element);
     }
@@ -104,7 +104,7 @@ public class ManualPlaylist extends Playlist implements MutablePlaylist {
     public boolean isManuallyEditable() {
         return true;
     }
-    
+
     public List<Playable> getElements() {
         return elements;
     }

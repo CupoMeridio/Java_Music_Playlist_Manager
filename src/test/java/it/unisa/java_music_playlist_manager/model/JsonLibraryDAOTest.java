@@ -15,8 +15,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 /**
- *
- * @author Mattia Sanzari
+ * Suite di test per l'Adapter di persistenza {@link JsonLibraryDAO}.
+ * Verifica roundtrip (save → load) del catalogo, gestione file non
+ * esistenti e (nei test avanzati) il polimorfismo Jackson per le
+ * {@link AutomaticPlaylistByTag} / ByGenre / ByYear.
  */
 
 public class JsonLibraryDAOTest {
@@ -136,5 +138,91 @@ public class JsonLibraryDAOTest {
         assertEquals("Queen", loadedTrack.getAuthor(), "L'autore deve essere stato ripristinato");
         assertEquals(1975, loadedTrack.getYear(), "L'anno deve essere stato ripristinato");
         assertEquals("C:/music/bohemian.mp3", loadedTrack.getFilePath(), "Il path deve essere stato ripristinato");
+    }
+
+    // ==========================================
+    // TEST 4: Roundtrip polimorfismo Jackson — AutomaticPlaylistByTag
+    // ==========================================
+    @Test
+    public void testSaveAndLoadAutomaticPlaylistByTagJacksonPolimorfismo() throws IOException {
+        // 1. Setup dati
+        Track t1 = new Track("Blinding Lights", "The Weeknd", "After Hours",
+                200, "Pop", 2020, "C:/bl.mp3");
+        Track t2 = new Track("Levitating", "Dua Lipa", "Future Nostalgia",
+                203, "Pop", 2020, "C:/lv.mp3");
+        t1.addTag(TagPredefined.PARTY);
+        t2.addTag(TagPredefined.PARTY);
+
+        library.addTrack(t1);
+        library.addTrack(t2);
+
+        // 2. Crea AutomaticPlaylist (tipo concreto!)
+        AutomaticPlaylistByTag partyPlaylist = new AutomaticPlaylistByTag(
+                "Party Hits", TagPredefined.PARTY);
+        library.addPlaylist(partyPlaylist);
+
+        // Verifica istantanea (prima della persistenza)
+        assertEquals(2, partyPlaylist.getTrackCount(), "Prima del save: 2 brani col tag PARTY");
+
+        // 3. Salvataggio JSON
+        dao.save(library);
+        File f = new File(TEST_FILE_PATH);
+        assertTrue(f.exists() && f.length() > 0, "File JSON creato con AutomaticPlaylistByTag");
+
+        // 4. Simula riavvio app: svuota la library (Singleton)
+        for (Track t : library.getTracks()) library.removeTrack(t);
+        for (Playlist p : library.getPlaylists()) library.removePlaylist(p);
+        assertEquals(0, library.getPlaylists().size());
+
+        // 5. Ricarica da JSON
+        Library reloaded = dao.load();
+
+        // 6. Verifica critica: il polimorfismo Jackson deve aver ricreato
+        //    la classe CONCRETA (AutomaticPlaylistByTag), NON una superclasse.
+        assertEquals(1, reloaded.getPlaylists().size());
+        Playlist loadedPlaylist = reloaded.getPlaylists().get(0);
+
+        assertTrue(loadedPlaylist instanceof AutomaticPlaylistByTag,
+                "Jackson @JsonSubTypes deve deserializzare come AutomaticPlaylistByTag concreto, non generico!");
+        AutomaticPlaylistByTag reloadedParty = (AutomaticPlaylistByTag) loadedPlaylist;
+
+        assertEquals("Party Hits", reloadedParty.getTitle(), "Titolo preservato");
+        assertEquals(TagPredefined.PARTY, reloadedParty.getFilterTag(), "filterTag preservato");
+
+        // Dopo il reload, la Library riempita, la playlist dinamica deve
+        // ri-trovare i suoi 2 brani (filtraggio lazy al volo)
+        reloadedParty.setLibrary(reloaded);  // opzionale: testiamo anche la DI
+        assertEquals(2, reloadedParty.getTrackCount(),
+                "Dopo load, la playlist dinamica deve filtrare e trovare 2 brani col tag PARTY");
+    }
+
+    // ==========================================
+    // TEST 5: Roundtrip AutomaticPlaylistByGenre
+    // ==========================================
+    @Test
+    public void testSaveAndLoadAutomaticPlaylistByGenreRoundtrip() throws IOException {
+        Track tRock = new Track("T", "A", "Al", 100, "Rock", 1990, "r.mp3");
+        library.addTrack(tRock);
+
+        AutomaticPlaylistByGenre genrePlaylist = new AutomaticPlaylistByGenre("Solo Rock", "Rock");
+        library.addPlaylist(genrePlaylist);
+        assertEquals(1, genrePlaylist.getTrackCount());
+
+        dao.save(library);
+
+        for (Track t : library.getTracks()) library.removeTrack(t);
+        for (Playlist p : library.getPlaylists()) library.removePlaylist(p);
+
+        Library reloaded = dao.load();
+        assertEquals(1, reloaded.getPlaylists().size());
+
+        Playlist loaded = reloaded.getPlaylists().get(0);
+        assertTrue(loaded instanceof AutomaticPlaylistByGenre,
+                "Polimorfismo Jackson errato: atteso AutomaticPlaylistByGenre");
+
+        AutomaticPlaylistByGenre gp = (AutomaticPlaylistByGenre) loaded;
+        assertEquals("Rock", gp.getGenreFilter());
+        gp.setLibrary(reloaded);
+        assertEquals(1, gp.getTrackCount(), "Filtro genere Rock deve funzionare anche dopo reload");
     }
 }
