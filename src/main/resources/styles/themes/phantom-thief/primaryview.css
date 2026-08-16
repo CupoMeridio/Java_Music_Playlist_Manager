@@ -157,37 +157,69 @@
     -fx-text-fill: #FFFFFF;
 }
 
-.combo-box {
+.combo-box, #sortComboBox {
     -fx-background-color: #000000, #000000;
     -fx-background-insets: 3 -5 -3 5, 0;
     -fx-background-radius: 0;
     -fx-border-color: #FFFFFF;
     -fx-border-radius: 0;
     -fx-border-width: 2px;
-    -fx-padding: 3px;
+    -fx-padding: 0 4px 0 8px;
 }
 
-.combo-box .cell {
+.combo-box:hover, .combo-box:showing,
+#sortComboBox:hover, #sortComboBox:showing {
+    -fx-border-color: #FFFF00;
+}
+
+.combo-box:focused,
+#sortComboBox:focused {
+    -fx-border-color: #FFFFFF;
+    -fx-border-width: 2px;
+}
+
+.combo-box:focused:hover, .combo-box:focused:showing,
+#sortComboBox:focused:hover, #sortComboBox:focused:showing {
+    -fx-border-color: #FFFF00;
+}
+
+/* Cella di visualizzazione del valore selezionato (solo quella nel box chiuso,
+   cioè figlia DIRETTA). NON si applica alle celle del popup per non
+   sovrascrivere le regole di hover con specificità più bassa. */
+.combo-box > .list-cell, #sortComboBox > .list-cell {
     -fx-text-fill: #FFFFFF;
     -fx-background-color: transparent;
     -fx-font-weight: bold;
 }
 
+.combo-box .arrow-button .arrow, #sortComboBox .arrow-button .arrow {
+    -fx-background-color: #FFFFFF;
+}
+
+.combo-box:hover .arrow-button .arrow,
+.combo-box:showing .arrow-button .arrow,
+#sortComboBox:hover .arrow-button .arrow,
+#sortComboBox:showing .arrow-button .arrow {
+    -fx-background-color: #FFFF00;
+}
+
 .combo-box-popup .list-view {
-    -fx-background-color: #000000, #000000;
-    -fx-background-insets: 6 -9 -6 9, 0;
+    -fx-background-color: #000000;
     -fx-border-color: #D11A2A;
     -fx-border-radius: 0;
     -fx-background-radius: 0;
     -fx-border-width: 2px;
+    -fx-effect: dropshadow(one-pass-box, #000000, 0, 1, 6, 6);
 }
 
 .combo-box-popup .list-cell {
     -fx-background-color: #000000;
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
+    -fx-padding: 6px 10px;
 }
 
+.combo-box-popup .list-cell:filled:hover,
 .combo-box-popup .list-cell:hover {
     -fx-background-color: #FFFF00;
     -fx-text-fill: #000000;
@@ -196,6 +228,12 @@
 .combo-box-popup .list-cell:selected {
     -fx-background-color: #D11A2A;
     -fx-text-fill: #FFFFFF;
+}
+
+.combo-box-popup .list-cell:selected:hover,
+.combo-box-popup .list-cell:filled:selected:hover {
+    -fx-background-color: #FFFF00;
+    -fx-text-fill: #000000;
 }
 
 .table-view {
@@ -254,7 +292,7 @@
     -fx-font-weight: 900;
 }
 
-.list-view {
+#queueListView {
     -fx-background-color: #000000, #FFFFFF;
     -fx-background-insets: 5 -8 -5 8, 0;
     -fx-background-radius: 0;
@@ -262,18 +300,18 @@
     -fx-border-width: 2px;
 }
 
-.list-cell {
+#queueListView .list-cell {
     -fx-background-color: #FFFFFF;
     -fx-text-fill: #000000;
     -fx-font-weight: bold;
     -fx-padding: 8px 10px;
 }
 
-.list-cell:filled:hover {
+#queueListView .list-cell:filled:hover {
     -fx-background-color: #FFFF00;
 }
 
-.list-cell:selected {
+#queueListView .list-cell:selected {
     -fx-background-color: #D11A2A;
     -fx-text-fill: #FFFFFF;
 }

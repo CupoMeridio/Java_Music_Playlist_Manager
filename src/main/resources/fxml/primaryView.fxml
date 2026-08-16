@@ -49,6 +49,7 @@
                   <Button fx:id="playPlaylistButton" disable="true" onAction="#handlePlayPlaylistAction" text="Riproduci Playlist" />
                   <ToggleButton fx:id="reorderButton" managed="false" text="Riordina" visible="false" />
                   <Region HBox.hgrow="ALWAYS" />
+                  <ComboBox fx:id="sortComboBox" promptText="Ordina per" minWidth="140.0" prefWidth="160.0" />
                   <ToggleButton fx:id="viewToggleButton" onAction="#handleViewToggleAction" text="  Vista a schede">
                      <graphic>
                         <FontIcon iconLiteral="fas-th" />

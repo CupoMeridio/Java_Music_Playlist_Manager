@@ -23,6 +23,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -53,6 +54,7 @@ import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import it.unisa.java_music_playlist_manager.model.Tag;
+import it.unisa.java_music_playlist_manager.model.TrackSortOption;
 import it.unisa.java_music_playlist_manager.model.ViewType;
 import java.util.Set;
 import java.util.HashSet;
@@ -158,9 +160,14 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     private void refreshTableData() {
         TableViewSortState sortState = captureSortState();
 
+        TrackSortOption sortOption = (sortComboBox != null && sortComboBox.getValue() != null)
+                ? sortComboBox.getValue()
+                : TrackSortOption.INSERTION_ORDER;
+
         if (currentOpenedPlaylist != null) {
-            ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(
-                    LibrarySearchService.filterTracks(currentOpenedPlaylist.getTracks(), searchQuery));
+            List<Track> filtered = LibrarySearchService.filterTracks(currentOpenedPlaylist.getTracks(), searchQuery);
+            List<Track> sorted = sortOption.sort(filtered);
+            ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(sorted);
             if (trackTableView != null)
                 trackTableView.setItems(trackList);
             if (isCardView)
@@ -190,8 +197,9 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                         LibrarySearchService.filterPlaylists(Library.getInstance().getPlaylists(), searchQuery)));
             }
         } else if (currentViewType == ViewType.MUSIC) {
-            ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(
-                    LibrarySearchService.filterTracks(Library.getInstance().getTracks(), searchQuery));
+            List<Track> filtered = LibrarySearchService.filterTracks(Library.getInstance().getTracks(), searchQuery);
+            List<Track> sorted = sortOption.sort(filtered);
+            ObservableList<Track> trackList = javafx.collections.FXCollections.observableArrayList(sorted);
             if (trackTableView != null)
                 trackTableView.setItems(trackList);
             if (isCardView)
@@ -337,6 +345,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     @FXML
     private ToggleButton reorderButton;
     @FXML
+    private ComboBox<TrackSortOption> sortComboBox;
+    @FXML
     private ToggleButton viewToggleButton;
     @FXML
     private GridView<Track> trackCardGridView;
@@ -440,6 +450,28 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPlaylistButton);
         if (reorderButton != null)
             it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(reorderButton);
+        if (sortComboBox != null) {
+            sortComboBox.setFocusTraversable(false);
+            sortComboBox.getItems().setAll(TrackSortOption.values());
+            sortComboBox.setValue(TrackSortOption.INSERTION_ORDER);
+            sortComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+                if (trackTableView != null) {
+                    trackTableView.getSortOrder().clear();
+                }
+                refreshTableData();
+                javafx.application.Platform.runLater(() -> {
+                    if (controlsBar != null) {
+                        controlsBar.requestFocus();
+                    }
+                });
+            });
+
+            sortComboBox.showingProperty().addListener((obs, wasShowing, isNowShowing) -> {
+                if (!isNowShowing && controlsBar != null) {
+                    javafx.application.Platform.runLater(controlsBar::requestFocus);
+                }
+            });
+        }
 
         // Registra Ctrl+Z come shortcut globale sulla scena non appena essa è disponibile
         if (undoButton != null) {
@@ -654,6 +686,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                 || currentViewType == ViewType.PLAYLISTS
                 || currentViewType == ViewType.PLAYLIST_DETAIL;
         boolean isPlaylistListSection = currentViewType == ViewType.PLAYLISTS;
+        boolean isTrackSection = currentViewType == ViewType.MUSIC
+                || currentViewType == ViewType.PLAYLIST_DETAIL;
 
         if (undoButton != null) {
             undoButton.setVisible(isEditableSection);
@@ -662,6 +696,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (playPlaylistButton != null) {
             playPlaylistButton.setVisible(isPlaylistListSection);
             playPlaylistButton.setManaged(isPlaylistListSection);
+        }
+        if (sortComboBox != null) {
+            sortComboBox.setVisible(isTrackSection);
+            sortComboBox.setManaged(isTrackSection);
         }
     }
 

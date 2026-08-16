@@ -42,26 +42,6 @@ public final class SnapMotion {
                                double liftX, double liftY) {
 
         DropShadow shadow = new DropShadow(BlurType.THREE_PASS_BOX, Color.BLACK, 0, 1, baseDx, baseDy);
-        
-        // Applica l'ombra di default solo se il tema è Phantom Thief, 
-        // altrimenti rimuovi l'effetto
-        Runnable updateEffect = () -> {
-            if ("Phantom Thief".equals(ThemeManager.getInstance().getActiveTheme())) {
-                node.setEffect(shadow);
-            } else {
-                node.setEffect(null);
-                node.setTranslateX(0);
-                node.setTranslateY(0);
-                node.setScaleX(1.0);
-                node.setScaleY(1.0);
-            }
-        };
-        
-        // Applica subito l'effetto
-        updateEffect.run();
-        
-        // Sarebbe ideale aggiornare l'effetto al cambio del tema, ma ThemeManager 
-        // attualmente non offre listener. Lo aggiorniamo quantomeno sugli eventi mouse.
 
         Timeline toHover = new Timeline(new KeyFrame(DURATION,
                 new KeyValue(shadow.offsetXProperty(), hoverDx, SNAP),
@@ -81,8 +61,33 @@ public final class SnapMotion {
                 new KeyValue(node.translateYProperty(), 0, SNAP)
         ));
 
+        // Applica l'ombra di default solo se il tema è Phantom Thief, 
+        // altrimenti rimuovi l'effetto e resetta le trasformazioni
+        Runnable updateEffect = () -> {
+            if ("Phantom Thief".equals(ThemeManager.getInstance().getActiveTheme())) {
+                shadow.setOffsetX(baseDx);
+                shadow.setOffsetY(baseDy);
+                node.setEffect(shadow);
+            } else {
+                toHover.stop();
+                toRest.stop();
+                node.setEffect(null);
+                node.setTranslateX(0);
+                node.setTranslateY(0);
+                node.setScaleX(1.0);
+                node.setScaleY(1.0);
+                shadow.setOffsetX(baseDx);
+                shadow.setOffsetY(baseDy);
+            }
+        };
+        
+        // Applica subito l'effetto iniziale
+        updateEffect.run();
+        
+        // Registra il listener per aggiornare reattivamente l'effetto al cambio del tema
+        ThemeManager.getInstance().addThemeChangeListener(newTheme -> updateEffect.run());
+
         node.setOnMouseEntered(e -> { 
-            updateEffect.run();
             if (!"Phantom Thief".equals(ThemeManager.getInstance().getActiveTheme())) return;
             toRest.stop(); 
             toHover.playFromStart(); 

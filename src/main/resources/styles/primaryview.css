@@ -85,7 +85,7 @@
     -fx-border-color: #D2D2D7;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
-    -fx-padding: 3px;
+    -fx-padding: 0 4px 0 8px;
 }
 
 .combo-box .cell {

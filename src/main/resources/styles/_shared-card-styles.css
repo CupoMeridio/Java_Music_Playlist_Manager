@@ -1,12 +1,31 @@
 /* Shared structural styles for card grid, toggle button and track cards.
  * Imported BEFORE theme-specific overrides; themes override only chromatic props. */
 
-/* Toggle button — JavaFX does not merge .toggle-button with .button rules.
- * Cursor/padding here; pressed:opacity shared by all themes.
+/* Toggle button & Sort ComboBox — Sincronizzazione altezze e proporzioni.
  * Background / border-color / text-fill are THEMATIC → in each theme file. */
 .toggle-button {
     -fx-cursor: hand;
-    -fx-padding: 7px 16px;
+    -fx-padding: 6px 14px;
+}
+
+#sortComboBox, #viewToggleButton {
+    -fx-pref-height: 32px;
+    -fx-min-height: 32px;
+    -fx-max-height: 32px;
+}
+
+#sortComboBox {
+    -fx-cursor: hand;
+    -fx-padding: 0 4px 0 8px;
+}
+
+#sortComboBox > .list-cell {
+    -fx-padding: 0 4px;
+    -fx-alignment: CENTER_LEFT;
+}
+
+#sortComboBox .arrow-button {
+    -fx-padding: 0 8px 0 4px;
 }
 
 .toggle-button:pressed {

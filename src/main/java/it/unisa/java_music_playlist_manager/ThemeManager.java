@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Consumer;
 
 /**
  * ThemeManager gestisce il tema visivo dell'applicazione.
@@ -40,6 +43,9 @@ public class ThemeManager {
 
     /** Scena principale, impostata da App all'avvio */
     private Scene scene;
+
+    /** Listener registrati per essere notificati al cambio del tema */
+    private final List<Consumer<String>> themeChangeListeners = new ArrayList<>();
 
     private ThemeManager() {
         registerThemes();
@@ -138,6 +144,28 @@ public class ThemeManager {
         activeTheme = themeName;
         applyActiveThemeToScene(scene);
         savePreference();
+        notifyThemeChange(activeTheme);
+    }
+
+    /** Registra un listener che viene invocato quando cambia il tema attivo. */
+    public void addThemeChangeListener(Consumer<String> listener) {
+        if (listener != null && !themeChangeListeners.contains(listener)) {
+            themeChangeListeners.add(listener);
+        }
+    }
+
+    /** Rimuove un listener precedentemente registrato. */
+    public void removeThemeChangeListener(Consumer<String> listener) {
+        themeChangeListeners.remove(listener);
+    }
+
+    /** Notifica tutti i listener del cambio di tema. */
+    private void notifyThemeChange(String newTheme) {
+        for (Consumer<String> listener : new ArrayList<>(themeChangeListeners)) {
+            try {
+                listener.accept(newTheme);
+            } catch (Exception ignored) {}
+        }
     }
 
     /** Applica il tema attivo corrente alla scena principale. */
