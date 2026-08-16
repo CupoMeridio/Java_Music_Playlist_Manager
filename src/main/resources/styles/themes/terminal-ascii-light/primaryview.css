@@ -257,3 +257,29 @@
 .track-card-artist {
     -fx-text-fill: #1B2A22;
 }
+
+/* Scrollbar — Terminal ASCII (Light Mode) */
+.scroll-bar:vertical {
+    -fx-pref-width: 10px;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10px;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #F2F5F3;
+    -fx-border-color: #1B2A22;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #1B2A22;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #3D5A4A;
+}

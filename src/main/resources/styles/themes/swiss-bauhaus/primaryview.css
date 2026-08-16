@@ -251,3 +251,26 @@
 .track-card-artist {
     -fx-text-fill: #111111;
 }
+
+/* Scrollbar — Swiss Bauhaus */
+.scroll-bar:vertical {
+    -fx-pref-width: 10px;
+}
+
+.scroll-bar:horizontal {
+    -fx-pref-height: 10px;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #E8E8E8;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #E30613;
+    -fx-background-radius: 0;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #0000FF;
+}

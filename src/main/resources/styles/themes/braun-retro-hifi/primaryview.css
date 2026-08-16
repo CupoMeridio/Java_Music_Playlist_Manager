@@ -249,3 +249,18 @@
 .track-card-artist {
     -fx-text-fill: #2B2B2B;
 }
+
+/* Scrollbar — Braun Retro-HiFi */
+.scroll-bar .track {
+    -fx-background-color: #DCDCDC;
+    -fx-background-radius: 2px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #A8A8A8;
+    -fx-background-radius: 2px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #FF5500;
+}

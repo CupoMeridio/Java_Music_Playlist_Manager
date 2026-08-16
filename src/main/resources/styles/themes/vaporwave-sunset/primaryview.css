@@ -249,3 +249,18 @@
 .track-card-artist {
     -fx-text-fill: #3d1a2e;
 }
+
+/* Scrollbar — Vaporwave Sunset */
+.scroll-bar .track {
+    -fx-background-color: rgba(200, 120, 150, 0.25);
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #b967ff;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #01cdfe;
+}

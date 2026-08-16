@@ -1,14 +1,17 @@
 package it.unisa.java_music_playlist_manager.ui;
 
 import it.unisa.java_music_playlist_manager.model.Track;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
+import java.util.function.Consumer;
 
 /**
  * Componente UI personalizzato per visualizzare un brano musicale come una "Scheda" (Card).
@@ -19,9 +22,13 @@ import java.io.IOException;
 public class TrackCardView extends VBox {
 
     private Track track;
+    private Consumer<Track> onPlayHandler;
 
     @FXML
     private ImageView coverImageView;
+
+    @FXML
+    private Button playButton;
 
     @FXML
     private Label titleLabel;
@@ -42,6 +49,27 @@ public class TrackCardView extends VBox {
         } catch (IOException exception) {
             throw new RuntimeException("Errore critico durante il caricamento di TrackCardView.fxml", exception);
         }
+    }
+
+    @FXML
+    private void initialize() {
+        if (playButton != null) {
+            playButton.setOnAction(event -> {
+                event.consume();
+                if (onPlayHandler != null && track != null) {
+                    onPlayHandler.accept(track);
+                }
+            });
+            // Evita che il click sul bottone si propaghi alla GridCell come click di selezione
+            playButton.setOnMouseClicked(Event::consume);
+        }
+    }
+
+    /**
+     * Imposta il callback per l'avvio della riproduzione tramite il tasto play della card.
+     */
+    public void setOnPlayAction(Consumer<Track> onPlayHandler) {
+        this.onPlayHandler = onPlayHandler;
     }
 
     /**

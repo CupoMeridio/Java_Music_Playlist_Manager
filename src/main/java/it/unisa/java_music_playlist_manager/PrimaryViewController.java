@@ -27,11 +27,13 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
 import org.controlsfx.control.GridView;
 import org.controlsfx.control.GridCell;
+import org.kordamp.ikonli.javafx.FontIcon;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -45,7 +47,6 @@ import java.util.Optional;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import java.io.IOException;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.control.TableRow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -473,28 +474,21 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             });
         }
 
-        // Registra Ctrl+Z come shortcut globale sulla scena non appena essa è disponibile
+        // Registra Ctrl+Z come shortcut globale sulla scena non appena essa è
+        // disponibile
         if (undoButton != null) {
             undoButton.sceneProperty().addListener((obs, oldScene, newScene) -> {
                 if (newScene != null) {
                     newScene.getAccelerators().put(
-                        new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
-                        this::handleUndoAction
-                    );
+                            new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+                            this::handleUndoAction);
                 }
             });
         }
     }
 
     private boolean isClickOnSelectedTableRow(MouseEvent event, Object selectedItem) {
-        Node node = event.getPickResult().getIntersectedNode();
-        while (node != null) {
-            if (node instanceof TableRow<?> row) {
-                return row.getItem() != null && java.util.Objects.equals(row.getItem(), selectedItem);
-            }
-            node = node.getParent();
-        }
-        return false;
+        return ContextMenuManager.isClickOnSelectedTableRow(event, selectedItem);
     }
 
     private void setupQueueListView() {
@@ -676,10 +670,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
      * in ogni metodo di navigazione.
      *
      * Regole:
-     *   - undoButton: visibile solo dove esistono operazioni reversibili
-     *     (Libreria, Playlist, Dettaglio Playlist).
-     *   - playPlaylistButton: visibile solo nell'elenco Playlist, l'unico contesto
-     *     in cui selezionare una playlist e avviarla senza entrarci è significativo.
+     * - undoButton: visibile solo dove esistono operazioni reversibili
+     * (Libreria, Playlist, Dettaglio Playlist).
+     * - playPlaylistButton: visibile solo nell'elenco Playlist, l'unico contesto
+     * in cui selezionare una playlist e avviarla senza entrarci è significativo.
      */
     private void updateContextualUI() {
         boolean isEditableSection = currentViewType == ViewType.MUSIC
@@ -843,6 +837,44 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             return;
         trackTableView.getColumns().clear();
 
+        TableColumn<Track, Void> playCol = new TableColumn<>("");
+        playCol.setMinWidth(40);
+        playCol.setPrefWidth(44);
+        playCol.setMaxWidth(48);
+        playCol.setResizable(false);
+        playCol.setSortable(false);
+        playCol.setCellFactory(col -> new TableCell<>() {
+            private final Button playBtn = new Button();
+            {
+                playBtn.getStyleClass().add("table-play-button");
+                playBtn.setMinSize(22, 22);
+                playBtn.setPrefSize(22, 22);
+                playBtn.setMaxSize(22, 22);
+                FontIcon playIcon = new FontIcon("fas-play");
+                playIcon.getStyleClass().add("table-play-icon");
+                playBtn.setGraphic(playIcon);
+                playBtn.setOnAction(event -> {
+                    event.consume();
+                    Track track = getTableRow() != null ? getTableRow().getItem() : null;
+                    if (track != null) {
+                        handleStartTrackPlayback(track);
+                    }
+                });
+                playBtn.setOnMouseClicked(javafx.event.Event::consume);
+                setAlignment(javafx.geometry.Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(playBtn);
+                }
+            }
+        });
+
         TableColumn<Track, String> titleCol = new TableColumn<>("Titolo");
         titleCol.setMinWidth(160);
         titleCol.setPrefWidth(220);
@@ -893,7 +925,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         tagCol.setCellValueFactory(data -> new javafx.beans.property.SimpleObjectProperty<>(data.getValue().getTags()));
         tagCol.setCellFactory(new TagCellFactory());
 
-        trackTableView.getColumns().addAll(titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
+        trackTableView.getColumns().addAll(playCol, titleCol, artistCol, albumCol, yearCol, genreCol, durationCol, tagCol);
 
         trackTableView.setRowFactory(new ReorderableTrackRowFactory(
                 () -> reorderButton != null && reorderButton.isSelected(),
@@ -933,7 +965,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
 
     /**
      * Aggiorna lo stato dei componenti grafici dopo la riconfigurazione
-     * o il cambio delle colonne della tabella (placeholder, refresh dati, stato bottoni).
+     * o il cambio delle colonne della tabella (placeholder, refresh dati, stato
+     * bottoni).
      */
     private void afterViewSwitch() {
         updateTablePlaceholder();
@@ -995,7 +1028,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             stage.setScene(new Scene(root));
             ThemeManager.getInstance().applyActiveThemeToScene(stage.getScene());
             stage.initModality(Modality.APPLICATION_MODAL);
-            // Vincoli di sicurezza: corrispondono ai prefWidth/prefHeight dichiarati in addTrackView.fxml
+            // Vincoli di sicurezza: corrispondono ai prefWidth/prefHeight dichiarati in
+            // addTrackView.fxml
             stage.setMinWidth(400);
             stage.setMinHeight(500);
             stage.showAndWait();
@@ -1259,6 +1293,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                     // senza handlers — li gestisce la GridCell sovrastante.
                     if (card == null) {
                         card = new it.unisa.java_music_playlist_manager.ui.TrackCardView();
+                        card.setOnPlayAction(PrimaryViewController.this::handleStartTrackPlayback);
                     }
 
                     card.updateData(item, imageService.getCachedCoverOrDefault(item.getFilePath()));

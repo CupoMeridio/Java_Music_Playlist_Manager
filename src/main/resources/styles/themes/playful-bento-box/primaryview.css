@@ -249,3 +249,18 @@
 .track-card-artist {
     -fx-text-fill: #1F2937;
 }
+
+/* Scrollbar — Playful Bento Box */
+.scroll-bar .track {
+    -fx-background-color: #E4E7EB;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #3B82F6;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #2563EB;
+}

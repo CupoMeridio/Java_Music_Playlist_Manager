@@ -80,4 +80,26 @@ public class ContextMenuManager {
             contextMenu.getItems().addAll(editPlaylistItem, deletePlaylistItem, addPlaylistToQueueItem);
         });
     }
+
+    /**
+     * Verifica che l'evento del mouse sia avvenuto su una TableRow associata
+     * all'elemento selezionato, e non su un'area vuota o sull'intestazione della tabella.
+     *
+     * @param event        L'evento del mouse catturato dalla tabella.
+     * @param selectedItem L'elemento selezionato nel SelectionModel della tabella.
+     * @return {@code true} se il click è avvenuto sulla riga valida dell'elemento selezionato.
+     */
+    public static boolean isClickOnSelectedTableRow(javafx.scene.input.MouseEvent event, Object selectedItem) {
+        if (event == null || selectedItem == null) {
+            return false;
+        }
+        javafx.scene.Node node = event.getPickResult() != null ? event.getPickResult().getIntersectedNode() : null;
+        while (node != null) {
+            if (node instanceof javafx.scene.control.TableRow<?> row) {
+                return row.getItem() != null && java.util.Objects.equals(row.getItem(), selectedItem);
+            }
+            node = node.getParent();
+        }
+        return false;
+    }
 }

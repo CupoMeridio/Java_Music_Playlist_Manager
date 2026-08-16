@@ -250,3 +250,18 @@
 .track-card-artist {
     -fx-text-fill: #8a5c70;
 }
+
+/* Scrollbar — Pastel Kawaii */
+.scroll-bar .track {
+    -fx-background-color: #ffd6e8;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #d48ef5;
+    -fx-background-radius: 8px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #c46ee5;
+}
