@@ -2,7 +2,7 @@
 
 **Java Music Playlist Manager** è un'applicazione desktop in Java per la gestione e la riproduzione di una libreria musicale composta da brani locali presenti sul PC.
 
-Il progetto è stato realizzato per l'esame di **Software Architecture Design** del corso di laurea in Informatica presso l'Università degli Studi di Salerno. Oltre alle funzionalità dell'applicazione, il punto centrale del lavoro è il percorso ingegneristico seguito: progettazione agile, gestione del team, definizione di task e user story, documentazione tecnica, scelte architetturali e applicazione di pattern di design.
+Il progetto è stato realizzato per l'esame di **Software Architecture Design** del corso di laurea in Ingegneria Informatica presso l'Università degli Studi di Salerno. Oltre alle funzionalità dell'applicazione, il punto centrale del lavoro è il percorso ingegneristico seguito: progettazione agile, gestione del team, definizione di task e user story, documentazione tecnica, scelte architetturali e applicazione di pattern di design.
 
 ## Panoramica
 
