@@ -5,6 +5,7 @@ import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.Track;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -99,6 +100,14 @@ public class ReorderableTrackRowFactory implements Callback<TableView<Track>, Ta
                 }
                 event.setDropCompleted(true);
                 event.consume();
+            }
+        });
+
+        row.setOnMousePressed(event -> {
+            if (row.isEmpty() || row.getItem() == null)
+                return;
+            if (event.getButton() == javafx.scene.input.MouseButton.SECONDARY) {
+                tv.getSelectionModel().select(row.getItem());
             }
         });
 

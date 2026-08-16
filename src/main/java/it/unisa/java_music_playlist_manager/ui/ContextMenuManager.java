@@ -4,6 +4,7 @@ import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.Track;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 
 public class ContextMenuManager {
@@ -23,6 +24,9 @@ public class ContextMenuManager {
 
     public static void setupTrackContextMenu(TableView<Track> table, ContextMenuActions actions) {
         ContextMenu contextMenu = new ContextMenu();
+        // Add a dummy item. JavaFX ignores ContextMenu requests on controls if the menu has 0 items.
+        // This ensures the auto-show mechanism starts and fires setOnShowing, where we clear and populate it.
+        contextMenu.getItems().add(new MenuItem(""));
         table.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {
@@ -58,6 +62,7 @@ public class ContextMenuManager {
 
     public static void setupPlaylistContextMenu(TableView<Playlist> table, ContextMenuActions actions) {
         ContextMenu contextMenu = new ContextMenu();
+        contextMenu.getItems().add(new MenuItem(""));
         table.setContextMenu(contextMenu);
 
         contextMenu.setOnShowing(e -> {

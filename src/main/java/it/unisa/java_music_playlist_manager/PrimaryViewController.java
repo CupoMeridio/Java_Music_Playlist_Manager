@@ -273,9 +273,11 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             playlistTableView.setVisible(false);
             playlistTableView.setManaged(false);
         }
+        boolean isTrackSection = currentViewType == ViewType.MUSIC
+                || currentViewType == ViewType.PLAYLIST_DETAIL;
         if (viewToggleButton != null) {
-            viewToggleButton.setVisible(true);
-            viewToggleButton.setManaged(true);
+            viewToggleButton.setVisible(isTrackSection);
+            viewToggleButton.setManaged(isTrackSection);
         }
         if (isCardView) {
             if (trackTableView != null) {
@@ -728,6 +730,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
             sortComboBox.setVisible(isTrackSection);
             sortComboBox.setManaged(isTrackSection);
         }
+        if (viewToggleButton != null) {
+            viewToggleButton.setVisible(isTrackSection);
+            viewToggleButton.setManaged(isTrackSection);
+        }
     }
 
     /** Configura la vista per mostrare la schermata Home con le statistiche. */
@@ -855,6 +861,10 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         if (queueListView != null) {
             queueListView.setVisible(true);
             queueListView.setManaged(true);
+        }
+        if (viewToggleButton != null) {
+            viewToggleButton.setVisible(false);
+            viewToggleButton.setManaged(false);
         }
         afterViewSwitch();
     }
