@@ -1,0 +1,25 @@
+/* Terminal ASCII (Dark Mode) — home.css */
+
+.stat-card {
+    -fx-background-color: #0D1410;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-padding: 16px 20px;
+}
+
+.stat-card:hover {
+    -fx-background-color: #1A2E1E;
+}
+
+.stat-card .label-title {
+    -fx-font-size: 10px;
+    -fx-text-fill: #58D68D;
+    -fx-font-weight: bold;
+}
+
+.stat-card .label-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00FF41;
+}

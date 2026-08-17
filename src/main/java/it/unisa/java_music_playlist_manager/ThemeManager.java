@@ -101,6 +101,13 @@ public class ThemeManager {
             "/styles/themes/terminal-ascii-light/home.css",
             "/styles/themes/terminal-ascii-light/addtrack.css"
         });
+        themes.put("Terminal ASCII (Dark Mode)", new String[]{
+            "/styles/themes/terminal-ascii-dark/primaryview.css",
+            "/styles/themes/terminal-ascii-dark/player.css",
+            "/styles/themes/terminal-ascii-dark/sidebar.css",
+            "/styles/themes/terminal-ascii-dark/home.css",
+            "/styles/themes/terminal-ascii-dark/addtrack.css"
+        });
         themes.put("Pastel Kawaii", new String[]{
             "/styles/themes/pastel-kawaii/primaryview.css",
             "/styles/themes/pastel-kawaii/player.css",

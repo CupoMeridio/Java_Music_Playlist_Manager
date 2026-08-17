@@ -1,0 +1,103 @@
+/* Terminal ASCII (Dark Mode) — sidebar.css */
+
+.sidebar {
+    -fx-background-color: #0D1410;
+    -fx-padding: 18px 12px;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 0 0 0 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.sidebar > .children > .label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00FF41;
+}
+
+#searchField {
+    -fx-background-color: #0D1410;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+    -fx-padding: 7px 10px;
+    -fx-prompt-text-fill: #58D68D;
+    -fx-text-fill: #00FF41;
+}
+
+#searchField:focused {
+    -fx-background-color: #1A2E1E;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+}
+
+.sidebar-button {
+    -fx-background-color: #0D1410;
+    -fx-text-fill: #00FF41;
+    -fx-alignment: center-left;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 7px 10px;
+    -fx-max-width: infinity;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: #1A2E1E;
+    -fx-text-fill: #00FF41;
+}
+
+.sidebar-button.active {
+    -fx-background-color: #1A2E1E;
+    -fx-text-fill: #00FF41;
+    -fx-border-color: #00FF41;
+}
+
+/* Icone Sidebar */
+.sidebar-button .sidebar-icon,
+.sidebar-button .ikonli-font-icon,
+#themeButton .sidebar-icon,
+#themeButton .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+
+
+.sidebar-button.active .sidebar-icon,
+.sidebar-button.active .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+.context-menu {
+    -fx-background-color: #0D1410;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.context-menu .label {
+    -fx-text-fill: #00FF41;
+    -fx-font-weight: bold;
+}
+
+.menu-item {
+    -fx-background-color: #0D1410;
+    -fx-text-fill: #00FF41;
+    -fx-padding: 8px 16px;
+}
+
+.menu-item:hover, .menu-item:focused {
+    -fx-background-color: #1A2E1E;
+    -fx-text-fill: #00FF41;
+}
+
+.menu-item .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+

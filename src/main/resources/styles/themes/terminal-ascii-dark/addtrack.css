@@ -1,0 +1,121 @@
+/* Terminal ASCII (Dark Mode) — addtrack.css */
+
+#formTitleLabel {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00FF41;
+    -fx-padding: 0 0 12 0;
+}
+
+.text-field {
+    -fx-background-color: #0D1410;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-radius: 0;
+    -fx-border-width: 1px;
+    -fx-padding: 8px 10px;
+    -fx-text-fill: #00FF41;
+    -fx-prompt-text-fill: #3A6B45;
+}
+
+.text-field:focused {
+    -fx-background-color: #1A2E1E;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+}
+
+
+
+.combo-box > .list-cell,
+.combo-box .text-field,
+.combo-box .arrow-button {
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+}
+
+.combo-box:focused {
+    -fx-background-color: #1A2E1E;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+}
+
+.check-combo-box {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+
+#addTrackErrorLabel {
+    -fx-text-fill: #00FF41;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+#filePathLabel {
+    -fx-text-fill: #58D68D;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+
+
+#saveTrackButton {
+    -fx-background-color: #00FF41;
+    -fx-text-fill: #0D1410;
+    -fx-font-weight: bold;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-padding: 8px 22px;
+    -fx-cursor: hand;
+}
+
+#saveTrackButton .ikonli-font-icon {
+    -fx-icon-color: #0D1410;
+}
+
+#saveTrackButton:hover {
+    -fx-background-color: #1A2E1E;
+    -fx-text-fill: #00FF41;
+}
+
+#saveTrackButton:hover .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+#saveTrackButton:pressed {
+    -fx-background-color: #00FF41;
+    -fx-text-fill: #0D1410;
+}
+
+#saveTrackButton:pressed .ikonli-font-icon {
+    -fx-icon-color: #0D1410;
+}
+
+#saveTrackButton:disabled {
+    -fx-background-color: #141F16;
+    -fx-text-fill: #3A6B45;
+    -fx-border-color: #24422B;
+    -fx-opacity: 0.65;
+}
+
+#saveTrackButton:disabled .ikonli-font-icon {
+    -fx-icon-color: #3A6B45;
+}
+
+#loadingOverlay {
+    -fx-background-color: #0D1410;
+    -fx-alignment: center;
+    -fx-spacing: 12px;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+}
+
+#addTrackTagComboBox > .combo-box {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}

@@ -1,0 +1,172 @@
+/* Terminal ASCII (Dark Mode) — player.css */
+
+.player-bar {
+    -fx-background-color: #0D1410;
+    -fx-border-color: #00FF41 transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 10px 18px;
+}
+
+#currentTrackTitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: #00FF41;
+}
+
+#currentTrackDetails {
+    -fx-font-size: 10px;
+    -fx-text-fill: #58D68D;
+}
+
+.player-button {
+    -fx-background-color: #0D1410;
+    -fx-text-fill: #00FF41;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-min-width: 30px;
+    -fx-max-width: 30px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+
+/* Icona verde fosforescente sui player-button a sfondo scuro */
+.player-button .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+.player-button:hover {
+    -fx-background-color: #1A2E1E;
+    -fx-text-fill: #00FF41;
+}
+
+
+
+.player-button:pressed {
+    -fx-background-color: #00FF41;
+    -fx-text-fill: #0D1410;
+}
+
+.player-button:pressed .ikonli-font-icon {
+    -fx-icon-color: #0D1410;
+}
+
+.player-button:disabled {
+    -fx-background-color: #0D1410;
+    -fx-border-color: #24422B;
+    -fx-opacity: 0.5;
+}
+
+.player-button:disabled .ikonli-font-icon {
+    -fx-icon-color: #3A6B45;
+}
+
+/* Stati speciali da Java */
+.player-button:active {
+    -fx-background-color: #1A2E1E;
+    -fx-border-color: #00FF41;
+}
+.player-button:active .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+
+.player-button:repeat-track {
+    -fx-background-color: #1A2E1E;
+    -fx-border-color: #00FF41;
+}
+.player-button:repeat-track .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+
+#volumeButton:muted .ikonli-font-icon {
+    -fx-icon-color: #3A6B45;
+}
+#volumeButton:muted:hover .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+#playPauseButton {
+    -fx-background-color: #00FF41;
+    -fx-text-fill: #0D1410;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-border-radius: 0;
+    -fx-min-width: 36px;
+    -fx-max-width: 36px;
+    -fx-min-height: 30px;
+    -fx-max-height: 30px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+
+/* Icona NERA di default: sfondo fosforescente #00FF41 */
+#playPauseButton .ikonli-font-icon {
+    -fx-icon-color: #0D1410;
+}
+
+#playPauseButton:hover {
+    -fx-background-color: #1A2E1E;
+    -fx-text-fill: #00FF41;
+}
+
+/* In hover lo sfondo è scuro: icona diventa VERDE */
+#playPauseButton:hover .ikonli-font-icon {
+    -fx-icon-color: #00FF41;
+}
+
+#playPauseButton:pressed {
+    -fx-background-color: #00FF41;
+    -fx-text-fill: #0D1410;
+}
+
+#playPauseButton:pressed .ikonli-font-icon {
+    -fx-icon-color: #0D1410;
+}
+
+#playPauseButton:disabled {
+    -fx-background-color: #141F16;
+    -fx-border-color: #24422B;
+    -fx-opacity: 0.5;
+}
+
+#playPauseButton:disabled .ikonli-font-icon {
+    -fx-icon-color: #3A6B45;
+}
+
+
+
+.slider .track {
+    -fx-background-color: #00FF41;
+    -fx-background-radius: 0;
+    -fx-pref-height: 2px;
+}
+
+.slider .thumb {
+    -fx-background-color: #0D1410;
+    -fx-background-radius: 0;
+    -fx-border-color: #00FF41;
+    -fx-border-width: 1px;
+    -fx-pref-width: 12px;
+    -fx-pref-height: 12px;
+}
+
+.slider:hover .thumb {
+    -fx-background-color: #1A2E1E;
+}
+
+#currentTimeLabel, #totalTimeLabel {
+    -fx-font-size: 10px;
+    -fx-text-fill: #58D68D;
+    -fx-font-weight: bold;
+}
