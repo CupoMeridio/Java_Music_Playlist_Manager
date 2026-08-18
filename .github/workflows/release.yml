@@ -1,0 +1,79 @@
+name: Rolling Release (Latest)
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v4
+
+      - name: Configurazione JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Compilazione e creazione Fat JAR con Maven
+        run: mvn clean package -DskipTests
+
+      - name: Preparazione artefatti ed eseguibili con jpackage
+        shell: pwsh
+        run: |
+          # 1. Crea una cartella di staging pulita contenente solo il Fat JAR
+          New-Item -ItemType Directory -Force -Path "target/jpackage-input"
+          Copy-Item "target/Java_Music_Playlist_Manager-*.jar" -Destination "target/jpackage-input/Java-Music-Playlist-Manager.jar"
+          Copy-Item "target/jpackage-input/Java-Music-Playlist-Manager.jar" -Destination "target/Java-Music-Playlist-Manager.jar"
+
+          # 2. Crea il pacchetto autonomo portatile (Cartella con .exe + Java Runtime integrato)
+          jpackage --type app-image `
+            --input "target/jpackage-input" `
+            --name "Java-Music-Playlist-Manager" `
+            --main-jar "Java-Music-Playlist-Manager.jar" `
+            --main-class it.unisa.java_music_playlist_manager.Launcher `
+            --dest "target/dist" `
+            --java-options "--enable-native-access=javafx.graphics,javafx.media"
+
+          # 3. Comprimi la cartella dell'eseguibile in uno zip portabile
+          Compress-Archive -Path "target/dist/Java-Music-Playlist-Manager" -DestinationPath "target/Java-Music-Playlist-Manager-Windows-Portable.zip"
+
+          # 4. Crea l'installer Windows (.msi) con scorciatoia su Desktop e Menu Start
+          jpackage --type msi `
+            --input "target/jpackage-input" `
+            --name "Java-Music-Playlist-Manager" `
+            --main-jar "Java-Music-Playlist-Manager.jar" `
+            --main-class it.unisa.java_music_playlist_manager.Launcher `
+            --dest "target" `
+            --win-shortcut `
+            --win-menu `
+            --java-options "--enable-native-access=javafx.graphics,javafx.media"
+
+      - name: Pubblicazione / Aggiornamento Release "Latest"
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "latest"
+          name: "Latest Release (Continuous Build)"
+          body: |
+            Questa release contiene sempre l'**ultima versione aggiornata** del programma, generata automaticamente a ogni commit sul ramo principale.
+
+            ### 📦 File disponibili per il download:
+            - **`Java-Music-Playlist-Manager-Windows-Portable.zip`**: Versione portabile per Windows (apri lo zip e avvia l'exe, non richiede Java).
+            - **`Java-Music-Playlist-Manager-*.msi`**: Installer di installazione Windows (crea collegamenti su Desktop e Menu Start, non richiede Java).
+            - **`Java-Music-Playlist-Manager.jar`**: Singolo file JAR eseguibile multipiattaforma (richiede Java 21+ installato).
+          artifacts: "target/Java-Music-Playlist-Manager.jar,target/Java-Music-Playlist-Manager-Windows-Portable.zip,target/*.msi"
+          allowUpdates: true
+          removeArtifacts: true
+          replacesArtifacts: true
+          makeLatest: true
+          token: ${{ secrets.GITHUB_TOKEN }}

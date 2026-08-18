@@ -5,7 +5,6 @@ import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.Track;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -17,7 +16,8 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
- * Factory per le righe della tabella dei brani che implementa il Drag & Drop per il riordinamento.
+ * Factory per le righe della tabella dei brani che implementa il Drag & Drop
+ * per il riordinamento.
  */
 public class ReorderableTrackRowFactory implements Callback<TableView<Track>, TableRow<Track>> {
 
@@ -25,7 +25,8 @@ public class ReorderableTrackRowFactory implements Callback<TableView<Track>, Ta
     private final Supplier<Playlist> currentPlaylistProvider;
     private final Runnable onDropCompleted;
 
-    public ReorderableTrackRowFactory(BooleanSupplier isReorderMode, Supplier<Playlist> currentPlaylistProvider, Runnable onDropCompleted) {
+    public ReorderableTrackRowFactory(BooleanSupplier isReorderMode, Supplier<Playlist> currentPlaylistProvider,
+            Runnable onDropCompleted) {
         this.isReorderMode = isReorderMode;
         this.currentPlaylistProvider = currentPlaylistProvider;
         this.onDropCompleted = onDropCompleted;
