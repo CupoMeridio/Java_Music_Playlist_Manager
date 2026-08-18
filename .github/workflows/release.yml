@@ -33,7 +33,7 @@ jobs:
         run: |
           # 1. Crea una cartella di staging pulita contenente solo il Fat JAR
           New-Item -ItemType Directory -Force -Path "target/jpackage-input"
-          Copy-Item "target/Java_Music_Playlist_Manager-*.jar" -Destination "target/jpackage-input/Java-Music-Playlist-Manager.jar"
+          Copy-Item "target/*-shaded.jar" -Destination "target/jpackage-input/Java-Music-Playlist-Manager.jar"
           Copy-Item "target/jpackage-input/Java-Music-Playlist-Manager.jar" -Destination "target/Java-Music-Playlist-Manager.jar"
 
           # 2. Crea il pacchetto autonomo portatile (Cartella con .exe + Java Runtime integrato)
@@ -65,12 +65,12 @@ jobs:
           tag: "latest"
           name: "Latest Release (Continuous Build)"
           body: |
-            Questa release contiene sempre l'**ultima versione aggiornata** del programma, generata automaticamente a ogni commit sul ramo principale.
+            Questa release contiene sempre la versione più recente compilata automaticamente dall'ultimo commit sul ramo principale.
 
-            ### 📦 File disponibili per il download:
-            - **`Java-Music-Playlist-Manager-Windows-Portable.zip`**: Versione portabile per Windows (apri lo zip e avvia l'exe, non richiede Java).
-            - **`Java-Music-Playlist-Manager-*.msi`**: Installer di installazione Windows (crea collegamenti su Desktop e Menu Start, non richiede Java).
-            - **`Java-Music-Playlist-Manager.jar`**: Singolo file JAR eseguibile multipiattaforma (richiede Java 21+ installato).
+            ### File disponibili per il download:
+            - **`Java-Music-Playlist-Manager-Windows-Portable.zip`**: Versione portabile per Windows (apri lo zip ed esegui il file .exe, non richiede Java preinstallato).
+            - **`Java-Music-Playlist-Manager-*.msi`**: Pacchetto di installazione Windows (crea collegamenti su Desktop e Menu Start, non richiede Java preinstallato).
+            - **`Java-Music-Playlist-Manager.jar`**: File JAR eseguibile multipiattaforma (richiede Java 21 o superiore).
           artifacts: "target/Java-Music-Playlist-Manager.jar,target/Java-Music-Playlist-Manager-Windows-Portable.zip,target/*.msi"
           allowUpdates: true
           removeArtifacts: true

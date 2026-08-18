@@ -32,10 +32,8 @@ public class ContextMenuManager {
 
     public static void setupTrackContextMenu(TableView<Track> table, ContextMenuActions actions) {
         ContextMenu contextMenu = new ContextMenu();
-        // Add a dummy item. JavaFX ignores ContextMenu requests on controls if the menu
-        // has 0 items.
-        // This ensures the auto-show mechanism starts and fires setOnShowing, where we
-        // clear and populate it.
+        // Aggiunge un elemento fittizio: JavaFX ignora le richieste di ContextMenu sui controlli se il menu ha 0 elementi.
+        // Questo garantisce che l'evento di apertura si attivi scatenando setOnShowing, dove il menu viene svuotato e popolato.
         contextMenu.getItems().add(new MenuItem(""));
         table.setContextMenu(contextMenu);
 

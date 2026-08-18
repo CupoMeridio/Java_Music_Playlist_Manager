@@ -1,8 +1,8 @@
-/* Shared structural styles for card grid, toggle button and track cards.
- * Imported BEFORE theme-specific overrides; themes override only chromatic props. */
+/* Stili strutturali condivisi per griglia card, pulsante toggle e card dei brani.
+ * Importati prima degli override dei temi; i singoli temi sovrascrivono solo le proprietà cromatiche. */
 
-/* Toggle button & Sort ComboBox — Sincronizzazione altezze e proporzioni.
- * Background / border-color / text-fill are THEMATIC → in each theme file. */
+/* Pulsante toggle e ComboBox di ordinamento — Sincronizzazione altezze e proporzioni.
+ * Sfondo, colore bordo e testo sono tematici e definiti nei singoli file dei temi. */
 .toggle-button {
     -fx-cursor: hand;
     -fx-padding: 6px 14px;
@@ -32,8 +32,8 @@
     -fx-opacity: 0.9;
 }
 
-/* #viewToggleButton: bg, gradient, border-radius, insets and innershadow
- * vary wildly (radius 0…24px) → thematic. Only hover fade shared. */
+/* #viewToggleButton: sfondo, gradiente, raggio del bordo e ombre interne variano in base al tema.
+ * Solo la dissolvenza in hover è condivisa. */
 #viewToggleButton:hover {
     -fx-opacity: 0.85;
 }
@@ -42,7 +42,7 @@
     -fx-icon-color: -fx-text-fill;
 }
 
-/* ControlsFX CardGridView container & cells. */
+/* Contenitore e celle ControlsFX CardGridView */
 .card-grid-view {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
@@ -58,9 +58,8 @@
     -fx-background-color: transparent;
 }
 
-/* TrackCardView — structural invariants:
- *   7/8 themes use radius 10px; base theme overrides to 12px.
- *   Chromatic props (bg-color, border-color) → in each theme. */
+/* TrackCardView — invarianti strutturali: raggio bordi e dimensioni.
+ * I colori sono definiti nei singoli temi. */
 .track-card {
     -fx-padding: 10px;
     -fx-cursor: hand;
@@ -81,7 +80,7 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);
 }
 
-/* Typography: size/weight invariant. Theme overrides only -fx-text-fill. */
+/* Tipografia: dimensioni e peso invarianti. I temi sovrascrivono solo il colore del testo (-fx-text-fill). */
 .track-card-title {
     -fx-alignment: center;
     -fx-text-alignment: center;
@@ -96,7 +95,7 @@
     -fx-opacity: 0.65;
 }
 
-/* Card Play Button Overlay */
+/* Pulsante Play in sovrimpressione sulla card */
 .track-card-image-container {
     -fx-alignment: bottom-right;
 }
@@ -143,7 +142,7 @@
     -fx-icon-color: #FFFFFF;
 }
 
-/* Table Play Button */
+/* Pulsante Play della riga tabella */
 .button.table-play-button {
     -fx-background-color: transparent;
     -fx-background-insets: 0;
@@ -174,7 +173,7 @@
     -fx-icon-color: -fx-text-fill;
 }
 
-/* Player Slider — structural cursor invariants shared across all themes. */
+/* Slider del Player — cursori strutturali condivisi tra tutti i temi. */
 .slider {
     -fx-cursor: default;
 }
@@ -184,7 +183,7 @@
 }
 
 /* ============================================================
- *  Scrollbar — Base / Shared Structural Styling
+ *  Scrollbar — Base e stili strutturali condivisi
  * ============================================================ */
 .scroll-bar {
     -fx-background-color: transparent;
@@ -226,7 +225,7 @@
     -fx-padding: 0;
 }
 
-/* Queue List View — Shared Base */
+/* Coda di riproduzione (ListView) — Base condivisa */
 #queueListView {
     -fx-background-color: transparent;
     -fx-padding: 4px;
