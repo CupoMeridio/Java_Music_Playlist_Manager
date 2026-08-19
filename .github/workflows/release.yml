@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configurazione JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '21'
@@ -63,6 +63,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           tag: "latest"
+          commit: ${{ github.sha }}
           name: "Latest Release (Continuous Build)"
           body: |
             Questa release contiene sempre la versione più recente compilata automaticamente dall'ultimo commit sul ramo principale.
