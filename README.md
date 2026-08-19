@@ -12,7 +12,7 @@ Per utilizzare direttamente l'applicazione senza compilare il codice sorgente, �
 
 - **Versione Portabile per Windows (`.zip`)**: include l'eseguibile `Java-Music-Playlist-Manager.exe` e il runtime Java integrato. È sufficiente estrarre l'archivio ed eseguire il file `.exe`, senza dover installare Java sul sistema.
 - **Installer Windows (`.msi`)**: pacchetto di installazione standard che installa l'applicazione e configura i collegamenti su Desktop e Menu Start.
-- **File JAR Eseguibile (`.jar`)**: singolo archivio multipiattaforma avviabile con doppio clic o tramite comando `java -jar` (richiede Java 21 o superiore installato).
+- **File JAR Eseguibile (`.jar`)**: singolo archivio multipiattaforma avviabile con doppio clic o tramite comando `java -jar` (richiede Java 25 o superiore installato).
 
 ---
 
@@ -124,7 +124,7 @@ Lo stesso criterio guida altre scelte: dove possibile, il codice evita di nascon
 
 ## Tecnologie utilizzate
 
-- **Java 21**
+- **Java 25**
 - **Maven** (gestione dipendenze e build lifecycle)
 - **JavaFX 21** (interfaccia grafica desktop)
 - **ControlsFX** (componenti UI avanzati)
@@ -137,7 +137,7 @@ Lo stesso criterio guida altre scelte: dove possibile, il codice evita di nascon
 
 Per compilare ed eseguire il progetto dal codice sorgente è necessario avere installato:
 
-- JDK 21 o compatibile;
+- JDK 25 o compatibile;
 - Maven;
 - un IDE Java (ad esempio NetBeans, IntelliJ IDEA, Eclipse o VS Code).
 

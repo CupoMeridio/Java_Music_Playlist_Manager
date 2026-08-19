@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!-- Versione Java utilizzata -->
-        <maven.compiler.release>21.0.9</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
 
     </properties>
 
@@ -127,8 +127,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.15.0</version>
                 <configuration>
-                    <!-- Compila usando Java 21 -->
-                    <release>21</release>
+                    <!-- Compila usando Java 25 -->
+                    <release>25</release>
                     <!-- Sopprime il warning sui moduli automatici con nome instabile (es. jaudiotagger) -->
                     <compilerArgs>
                         <arg>-Xlint:-module</arg>
