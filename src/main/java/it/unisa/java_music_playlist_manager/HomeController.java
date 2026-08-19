@@ -222,24 +222,38 @@ public class HomeController implements Observer {
             }
         });
 
-        // Menu contestuale (Tasto destro)
-        ContextMenu trackContextMenu = new ContextMenu();
-        topTracksTable.setContextMenu(trackContextMenu);
-        trackContextMenu.setOnShowing(e -> {
-            trackContextMenu.getItems().clear();
-            Track selectedTrack = topTracksTable.getSelectionModel().getSelectedItem();
-            if (selectedTrack == null) {
-                e.consume();
-                return;
-            }
+        // Menu contestuale (Tasto destro) legato alle righe
+        topTracksTable.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<Track> row = new javafx.scene.control.TableRow<>();
+            row.setOnMousePressed(event -> {
+                if (row.isEmpty() || row.getItem() == null) {
+                    return;
+                }
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    tv.getSelectionModel().select(row.getItem());
+                }
+            });
 
+            ContextMenu trackContextMenu = new ContextMenu();
             MenuItem playItem = new MenuItem("Riproduci");
-            playItem.setOnAction(ev -> playTrack(selectedTrack));
-
             MenuItem addToQueueItem = new MenuItem("Aggiungi brano alla coda");
-            addToQueueItem.setOnAction(ev -> PlaybackManager.getInstance().addToQueue(selectedTrack));
-
             trackContextMenu.getItems().addAll(playItem, addToQueueItem);
+
+            trackContextMenu.setOnShowing(e -> {
+                Track selectedTrack = row.getItem();
+                if (selectedTrack == null) {
+                    e.consume();
+                    return;
+                }
+                playItem.setOnAction(ev -> playTrack(selectedTrack));
+                addToQueueItem.setOnAction(ev -> PlaybackManager.getInstance().addToQueue(selectedTrack));
+            });
+
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(trackContextMenu));
+            return row;
         });
     }
 
@@ -261,24 +275,38 @@ public class HomeController implements Observer {
             }
         });
 
-        // Menu contestuale (Tasto destro)
-        ContextMenu playlistContextMenu = new ContextMenu();
-        table.setContextMenu(playlistContextMenu);
-        playlistContextMenu.setOnShowing(e -> {
-            playlistContextMenu.getItems().clear();
-            Playlist selectedPlaylist = table.getSelectionModel().getSelectedItem();
-            if (selectedPlaylist == null) {
-                e.consume();
-                return;
-            }
+        // Menu contestuale (Tasto destro) legato alle righe
+        table.setRowFactory(tv -> {
+            javafx.scene.control.TableRow<Playlist> row = new javafx.scene.control.TableRow<>();
+            row.setOnMousePressed(event -> {
+                if (row.isEmpty() || row.getItem() == null) {
+                    return;
+                }
+                if (event.getButton() == MouseButton.SECONDARY) {
+                    tv.getSelectionModel().select(row.getItem());
+                }
+            });
 
+            ContextMenu playlistContextMenu = new ContextMenu();
             MenuItem playItem = new MenuItem("Riproduci playlist");
-            playItem.setOnAction(ev -> playPlaylist(selectedPlaylist));
-
             MenuItem addToQueueItem = new MenuItem("Aggiungi playlist alla coda");
-            addToQueueItem.setOnAction(ev -> PlaybackManager.getInstance().addToQueue(selectedPlaylist));
-
             playlistContextMenu.getItems().addAll(playItem, addToQueueItem);
+
+            playlistContextMenu.setOnShowing(e -> {
+                Playlist selectedPlaylist = row.getItem();
+                if (selectedPlaylist == null) {
+                    e.consume();
+                    return;
+                }
+                playItem.setOnAction(ev -> playPlaylist(selectedPlaylist));
+                addToQueueItem.setOnAction(ev -> PlaybackManager.getInstance().addToQueue(selectedPlaylist));
+            });
+
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(playlistContextMenu));
+            return row;
         });
     }
 

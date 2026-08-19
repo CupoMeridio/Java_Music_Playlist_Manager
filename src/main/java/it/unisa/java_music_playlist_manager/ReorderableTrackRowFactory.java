@@ -5,6 +5,8 @@ import it.unisa.java_music_playlist_manager.model.ManualPlaylist;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
 import it.unisa.java_music_playlist_manager.model.Playlist;
 import it.unisa.java_music_playlist_manager.model.Track;
+import it.unisa.java_music_playlist_manager.ui.ContextMenuManager;
+import it.unisa.java_music_playlist_manager.ui.ContextMenuManager.ContextMenuActions;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.input.ClipboardContent;
@@ -24,17 +26,27 @@ public class ReorderableTrackRowFactory implements Callback<TableView<Track>, Ta
     private final BooleanSupplier isReorderMode;
     private final Supplier<Playlist> currentPlaylistProvider;
     private final Runnable onDropCompleted;
+    private final ContextMenuActions contextMenuActions;
 
     public ReorderableTrackRowFactory(BooleanSupplier isReorderMode, Supplier<Playlist> currentPlaylistProvider,
-            Runnable onDropCompleted) {
+            Runnable onDropCompleted, ContextMenuActions contextMenuActions) {
         this.isReorderMode = isReorderMode;
         this.currentPlaylistProvider = currentPlaylistProvider;
         this.onDropCompleted = onDropCompleted;
+        this.contextMenuActions = contextMenuActions;
+    }
+
+    public ReorderableTrackRowFactory(BooleanSupplier isReorderMode, Supplier<Playlist> currentPlaylistProvider,
+            Runnable onDropCompleted) {
+        this(isReorderMode, currentPlaylistProvider, onDropCompleted, null);
     }
 
     @Override
     public TableRow<Track> call(TableView<Track> tv) {
         TableRow<Track> row = new TableRow<>();
+        if (contextMenuActions != null) {
+            ContextMenuManager.bindTrackContextMenu(row, contextMenuActions);
+        }
 
         row.setOnDragDetected(event -> {
             if (!row.isEmpty() && isReorderMode.getAsBoolean()) {

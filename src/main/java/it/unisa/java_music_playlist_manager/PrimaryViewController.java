@@ -405,7 +405,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         setupQueueListView();
         setupTrackCardGridView();
 
-        ContextMenuManager.setupTrackContextMenu(trackTableView, this);
+
         ContextMenuManager.setupPlaylistContextMenu(playlistTableView, this);
 
         if (trackTableView != null)
@@ -982,7 +982,8 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
         trackTableView.setRowFactory(new ReorderableTrackRowFactory(
                 () -> reorderButton != null && reorderButton.isSelected(),
                 () -> currentOpenedPlaylist,
-                this::updatePlayerUI));
+                this::updatePlayerUI,
+                this));
 
         afterViewSwitch();
     }
