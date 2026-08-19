@@ -59,6 +59,10 @@ jobs:
             --win-menu `
             --java-options "--enable-native-access=javafx.graphics,javafx.media"
 
+      - name: Forza l'aggiornamento del tag "latest" al commit corrente
+        shell: bash
+        run: git push --force origin HEAD:refs/tags/latest
+
       - name: Pubblicazione / Aggiornamento Release "Latest"
         uses: ncipollo/release-action@v1
         with:
