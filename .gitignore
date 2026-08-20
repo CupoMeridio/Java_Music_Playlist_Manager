@@ -34,3 +34,6 @@ salvataggio/
 
 # VS Code
 .vscode/
+
+# Trae IDE
+.trae/

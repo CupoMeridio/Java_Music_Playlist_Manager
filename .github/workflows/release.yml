@@ -18,11 +18,11 @@ jobs:
       - name: Checkout del codice
         uses: actions/checkout@v4
 
-      - name: Configurazione JDK 21
+      - name: Configurazione JDK 25
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: '21'
+          java-version: '25'
           cache: 'maven'
 
       - name: Compilazione e creazione Fat JAR con Maven
@@ -75,7 +75,7 @@ jobs:
             ### File disponibili per il download:
             - **`Java-Music-Playlist-Manager-Windows-Portable.zip`**: Versione portabile per Windows (apri lo zip ed esegui il file .exe, non richiede Java preinstallato).
             - **`Java-Music-Playlist-Manager-*.msi`**: Pacchetto di installazione Windows (crea collegamenti su Desktop e Menu Start, non richiede Java preinstallato).
-            - **`Java-Music-Playlist-Manager.jar`**: File JAR eseguibile multipiattaforma (richiede Java 21 o superiore).
+            - **`Java-Music-Playlist-Manager.jar`**: File JAR eseguibile multipiattaforma (richiede Java 25 o superiore).
           artifacts: "target/Java-Music-Playlist-Manager.jar,target/Java-Music-Playlist-Manager-Windows-Portable.zip,target/*.msi"
           allowUpdates: true
           removeArtifacts: true
