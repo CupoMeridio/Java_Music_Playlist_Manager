@@ -40,27 +40,11 @@ Questo repository contiene due branch principali che riflettono fasi di vita div
 - **`consegna-esame`**: Questo branch rappresenta lo stato ufficiale del progetto consegnato e presentato al docente per l'esame. È allineato al 100% con la documentazione tecnica e rappresenta l'esito formale del processo di sviluppo basato sulla filosofia Agile e sulle regole Scrum seguite durante il corso. Se sei interessato a valutare il progetto didattico e il processo di ingegneria del software seguito per l'esame, questo è il branch di riferimento.
 - **`master`** (il branch attuale): È un'evoluzione e continuazione del progetto post-esame. Lo sviluppo ufficiale si è concluso con la consegna, ma in questo branch il progetto viene portato avanti per piacere personale. Include vari refactoring, ottimizzazioni del codice, l'aggiunta di nuovi temi grafici e piccole funzionalità aggiuntive. Queste modifiche **non** fanno più parte del contesto dell'esame e non seguono i processi di sprint Agile/Scrum documentati.
 
-### La documentazione del processo (riferimento: `consegna-esame`)
+## Documentazione del processo (riferimento: `consegna-esame`)
 
-Questo repository non contiene solo un'applicazione funzionante, ma soprattutto la documentazione del processo di sviluppo.
+Questo repository non contiene solo un'applicazione funzionante, ma soprattutto la documentazione del processo di sviluppo. Essa è parte integrante del progetto, perché descrive le scelte di progettazione, l'organizzazione del lavoro di gruppo e l'evoluzione dell'architettura software.
 
-La cartella [`docs/`](docs/) raccoglie, sprint dopo sprint, gli artefatti prodotti durante il corso:
-
-- Product Backlog iniziale;
-- Relazione Tecnico-Metodologica;
-- Sprint Planning;
-- Sprint Backlog;
-- Burndown Chart;
-- Sprint Review;
-- Sprint Retrospective;
-- presentazioni di progetto;
-- diagrammi e documentazione architetturale.
-
-Questa documentazione è parte integrante del progetto, perché descrive le scelte di progettazione, l'organizzazione del lavoro di gruppo e l'evoluzione dell'architettura software.
-
-## Documentazione
-
-La documentazione è organizzata per fase e sprint:
+La cartella [`docs/`](docs/) raccoglie gli artefatti prodotti durante il corso, organizzati per fase e sprint (Product Backlog, Sprint Planning, Review, Retrospective, Burndown Chart, diagrammi, ecc.):
 
 ```text
 docs/
