@@ -33,7 +33,14 @@ L'applicazione permette di:
 
 Il software è pensato per lavorare su file musicali locali e non richiede servizi esterni o piattaforme di streaming.
 
-## Focus del progetto
+## Rami (Branches) del progetto e Focus
+
+Questo repository contiene due branch principali che riflettono fasi di vita diverse del progetto:
+
+- **`consegna-esame`**: Questo branch rappresenta lo stato ufficiale del progetto consegnato e presentato al docente per l'esame. È allineato al 100% con la documentazione tecnica e rappresenta l'esito formale del processo di sviluppo basato sulla filosofia Agile e sulle regole Scrum seguite durante il corso. Se sei interessato a valutare il progetto didattico e il processo di ingegneria del software seguito per l'esame, questo è il branch di riferimento.
+- **`master`** (il branch attuale): È un'evoluzione e continuazione del progetto post-esame. Lo sviluppo ufficiale si è concluso con la consegna, ma in questo branch il progetto viene portato avanti per piacere personale. Include vari refactoring, ottimizzazioni del codice, l'aggiunta di nuovi temi grafici e piccole funzionalità aggiuntive. Queste modifiche **non** fanno più parte del contesto dell'esame e non seguono i processi di sprint Agile/Scrum documentati.
+
+### La documentazione del processo (riferimento: `consegna-esame`)
 
 Questo repository non contiene solo un'applicazione funzionante, ma soprattutto la documentazione del processo di sviluppo.
 

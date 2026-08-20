@@ -23,9 +23,9 @@ public class PlaybackManagerTest {
         manager.setStrategy(new SequentialStrategy());
         manager.setQueue(new ArrayList<>());
 
-        // Utilizzo di un file reale dalla cartella "brani di prova" per rendere i test più veritieri
+        // Utilizzo di un file reale dalla cartella resources per rendere i test più veritieri
         String baseDir = System.getProperty("user.dir");
-        String realPath = new java.io.File(baseDir, "brani di prova/Vibing Over Venus.mp3").getAbsolutePath();
+        String realPath = new java.io.File(baseDir, "src/test/resources/test_song.mp3").getAbsolutePath();
 
         track1 = new Track("Vibing Over Venus", "NCS", "Release", 180, "Electronic", 2024, realPath);
         track2 = new Track("Song 2", "Artist 2", "Album 2", 200, "Rock", 2026, realPath);

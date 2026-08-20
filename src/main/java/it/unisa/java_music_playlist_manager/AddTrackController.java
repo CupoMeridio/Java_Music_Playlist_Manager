@@ -249,11 +249,16 @@ public class AddTrackController {
     private void handleSelectFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleziona File Audio");
-        
-        // Shortcut alla cartella brani di prova se esiste
-        File defaultDir = new File(System.getProperty("user.dir"), "brani di prova");
-        if (defaultDir.exists() && defaultDir.isDirectory()) fileChooser.setInitialDirectory(defaultDir);
-
+        File userHome = new File(System.getProperty("user.home"));
+        File musicDir = new File(userHome, "Music");
+        if (!musicDir.exists() || !musicDir.isDirectory()) {
+            musicDir = new File(userHome, "Musica");
+        }
+        if (musicDir.exists() && musicDir.isDirectory()) {
+            fileChooser.setInitialDirectory(musicDir);
+        } else {
+            fileChooser.setInitialDirectory(userHome);
+        }
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File Audio", "*.mp3", "*.wav", "*.m4a"));
 
         File file = fileChooser.showOpenDialog(addTrackTitleField.getScene().getWindow());

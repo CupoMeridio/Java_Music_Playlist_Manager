@@ -33,7 +33,7 @@ public class TrackTest {
     public void setUp() {
         // eseguito prima di ogni singolo test. 
         String baseDir = System.getProperty("user.dir");
-        String realPath = new java.io.File(baseDir, "brani di prova/Vibing Over Venus.mp3").getAbsolutePath();
+        String realPath = new java.io.File(baseDir, "src/test/resources/test_song.mp3").getAbsolutePath();
         track = new Track("Epitaph", "King Crimson", "In the Court of the Crimson King", 527, "Progressive Rock", 1969, realPath);
     }
     
@@ -53,7 +53,7 @@ public class TrackTest {
         assertEquals(527, track.getDuration());
         assertEquals("Progressive Rock", track.getGenre());
         assertEquals(1969, track.getYear());
-        assertTrue(track.getFilePath().contains("Vibing Over Venus.mp3"));
+        assertTrue(track.getFilePath().contains("test_song.mp3"));
     }
 
     @Test
