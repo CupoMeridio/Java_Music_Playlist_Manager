@@ -66,15 +66,8 @@ public class TrackCardView extends VBox {
                     onPlayHandler.accept(track);
                 }
             });
-            // Evita che il click sul bottone si propaghi alla GridCell come click di
-            // selezione
-            playButton.setOnMouseClicked(event -> {
-                event.consume();
-                if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY && onPlayHandler != null
-                        && track != null) {
-                    onPlayHandler.accept(track);
-                }
-            });
+            // Evita che il click sul bottone si propaghi alla GridCell come click di selezione
+            playButton.setOnMouseClicked(javafx.scene.input.MouseEvent::consume);
         }
     }
 

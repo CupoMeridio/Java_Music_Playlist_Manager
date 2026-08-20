@@ -57,7 +57,24 @@ import javafx.beans.property.SimpleIntegerProperty;
 import it.unisa.java_music_playlist_manager.model.Tag;
 import it.unisa.java_music_playlist_manager.model.TrackSortOption;
 import it.unisa.java_music_playlist_manager.model.ViewType;
+import it.unisa.java_music_playlist_manager.model.AddMultipleTracksCommand;
 import java.util.Set;
+import java.io.File;
+import javafx.stage.FileChooser;
+import javafx.stage.DirectoryChooser;
+import javafx.concurrent.Task;
+import javafx.application.Platform;
+import javafx.geometry.Side;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.FieldKey;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
+import javafx.scene.control.Dialog;
+import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.VBox;
 import java.util.HashSet;
 import javafx.scene.Node;
 
@@ -904,15 +921,7 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
                         handleStartTrackPlayback(track);
                     }
                 });
-                playBtn.setOnMouseClicked(event -> {
-                    event.consume();
-                    if (event.getButton() == javafx.scene.input.MouseButton.PRIMARY) {
-                        Track track = getTableRow() != null ? getTableRow().getItem() : null;
-                        if (track != null) {
-                            handleStartTrackPlayback(track);
-                        }
-                    }
-                });
+                playBtn.setOnMouseClicked(javafx.scene.input.MouseEvent::consume);
                 setAlignment(javafx.geometry.Pos.CENTER);
             }
 
@@ -1098,9 +1107,145 @@ public class PrimaryViewController implements Observer, ContextMenuActions {
     private void handleActionBtnClick() {
         if (currentViewType == ViewType.MUSIC) {
             currentEditingTrack = null;
-            openAddTrackView();
+            ContextMenu contextMenu = new ContextMenu();
+            
+            MenuItem singleItem = new MenuItem("Aggiungi singolo brano (Modifica metadati)");
+            singleItem.setOnAction(e -> openAddTrackView());
+            
+            MenuItem multiItem = new MenuItem("Aggiungi più file...");
+            multiItem.setOnAction(e -> handleAddFiles());
+            
+            MenuItem folderItem = new MenuItem("Aggiungi intera cartella...");
+            folderItem.setOnAction(e -> handleAddFolder());
+            
+            contextMenu.getItems().addAll(singleItem, multiItem, folderItem);
+            contextMenu.show(actionButton, Side.BOTTOM, 0, 0);
         } else if (currentViewType == ViewType.PLAYLISTS) {
             dialogService.openCreatePlaylistDialog();
+        }
+    }
+
+    private void handleAddFiles() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Seleziona File Audio");
+        File userHome = new File(System.getProperty("user.home"));
+        File musicDir = new File(userHome, "Music");
+        if (!musicDir.exists() || !musicDir.isDirectory()) musicDir = new File(userHome, "Musica");
+        fileChooser.setInitialDirectory((musicDir.exists() && musicDir.isDirectory()) ? musicDir : userHome);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("File Audio", "*.mp3", "*.wav", "*.m4a"));
+        
+        List<File> files = fileChooser.showOpenMultipleDialog(actionButton.getScene().getWindow());
+        if (files != null && !files.isEmpty()) {
+            processMultipleFilesAsync(files);
+        }
+    }
+
+    private void handleAddFolder() {
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setTitle("Seleziona Cartella Musicale");
+        File userHome = new File(System.getProperty("user.home"));
+        File musicDir = new File(userHome, "Music");
+        if (!musicDir.exists() || !musicDir.isDirectory()) musicDir = new File(userHome, "Musica");
+        dirChooser.setInitialDirectory((musicDir.exists() && musicDir.isDirectory()) ? musicDir : userHome);
+        
+        File dir = dirChooser.showDialog(actionButton.getScene().getWindow());
+        if (dir != null) {
+            try (Stream<Path> paths = Files.walk(dir.toPath())) {
+                List<File> files = paths.filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .filter(f -> {
+                        String name = f.getName().toLowerCase();
+                        return name.endsWith(".mp3") || name.endsWith(".wav") || name.endsWith(".m4a");
+                    })
+                    .collect(Collectors.toList());
+                if (!files.isEmpty()) {
+                    processMultipleFilesAsync(files);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void processMultipleFilesAsync(List<File> files) {
+        Dialog<Void> progressDialog = new Dialog<>();
+        progressDialog.setTitle("Importazione Brani");
+        progressDialog.setHeaderText("Analisi di " + files.size() + " brani in corso...");
+        
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.setPrefWidth(300);
+        Label progressLabel = new Label("Preparazione...");
+        
+        VBox content = new VBox(10, progressLabel, progressBar);
+        progressDialog.getDialogPane().setContent(content);
+        progressDialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL); // Required to show dialog, though we will close it programmatically
+        progressDialog.getDialogPane().lookupButton(ButtonType.CANCEL).setDisable(true); // Disable cancel for simplicity
+        
+        Task<List<Track>> task = new Task<>() {
+            @Override
+            protected List<Track> call() {
+                List<Track> importedTracks = new ArrayList<>();
+                for (int i = 0; i < files.size(); i++) {
+                    File file = files.get(i);
+                    updateMessage("Elaborazione: " + file.getName() + " (" + (i+1) + "/" + files.size() + ")");
+                    updateProgress(i, files.size());
+                    Track t = extractMetadata(file);
+                    if (t != null) {
+                        importedTracks.add(t);
+                    }
+                }
+                updateProgress(files.size(), files.size());
+                return importedTracks;
+            }
+        };
+
+        task.messageProperty().addListener((obs, oldMsg, newMsg) -> {
+            Platform.runLater(() -> progressLabel.setText(newMsg));
+        });
+        
+        task.progressProperty().addListener((obs, oldProg, newProg) -> {
+            Platform.runLater(() -> progressBar.setProgress(newProg.doubleValue()));
+        });
+
+        task.setOnSucceeded(e -> {
+            List<Track> importedTracks = task.getValue();
+            if (!importedTracks.isEmpty()) {
+                Command addMulti = new AddMultipleTracksCommand(Library.getInstance(), importedTracks);
+                UndoManager.getInstance().executeCommand(addMulti);
+            }
+            progressDialog.setResult(null);
+            progressDialog.close();
+        });
+
+        task.setOnFailed(e -> {
+            progressDialog.setResult(null);
+            progressDialog.close();
+        });
+
+        new Thread(task).start();
+        progressDialog.showAndWait();
+    }
+
+    private Track extractMetadata(File file) {
+        try {
+            AudioFile f = AudioFileIO.read(file);
+            org.jaudiotagger.tag.Tag tag = f.getTag();
+            String title = (tag != null && tag.getFirst(FieldKey.TITLE) != null && !tag.getFirst(FieldKey.TITLE).isEmpty()) 
+                    ? tag.getFirst(FieldKey.TITLE) : file.getName().replaceFirst("[.][^.]+$", "");
+            String author = (tag != null && tag.getFirst(FieldKey.ARTIST) != null && !tag.getFirst(FieldKey.ARTIST).isEmpty()) 
+                    ? tag.getFirst(FieldKey.ARTIST) : "Artista Sconosciuto";
+            String album = (tag != null && tag.getFirst(FieldKey.ALBUM) != null) ? tag.getFirst(FieldKey.ALBUM) : "";
+            String genre = (tag != null && tag.getFirst(FieldKey.GENRE) != null) ? tag.getFirst(FieldKey.GENRE) : "Altro";
+            String yearStr = (tag != null && tag.getFirst(FieldKey.YEAR) != null) ? tag.getFirst(FieldKey.YEAR) : "";
+            Integer year = null;
+            if (!yearStr.isEmpty()) {
+                try { year = Integer.parseInt(yearStr.replaceAll("[^0-9]", "")); } catch (Exception ignored) {}
+            }
+            int duration = f.getAudioHeader().getTrackLength(); // seconds
+            return new Track(title, author, album, duration, genre, year, file.getAbsolutePath());
+        } catch (Exception e) {
+            // Fallback base
+            return new Track(file.getName().replaceFirst("[.][^.]+$", ""), "Artista Sconosciuto", "", 0, "Altro", null, file.getAbsolutePath());
         }
     }
 
