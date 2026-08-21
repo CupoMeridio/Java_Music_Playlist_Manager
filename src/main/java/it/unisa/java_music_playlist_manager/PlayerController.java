@@ -7,6 +7,7 @@ import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
 import it.unisa.java_music_playlist_manager.model.Observer;
 import it.unisa.java_music_playlist_manager.model.Library;
 import it.unisa.java_music_playlist_manager.model.StoppedState;
+import it.unisa.java_music_playlist_manager.utils.TimeFormatUtils;
 import javafx.animation.RotateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -292,7 +293,7 @@ public class PlayerController implements Observer {
             }
             double totalSec = manager.getAudioTotalDuration();
             if (totalTimeLabel != null)
-                totalTimeLabel.setText(formatTime(totalSec));
+                totalTimeLabel.setText(TimeFormatUtils.formatDuration((int) totalSec));
             if (progressSlider != null)
                 progressSlider.setMax(totalSec);
         }));
@@ -301,7 +302,7 @@ public class PlayerController implements Observer {
                 progressSlider.setValue(timeSec);
             }
             if (currentTimeLabel != null)
-                currentTimeLabel.setText(formatTime(timeSec));
+                currentTimeLabel.setText(TimeFormatUtils.formatDuration((int) timeSec));
         }));
     }
 
@@ -477,20 +478,6 @@ public class PlayerController implements Observer {
         } else {
             showVinylView();
         }
-    }
-
-    /**
-     * Formatta un tempo in secondi come {@code mm:ss}.
-     * <p>
-     * Accetta un {@code double} invece di {@code Duration} per rimanere
-     * disaccoppiato da qualsiasi libreria UI (DIP).
-     *
-     * @param totalSeconds tempo in secondi
-     * @return stringa formattata {@code mm:ss}
-     */
-    private String formatTime(double totalSeconds) {
-        int seconds = (int) totalSeconds;
-        return String.format("%02d:%02d", seconds / 60, seconds % 60);
     }
 
     // Gestori eventi UI

@@ -13,13 +13,9 @@ import it.unisa.java_music_playlist_manager.model.AddTrackCommand;
 import java.util.List;
 import java.util.TreeSet;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-// IMPORTAZIONI JAUDIOTAGGER per lettura affidabile dei tag ID3
-import org.jaudiotagger.audio.AudioFile;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.FieldKey;
+
+// IMPORTAZIONI JAUDIOTAGGER rimosse: la logica è ora in TrackMetadataExtractor
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -297,33 +293,14 @@ public class AddTrackController {
         addTrackTitleField.setText(lastDot > 0 ? fileName.substring(0, lastDot) : fileName);
 
         new Thread(() -> {
-            // 1. Lettura tag ID3 con jaudiotagger (sincrona)
-            String title = null, artist = null, album = null, genre = null, year = null;
-            try {
-                // Silenzia il logger verboso di jaudiotagger
-                Logger.getLogger("org.jaudiotagger").setLevel(Level.OFF);
-
-                AudioFile audioFile = AudioFileIO.read(file);
-                org.jaudiotagger.tag.Tag id3Tag = audioFile.getTag();
-                if (id3Tag != null) {
-                    title  = safeGet(id3Tag, FieldKey.TITLE);
-                    artist = safeGet(id3Tag, FieldKey.ARTIST);
-                    album  = safeGet(id3Tag, FieldKey.ALBUM);
-                    genre  = safeGet(id3Tag, FieldKey.GENRE);
-                    year   = safeGet(id3Tag, FieldKey.YEAR);
-                }
-            } catch (Exception e) {
-                // File non supportato da jaudiotagger (es. WAV senza tag) o errore di parsing: logga l'eccezione e procedi con campi vuoti
-                Logger.getLogger(AddTrackController.class.getName()).log(Level.WARNING,
-                        "Lettura metadati jaudiotagger fallita per: " + file.getName(), e);
-            }
+            it.unisa.java_music_playlist_manager.model.Track extractedTrack = it.unisa.java_music_playlist_manager.model.TrackMetadataExtractor.extractMetadata(file);
 
             // Cattura variabili final per il lambda del Platform.runLater
-            final String fTitle  = title;
-            final String fArtist = artist;
-            final String fAlbum  = album;
-            final String fGenre  = genre;
-            final String fYear   = year;
+            final String fTitle  = extractedTrack.getTitle();
+            final String fArtist = extractedTrack.getAuthor();
+            final String fAlbum  = extractedTrack.getAlbum();
+            final String fGenre  = extractedTrack.getGenre();
+            final String fYear   = extractedTrack.getYear() != null ? String.valueOf(extractedTrack.getYear()) : null;
 
             // 2. Aggiorna i campi UI con i tag letti
             Platform.runLater(() -> {
@@ -403,17 +380,7 @@ public class AddTrackController {
         });
     }
 
-    /**
-     * Legge in modo sicuro un campo da un tag jaudiotagger, restituendo null se assente o vuoto.
-     */
-    private String safeGet(org.jaudiotagger.tag.Tag tag, FieldKey key) {
-        try {
-            String value = tag.getFirst(key);
-            return (value != null && !value.trim().isEmpty()) ? value.trim() : null;
-        } catch (Exception e) {
-            return null;
-        }
-    }
+
 
     private void startAnalysisTimeout(MediaPlayer player) {
         new Thread(() -> {

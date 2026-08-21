@@ -2,6 +2,7 @@ package it.unisa.java_music_playlist_manager;
 
 import it.unisa.java_music_playlist_manager.model.*;
 import it.unisa.java_music_playlist_manager.ui.ContextMenuManager;
+import it.unisa.java_music_playlist_manager.utils.TimeFormatUtils;
 
 import java.util.Comparator;
 import java.util.List;
@@ -107,7 +108,7 @@ public class HomeController implements Observer {
         topPlaylistCountColumn.setCellValueFactory(
                 data -> new SimpleIntegerProperty(data.getValue().getTrackCount()).asObject());
         topPlaylistDurationColumn.setCellValueFactory(
-                data -> new SimpleStringProperty(formatDuration(data.getValue().getDuration())));
+                data -> new SimpleStringProperty(TimeFormatUtils.formatDuration(data.getValue().getDuration())));
 
         // Tabella playlist più riprodotte
         topPlayedPlaylistRankColumn.setCellFactory(col -> new TableCell<>() {
@@ -330,10 +331,6 @@ public class HomeController implements Observer {
     }
 
     // Utilità
-
-    private String formatDuration(int seconds) {
-        return String.format("%02d:%02d", seconds / 60, seconds % 60);
-    }
 
     private <T> void setTablePlaceholder(TableView<T> table, String message) {
         Label placeholder = new Label(message);
