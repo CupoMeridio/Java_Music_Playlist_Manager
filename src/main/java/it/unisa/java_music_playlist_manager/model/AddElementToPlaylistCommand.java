@@ -1,5 +1,7 @@
 package it.unisa.java_music_playlist_manager.model;
 
+import it.unisa.java_music_playlist_manager.model.command.Command;
+
 /**
  * Comando per l'inserimento di un elemento {@link Playable} (traccia o sotto-playlist)
  * all'interno di una {@link MutablePlaylist}.

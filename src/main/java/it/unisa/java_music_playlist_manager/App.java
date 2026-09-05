@@ -1,11 +1,12 @@
 package it.unisa.java_music_playlist_manager;
 
+import it.unisa.java_music_playlist_manager.dao.JsonLibraryDAO;
+import it.unisa.java_music_playlist_manager.dao.LibraryDAO;
 import it.unisa.java_music_playlist_manager.model.Library;
-import it.unisa.java_music_playlist_manager.model.LibraryDAO;
-import it.unisa.java_music_playlist_manager.model.JsonLibraryDAO;
 import it.unisa.java_music_playlist_manager.model.PlaybackManager;
-import it.unisa.java_music_playlist_manager.model.UndoManager;
-import it.unisa.java_music_playlist_manager.ui.JavaFXAudioEngine;
+import it.unisa.java_music_playlist_manager.model.command.UndoManager;
+import it.unisa.java_music_playlist_manager.services.JavaFXAudioEngine;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +22,8 @@ import javafx.scene.control.ButtonType;
  * JavaFX App — bootstrap dell'applicazione.
  * <p>
  * Qui avviene l'<i>Composition Root</i> (Punto di Composizione)
- * in cui iniettiamo le dipendenze concrete nel layer Model (Dependency Injection).
+ * in cui iniettiamo le dipendenze concrete nel layer Model (Dependency
+ * Injection).
  * Es. assegniamo {@code JavaFXAudioEngine} (layer UI) al
  * {@link PlaybackManager} (layer Model), rispettando il
  * <i>Dependency Inversion Principle</i> e la Ports &amp; Adapters (Hexagonal).
@@ -63,11 +65,15 @@ public class App extends Application {
         ThemeManager.getInstance().setScene(scene);
         ThemeManager.getInstance().applyActiveTheme();
 
-        // Vincoli di sicurezza per garantire leggibilità ed ergonomia su qualsiasi risoluzione.
-        // I valori tengono conto delle decorazioni OS (barra del titolo ~35px, bordi ~8px per lato)
-        // sommati al minWidth=900 e minHeight=600 dichiarati nel BorderPane di primaryView.fxml.
-        stage.setMinWidth(940);   // 900 (BorderPane minWidth) + ~40px decorazioni OS
-        stage.setMinHeight(680);  // 600 (BorderPane minHeight) + ~80px decorazioni OS (titolo + barra delle applicazioni)
+        // Vincoli di sicurezza per garantire leggibilità ed ergonomia su qualsiasi
+        // risoluzione.
+        // I valori tengono conto delle decorazioni OS (barra del titolo ~35px, bordi
+        // ~8px per lato)
+        // sommati al minWidth=900 e minHeight=600 dichiarati nel BorderPane di
+        // primaryView.fxml.
+        stage.setMinWidth(940); // 900 (BorderPane minWidth) + ~40px decorazioni OS
+        stage.setMinHeight(680); // 600 (BorderPane minHeight) + ~80px decorazioni OS (titolo + barra delle
+                                 // applicazioni)
 
         // Caricamento delle icone dell'applicazione in diverse dimensioni.
         loadAppIcons(stage);

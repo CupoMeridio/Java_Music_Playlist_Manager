@@ -1,5 +1,7 @@
 package it.unisa.java_music_playlist_manager.model;
 
+import it.unisa.java_music_playlist_manager.model.command.Command;
+
 /**
  * Comando per l'aggiunta di una playlist alla {@link Library}.
  * Permette il ripristino dello stato precedente (rimozione) in caso di Undo.

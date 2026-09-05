@@ -1,6 +1,8 @@
 
 package it.unisa.java_music_playlist_manager.model;
 
+import it.unisa.java_music_playlist_manager.model.generator.AutomaticPlaylistByYear;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

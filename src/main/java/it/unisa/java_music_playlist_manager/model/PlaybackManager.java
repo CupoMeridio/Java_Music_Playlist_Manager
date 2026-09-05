@@ -1,5 +1,13 @@
 package it.unisa.java_music_playlist_manager.model;
 
+import it.unisa.java_music_playlist_manager.model.state.PausedState;
+import it.unisa.java_music_playlist_manager.model.state.PlaybackState;
+import it.unisa.java_music_playlist_manager.model.state.PlayingState;
+import it.unisa.java_music_playlist_manager.model.state.StoppedState;
+import it.unisa.java_music_playlist_manager.model.strategy.PlaybackStrategy;
+import it.unisa.java_music_playlist_manager.model.strategy.RepeatStrategy;
+import it.unisa.java_music_playlist_manager.model.strategy.SequentialStrategy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.DoubleConsumer;
@@ -738,7 +746,6 @@ public class PlaybackManager implements Subject {
     public void setAudioEnabled(boolean enabled) {
         this.audioEnabled = enabled;
     }
-
 
     // ---------- WRAPPER FACADE PER PlayerController (UI) ----------
     // Questi metodi permettono a PlayerController di pilotare l'audio

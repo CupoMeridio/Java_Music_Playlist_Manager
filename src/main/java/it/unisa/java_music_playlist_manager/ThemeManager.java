@@ -27,7 +27,7 @@ public class ThemeManager {
 
     /** Cartella di salvataggio preferenze (stessa della libreria) */
     private static final String PREFS_PATH = "salvataggio/theme.properties";
-    private static final String PREFS_KEY  = "activeTheme";
+    private static final String PREFS_KEY = "activeTheme";
 
     /** Tema di default */
     private static final String DEFAULT_THEME = "Neo-Pop Brutal";
@@ -53,74 +53,75 @@ public class ThemeManager {
     }
 
     public static synchronized ThemeManager getInstance() {
-        if (instance == null) instance = new ThemeManager();
+        if (instance == null)
+            instance = new ThemeManager();
         return instance;
     }
 
     /** Registra tutti i temi disponibili. */
     private void registerThemes() {
-        themes.put("Neo-Pop Brutal", new String[]{
-            "/styles/themes/neo-pop-brutal/primaryview.css",
-            "/styles/themes/neo-pop-brutal/player.css",
-            "/styles/themes/neo-pop-brutal/sidebar.css",
-            "/styles/themes/neo-pop-brutal/home.css",
-            "/styles/themes/neo-pop-brutal/addtrack.css"
+        themes.put("Neo-Pop Brutal", new String[] {
+                "/styles/themes/neo-pop-brutal/primaryview.css",
+                "/styles/themes/neo-pop-brutal/player.css",
+                "/styles/themes/neo-pop-brutal/sidebar.css",
+                "/styles/themes/neo-pop-brutal/home.css",
+                "/styles/themes/neo-pop-brutal/addtrack.css"
         });
-        themes.put("Phantom Thief", new String[]{
-            "/styles/themes/phantom-thief/primaryview.css",
-            "/styles/themes/phantom-thief/player.css",
-            "/styles/themes/phantom-thief/sidebar.css",
-            "/styles/themes/phantom-thief/home.css",
-            "/styles/themes/phantom-thief/addtrack.css"
+        themes.put("Phantom Thief", new String[] {
+                "/styles/themes/phantom-thief/primaryview.css",
+                "/styles/themes/phantom-thief/player.css",
+                "/styles/themes/phantom-thief/sidebar.css",
+                "/styles/themes/phantom-thief/home.css",
+                "/styles/themes/phantom-thief/addtrack.css"
         });
-        themes.put("Braun Retro-HiFi", new String[]{
-            "/styles/themes/braun-retro-hifi/primaryview.css",
-            "/styles/themes/braun-retro-hifi/player.css",
-            "/styles/themes/braun-retro-hifi/sidebar.css",
-            "/styles/themes/braun-retro-hifi/home.css",
-            "/styles/themes/braun-retro-hifi/addtrack.css"
+        themes.put("Braun Retro-HiFi", new String[] {
+                "/styles/themes/braun-retro-hifi/primaryview.css",
+                "/styles/themes/braun-retro-hifi/player.css",
+                "/styles/themes/braun-retro-hifi/sidebar.css",
+                "/styles/themes/braun-retro-hifi/home.css",
+                "/styles/themes/braun-retro-hifi/addtrack.css"
         });
-        themes.put("Playful Bento Box", new String[]{
-            "/styles/themes/playful-bento-box/primaryview.css",
-            "/styles/themes/playful-bento-box/player.css",
-            "/styles/themes/playful-bento-box/sidebar.css",
-            "/styles/themes/playful-bento-box/home.css",
-            "/styles/themes/playful-bento-box/addtrack.css"
+        themes.put("Playful Bento Box", new String[] {
+                "/styles/themes/playful-bento-box/primaryview.css",
+                "/styles/themes/playful-bento-box/player.css",
+                "/styles/themes/playful-bento-box/sidebar.css",
+                "/styles/themes/playful-bento-box/home.css",
+                "/styles/themes/playful-bento-box/addtrack.css"
         });
-        themes.put("Swiss Bauhaus", new String[]{
-            "/styles/themes/swiss-bauhaus/primaryview.css",
-            "/styles/themes/swiss-bauhaus/player.css",
-            "/styles/themes/swiss-bauhaus/sidebar.css",
-            "/styles/themes/swiss-bauhaus/home.css",
-            "/styles/themes/swiss-bauhaus/addtrack.css"
+        themes.put("Swiss Bauhaus", new String[] {
+                "/styles/themes/swiss-bauhaus/primaryview.css",
+                "/styles/themes/swiss-bauhaus/player.css",
+                "/styles/themes/swiss-bauhaus/sidebar.css",
+                "/styles/themes/swiss-bauhaus/home.css",
+                "/styles/themes/swiss-bauhaus/addtrack.css"
         });
-        themes.put("Terminal ASCII (Light Mode)", new String[]{
-            "/styles/themes/terminal-ascii-light/primaryview.css",
-            "/styles/themes/terminal-ascii-light/player.css",
-            "/styles/themes/terminal-ascii-light/sidebar.css",
-            "/styles/themes/terminal-ascii-light/home.css",
-            "/styles/themes/terminal-ascii-light/addtrack.css"
+        themes.put("Terminal ASCII (Light Mode)", new String[] {
+                "/styles/themes/terminal-ascii-light/primaryview.css",
+                "/styles/themes/terminal-ascii-light/player.css",
+                "/styles/themes/terminal-ascii-light/sidebar.css",
+                "/styles/themes/terminal-ascii-light/home.css",
+                "/styles/themes/terminal-ascii-light/addtrack.css"
         });
-        themes.put("Terminal ASCII (Dark Mode)", new String[]{
-            "/styles/themes/terminal-ascii-dark/primaryview.css",
-            "/styles/themes/terminal-ascii-dark/player.css",
-            "/styles/themes/terminal-ascii-dark/sidebar.css",
-            "/styles/themes/terminal-ascii-dark/home.css",
-            "/styles/themes/terminal-ascii-dark/addtrack.css"
+        themes.put("Terminal ASCII (Dark Mode)", new String[] {
+                "/styles/themes/terminal-ascii-dark/primaryview.css",
+                "/styles/themes/terminal-ascii-dark/player.css",
+                "/styles/themes/terminal-ascii-dark/sidebar.css",
+                "/styles/themes/terminal-ascii-dark/home.css",
+                "/styles/themes/terminal-ascii-dark/addtrack.css"
         });
-        themes.put("Pastel Kawaii", new String[]{
-            "/styles/themes/pastel-kawaii/primaryview.css",
-            "/styles/themes/pastel-kawaii/player.css",
-            "/styles/themes/pastel-kawaii/sidebar.css",
-            "/styles/themes/pastel-kawaii/home.css",
-            "/styles/themes/pastel-kawaii/addtrack.css"
+        themes.put("Pastel Kawaii", new String[] {
+                "/styles/themes/pastel-kawaii/primaryview.css",
+                "/styles/themes/pastel-kawaii/player.css",
+                "/styles/themes/pastel-kawaii/sidebar.css",
+                "/styles/themes/pastel-kawaii/home.css",
+                "/styles/themes/pastel-kawaii/addtrack.css"
         });
-        themes.put("Vaporwave Sunset", new String[]{
-            "/styles/themes/vaporwave-sunset/primaryview.css",
-            "/styles/themes/vaporwave-sunset/player.css",
-            "/styles/themes/vaporwave-sunset/sidebar.css",
-            "/styles/themes/vaporwave-sunset/home.css",
-            "/styles/themes/vaporwave-sunset/addtrack.css"
+        themes.put("Vaporwave Sunset", new String[] {
+                "/styles/themes/vaporwave-sunset/primaryview.css",
+                "/styles/themes/vaporwave-sunset/player.css",
+                "/styles/themes/vaporwave-sunset/sidebar.css",
+                "/styles/themes/vaporwave-sunset/home.css",
+                "/styles/themes/vaporwave-sunset/addtrack.css"
         });
     }
 
@@ -146,7 +147,8 @@ public class ThemeManager {
      * @param themeName nome del tema (deve esistere nel catalogo)
      */
     public void applyTheme(String themeName) {
-        if (!themes.containsKey(themeName)) return;
+        if (!themes.containsKey(themeName))
+            return;
 
         activeTheme = themeName;
         applyActiveThemeToScene(scene);
@@ -171,7 +173,8 @@ public class ThemeManager {
         for (Consumer<String> listener : new ArrayList<>(themeChangeListeners)) {
             try {
                 listener.accept(newTheme);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
     }
 
@@ -180,9 +183,13 @@ public class ThemeManager {
         applyActiveThemeToScene(scene);
     }
 
-    /** Applica il tema attivo corrente a una scena secondaria, ad esempio una finestra modale. */
+    /**
+     * Applica il tema attivo corrente a una scena secondaria, ad esempio una
+     * finestra modale.
+     */
     public void applyActiveThemeToScene(Scene targetScene) {
-        if (targetScene == null) return;
+        if (targetScene == null)
+            return;
 
         targetScene.getStylesheets().clear();
         for (String cssPath : themes.get(activeTheme)) {
@@ -196,8 +203,10 @@ public class ThemeManager {
     }
 
     /**
-     * Mostra un Dialog o Alert applicando il tema attivo non appena la scena viene creata.
-     * Necessario per garantire l'applicazione dei CSS ai dialoghi JavaFX che istanziano
+     * Mostra un Dialog o Alert applicando il tema attivo non appena la scena viene
+     * creata.
+     * Necessario per garantire l'applicazione dei CSS ai dialoghi JavaFX che
+     * istanziano
      * la Scena solo al momento di showAndWait().
      */
     public <T> java.util.Optional<T> showThemedDialog(javafx.scene.control.Dialog<T> dialog) {
@@ -211,7 +220,8 @@ public class ThemeManager {
     /** Legge la preferenza salvata. */
     private void loadPreference() {
         File file = new File(PREFS_PATH);
-        if (!file.exists()) return;
+        if (!file.exists())
+            return;
         try (FileInputStream fis = new FileInputStream(file)) {
             Properties props = new Properties();
             props.load(fis);
@@ -219,7 +229,8 @@ public class ThemeManager {
             if (saved != null && themes.containsKey(saved)) {
                 activeTheme = saved;
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 
     /** Salva la preferenza su disco. */
@@ -231,6 +242,7 @@ public class ThemeManager {
             try (FileOutputStream fos = new FileOutputStream(PREFS_PATH)) {
                 props.store(fos, "Java Music Playlist Manager - Theme Preference");
             }
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
     }
 }

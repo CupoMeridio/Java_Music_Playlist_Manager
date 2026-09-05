@@ -1,5 +1,10 @@
 package it.unisa.java_music_playlist_manager.model;
 
+import it.unisa.java_music_playlist_manager.model.state.PausedState;
+import it.unisa.java_music_playlist_manager.model.state.PlayingState;
+import it.unisa.java_music_playlist_manager.model.state.StoppedState;
+import it.unisa.java_music_playlist_manager.model.strategy.SequentialStrategy;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

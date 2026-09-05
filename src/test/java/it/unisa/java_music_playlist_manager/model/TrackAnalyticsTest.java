@@ -1,5 +1,8 @@
 package it.unisa.java_music_playlist_manager.model;
 
+import it.unisa.java_music_playlist_manager.model.state.StoppedState;
+import it.unisa.java_music_playlist_manager.model.strategy.SequentialStrategy;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -9,8 +12,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Suite di test automatizzati per l'adempimento del Task 4.2.3.
- * Verifica il corretto funzionamento del conteggio delle riproduzioni (analytics)
- * su singoli brani e playlist, e la corretta propagazione degli eventi verso gli osservatori.
+ * Verifica il corretto funzionamento del conteggio delle riproduzioni
+ * (analytics)
+ * su singoli brani e playlist, e la corretta propagazione degli eventi verso
+ * gli osservatori.
  */
 public class TrackAnalyticsTest {
 
@@ -41,7 +46,8 @@ public class TrackAnalyticsTest {
         }
 
         // Inizializzazione dei dati fittizi conformi al dominio
-        track1 = new Track("Epitaph", "King Crimson", "In the Court of the Crimson King", 527, "Progressive Rock", 1969, "path1.mp3");
+        track1 = new Track("Epitaph", "King Crimson", "In the Court of the Crimson King", 527, "Progressive Rock", 1969,
+                "path1.mp3");
         track2 = new Track("Starless", "King Crimson", "Red", 742, "Progressive Rock", 1974, "path2.mp3");
 
         manualPlaylist = new ManualPlaylist("Test Analytics Playlist");
@@ -71,12 +77,15 @@ public class TrackAnalyticsTest {
         playbackManager.selectAndLoadTrack(track1, List.of(track1));
         playbackManager.forcePlayCurrent();
 
-        assertEquals(1, track1.getPlayCount(), "Il contatore del brano deve essere incrementato a 1 dopo la riproduzione.");
+        assertEquals(1, track1.getPlayCount(),
+                "Il contatore del brano deve essere incrementato a 1 dopo la riproduzione.");
     }
 
     /**
-     * Verifica che la riproduzione di un brano all'interno di una playlist incrementi
-     * simultaneamente sia il contatore del brano che quello della playlist contenitrice.
+     * Verifica che la riproduzione di un brano all'interno di una playlist
+     * incrementi
+     * simultaneamente sia il contatore del brano che quello della playlist
+     * contenitrice.
      */
     @Test
     public void testIncrementoPlayCountInContestoPlaylist() {
@@ -92,8 +101,10 @@ public class TrackAnalyticsTest {
     }
 
     /**
-     * Garantisce che la stessa playlist non subisca incrementi multipli del proprio contatore
-     * se l'utente va avanti con le tracce rimanendo sempre all'interno dello stesso blocco riproducibile.
+     * Garantisce che la stessa playlist non subisca incrementi multipli del proprio
+     * contatore
+     * se l'utente va avanti con le tracce rimanendo sempre all'interno dello stesso
+     * blocco riproducibile.
      */
     @Test
     public void testContatorePlaylistNonIncrementatoConsecutivamente() {
@@ -112,7 +123,8 @@ public class TrackAnalyticsTest {
     }
 
     /**
-     * Verifica l'integrità del Pattern Observer: l'incremento delle metriche di riproduzione
+     * Verifica l'integrità del Pattern Observer: l'incremento delle metriche di
+     * riproduzione
      * deve propagare immediatamente una notifica verso gli osservatori registrati.
      */
     @Test
