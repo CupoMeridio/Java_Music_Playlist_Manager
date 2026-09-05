@@ -200,11 +200,12 @@
 }
 
 .table-row-cell:filled:hover {
-    -fx-background-color: #FFDE47;
+    -fx-background-color: #FFF8D6;
 }
 
-.table-row-cell:filled:selected {
-    -fx-background-color: #FF5C5C;
+.table-row-cell:filled:selected,
+.table-row-cell:filled:selected:hover {
+    -fx-background-color: #FFDE47;
 }
 
 .table-row-cell:filled:selected .label {
@@ -292,7 +293,10 @@
 /* Play Buttons — Neo-Pop Brutal */
 .button.card-play-button,
 .button.card-play-button:hover,
-.button.card-play-button:pressed {
+.button.card-play-button:pressed,
+.button.table-play-button,
+.button.table-play-button:hover,
+.button.table-play-button:pressed {
     -fx-background-insets: 0;
     -fx-border-insets: 0;
     -fx-padding: 0;
@@ -305,6 +309,7 @@
     -fx-border-width: 1.5px;
     -fx-border-radius: 50%;
     -fx-background-radius: 50%;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
 }
 
 .button.card-play-button .card-play-icon {
@@ -314,28 +319,60 @@
 .button.card-play-button:hover {
     -fx-background-color: #FF5C5C;
     -fx-border-color: #000000;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
 }
 
 .button.card-play-button:hover .card-play-icon {
     -fx-icon-color: #FFFFFF;
 }
 
-.button.table-play-button,
-.button.table-play-button:hover,
-.button.table-play-button:pressed {
-    -fx-background-color: transparent;
-    -fx-background-insets: 0;
-    -fx-border-color: transparent;
-    -fx-padding: 0;
-    -fx-rotate: 0deg;
+.button.card-play-button:pressed {
+    -fx-background-color: #000000;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 1, 1);
+}
+
+.button.card-play-button:pressed .card-play-icon {
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.table-play-button {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #000000;
+    -fx-border-width: 1.5px;
+    -fx-background-radius: 50%;
+    -fx-border-radius: 50%;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
 }
 
 .button.table-play-button .table-play-icon {
     -fx-icon-color: #000000;
+    -fx-icon-size: 10px;
+}
+
+.button.table-play-button:hover {
+    -fx-background-color: #FF5C5C;
+    -fx-border-color: #000000;
+    -fx-opacity: 1.0;
+    -fx-scale-x: 1.15;
+    -fx-scale-y: 1.15;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 2, 2, 2);
 }
 
 .button.table-play-button:hover .table-play-icon {
-    -fx-icon-color: #FF5C5C;
+    -fx-icon-color: #FFFFFF;
+}
+
+.button.table-play-button:pressed {
+    -fx-background-color: #000000;
+    -fx-border-color: #000000;
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+    -fx-effect: dropshadow(three-pass-box, #000000, 0, 1, 1, 1);
+}
+
+.button.table-play-button:pressed .table-play-icon {
+    -fx-icon-color: #FFFFFF;
 }
 
 /* Queue List View — Neo-Pop Brutal */

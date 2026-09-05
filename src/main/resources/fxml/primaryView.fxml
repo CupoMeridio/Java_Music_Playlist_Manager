@@ -9,10 +9,10 @@
 <!-- 
     File FXML generato e gestito tramite SceneBuilder.
     Definisce la struttura dell'interfaccia utente principale.
-    Collegato al controller it.unisa.java_music_playlist_manager.PrimaryViewController
+    Collegato al controller it.unisa.java_music_playlist_manager.controllers.PrimaryViewController
 -->
 
-<BorderPane minHeight="600.0" minWidth="900.0" prefWidth="1132.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.PrimaryViewController">
+<BorderPane minHeight="600.0" minWidth="900.0" prefWidth="1132.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unisa.java_music_playlist_manager.controllers.PrimaryViewController">
    
    <!-- 1. BARRA LATERALE (LEFT) -->
    <left>

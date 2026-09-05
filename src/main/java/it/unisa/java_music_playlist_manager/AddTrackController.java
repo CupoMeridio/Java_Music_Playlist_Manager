@@ -1,19 +1,18 @@
 package it.unisa.java_music_playlist_manager;
 
 import it.unisa.java_music_playlist_manager.model.Library;
-import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.model.Observer;
-import it.unisa.java_music_playlist_manager.model.TagPredefined;
 import it.unisa.java_music_playlist_manager.model.Tag;
-import it.unisa.java_music_playlist_manager.model.Command;
-import it.unisa.java_music_playlist_manager.model.UndoManager;
-import it.unisa.java_music_playlist_manager.model.UpdateTrackCommand;
-import it.unisa.java_music_playlist_manager.model.AddTrackCommand;
+import it.unisa.java_music_playlist_manager.model.TagPredefined;
+import it.unisa.java_music_playlist_manager.model.Track;
+import it.unisa.java_music_playlist_manager.model.command.AddTrackCommand;
+import it.unisa.java_music_playlist_manager.model.command.Command;
+import it.unisa.java_music_playlist_manager.model.command.UndoManager;
+import it.unisa.java_music_playlist_manager.model.command.UpdateTrackCommand;
 
 import java.util.List;
 import java.util.TreeSet;
 import java.io.File;
-
 
 // IMPORTAZIONI JAUDIOTAGGER rimosse: la logica è ora in TrackMetadataExtractor
 
@@ -32,26 +31,35 @@ import javafx.application.Platform;
 // IMPORTAZIONE PER CONTROLSFX
 import org.controlsfx.control.CheckComboBox;
 
-
-
-
 /**
- * AddTrackController gestisce la finestra di dialogo per l'inserimento o la modifica di una traccia.
- * Si occupa della validazione dell'input utente e dell'estrazione automatica dei metadati dai file audio.
+ * AddTrackController gestisce la finestra di dialogo per l'inserimento o la
+ * modifica di una traccia.
+ * Si occupa della validazione dell'input utente e dell'estrazione automatica
+ * dei metadati dai file audio.
  * 
  * Ruolo nel progetto:
  * - Fornisce un'interfaccia form per popolare gli oggetti {@link Track}.
- * - Utilizza jaudiotagger per estrarre in modo affidabile i tag ID3 (titolo, artista, album, anno, genere).
- * - Utilizza {@link MediaPlayer} esclusivamente per calcolare la durata del brano.
- * - Integra {@link org.controlsfx.control.CheckComboBox} per permettere l'assegnazione multipla di {@link Tag} ai brani.
- * - Gestisce sia la creazione di nuovi brani che l'aggiornamento di brani esistenti.
+ * - Utilizza jaudiotagger per estrarre in modo affidabile i tag ID3 (titolo,
+ * artista, album, anno, genere).
+ * - Utilizza {@link MediaPlayer} esclusivamente per calcolare la durata del
+ * brano.
+ * - Integra {@link org.controlsfx.control.CheckComboBox} per permettere
+ * l'assegnazione multipla di {@link Tag} ai brani.
+ * - Gestisce sia la creazione di nuovi brani che l'aggiornamento di brani
+ * esistenti.
  */
 public class AddTrackController {
 
-    /** Brano correntemente in fase di editing (null se stiamo aggiungendo un nuovo brano) */
+    /**
+     * Brano correntemente in fase di editing (null se stiamo aggiungendo un nuovo
+     * brano)
+     */
     private Track currentEditingTrack = null;
-    
-    /** Observer da registrare sul brano appena creato (solitamente il PrimaryViewController) */
+
+    /**
+     * Observer da registrare sul brano appena creato (solitamente il
+     * PrimaryViewController)
+     */
     private Observer trackObserver = null;
 
     @FXML
@@ -70,7 +78,7 @@ public class AddTrackController {
     private ComboBox<String> addTrackGenreComboBox;
     @FXML
     private Label formTitleLabel;
-    
+
     /** Componente della libreria ControlsFX per la selezione multipla dei tag */
     @FXML
     private CheckComboBox<Tag> addTrackTagComboBox;
@@ -78,18 +86,21 @@ public class AddTrackController {
     @FXML
     private Button saveTrackButton;
 
-    /** Overlay visualizzato durante l'analisi asincrona del file audio selezionato */
+    /**
+     * Overlay visualizzato durante l'analisi asincrona del file audio selezionato
+     */
     @FXML
     private VBox loadingOverlay;
 
     /** Percorso del file audio selezionato nel filesystem */
     private String selectedFilePath = null;
-    
+
     /** Durata in secondi estratta automaticamente dal file audio */
     private int extractedDuration = 0;
 
     /**
      * Imposta l'observer da collegare ai nuovi brani dopo il salvataggio.
+     * 
      * @param observer L'osservatore (tipicamente il controller principale).
      */
     public void setOnTrackSaved(Observer observer) {
@@ -97,10 +108,12 @@ public class AddTrackController {
     }
 
     /**
-     * Inizializza il form con i dati di una traccia esistente (modifica) o con campi vuoti (inserimento).
+     * Inizializza il form con i dati di una traccia esistente (modifica) o con
+     * campi vuoti (inserimento).
      * Gestisce la sincronizzazione dei componenti UI con lo stato del Modello.
      * 
-     * @param editingTrack La traccia da modificare, o null per un nuovo inserimento.
+     * @param editingTrack La traccia da modificare, o null per un nuovo
+     *                     inserimento.
      */
     public void initForm(Track editingTrack) {
         this.currentEditingTrack = editingTrack;
@@ -110,25 +123,26 @@ public class AddTrackController {
             formTitleLabel.setText(currentEditingTrack != null ? "Modifica brano" : "Aggiungi nuovo brano");
         }
 
-        // Popolamento lista generi predefiniti + custom dalla libreria, in ordine alfabetico
+        // Popolamento lista generi predefiniti + custom dalla libreria, in ordine
+        // alfabetico
         if (addTrackGenreComboBox != null) {
             addTrackGenreComboBox.setEditable(true);
             TreeSet<String> allGenres = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
             allGenres.addAll(List.of(
-                "Alternative", "Ambient", "Anime", "Blues", "Bollywood",
-                "Bossa Nova", "Classica", "Classical", "Country", "Dance",
-                "Disco", "Drum and Bass", "Dubstep", "Electronic", "Folk",
-                "Funk", "Gospel", "Grunge", "Hard Rock", "Heavy Metal",
-                "Hip Hop", "House", "Indie", "Jazz", "K-Pop", "Latin",
-                "Lo-Fi", "Metal", "Metalcore", "Pop", "Pop Rock",
-                "Post-Rock", "Progressive Rock", "Punk", "R&B", "Rap",
-                "Reggae", "Reggaeton", "Rock", "Salsa", "Samba", "Soul",
-                "Synthwave", "Techno", "Trap", "World", "Generico"
-            ));
+                    "Alternative", "Ambient", "Anime", "Blues", "Bollywood",
+                    "Bossa Nova", "Classica", "Classical", "Country", "Dance",
+                    "Disco", "Drum and Bass", "Dubstep", "Electronic", "Folk",
+                    "Funk", "Gospel", "Grunge", "Hard Rock", "Heavy Metal",
+                    "Hip Hop", "House", "Indie", "Jazz", "K-Pop", "Latin",
+                    "Lo-Fi", "Metal", "Metalcore", "Pop", "Pop Rock",
+                    "Post-Rock", "Progressive Rock", "Punk", "R&B", "Rap",
+                    "Reggae", "Reggaeton", "Rock", "Salsa", "Samba", "Soul",
+                    "Synthwave", "Techno", "Trap", "World", "Generico"));
             // Aggiunge i generi custom già presenti in libreria
             Library.getInstance().getTracks().forEach(t -> {
                 String g = t.getGenre();
-                if (g != null && !g.isBlank()) allGenres.add(g);
+                if (g != null && !g.isBlank())
+                    allGenres.add(g);
             });
             if (addTrackGenreComboBox.getItems() == null) {
                 addTrackGenreComboBox.setItems(javafx.collections.FXCollections.observableArrayList());
@@ -141,11 +155,13 @@ public class AddTrackController {
             addTrackTitleField.setText(currentEditingTrack.getTitle());
             addTrackAuthorField.setText(currentEditingTrack.getAuthor());
             addTrackAlbumField.setText(currentEditingTrack.getAlbum());
-            extractedDuration = currentEditingTrack.getDuration(); 
-            addTrackYearField.setText(currentEditingTrack.getYear() == null ? "" : String.valueOf(currentEditingTrack.getYear()));
+            extractedDuration = currentEditingTrack.getDuration();
+            addTrackYearField.setText(
+                    currentEditingTrack.getYear() == null ? "" : String.valueOf(currentEditingTrack.getYear()));
             addTrackGenreComboBox.setValue(currentEditingTrack.getGenre());
             selectedFilePath = currentEditingTrack.getFilePath();
-            filePathLabel.setText(selectedFilePath != null ? new File(selectedFilePath).getName() : "Nessun file associato");
+            filePathLabel
+                    .setText(selectedFilePath != null ? new File(selectedFilePath).getName() : "Nessun file associato");
 
             // Sincronizzazione spunte dei Tag
             if (addTrackTagComboBox != null) {
@@ -159,9 +175,11 @@ public class AddTrackController {
             resetFields();
         }
 
-        if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
+        if (addTrackErrorLabel != null)
+            addTrackErrorLabel.setText("");
 
-        // I campi rimangono disabilitati finché non viene selezionato un file audio valido
+        // I campi rimangono disabilitati finché non viene selezionato un file audio
+        // valido
         setFieldsDisable(selectedFilePath == null || selectedFilePath.isEmpty());
     }
 
@@ -174,8 +192,10 @@ public class AddTrackController {
         addTrackGenreComboBox.setValue(null);
         selectedFilePath = null;
         filePathLabel.setText("Nessun file selezionato");
-        if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
-        if (addTrackTagComboBox != null) addTrackTagComboBox.getCheckModel().clearChecks();
+        if (addTrackErrorLabel != null)
+            addTrackErrorLabel.setText("");
+        if (addTrackTagComboBox != null)
+            addTrackTagComboBox.getCheckModel().clearChecks();
     }
 
     /**
@@ -190,7 +210,8 @@ public class AddTrackController {
             String album = addTrackAlbumField.getText().trim();
             String genre = addTrackGenreComboBox.getValue();
             String yearText = addTrackYearField.getText().trim();
-            List<Tag> selectedTags = addTrackTagComboBox != null ? addTrackTagComboBox.getCheckModel().getCheckedItems() : null;
+            List<Tag> selectedTags = addTrackTagComboBox != null ? addTrackTagComboBox.getCheckModel().getCheckedItems()
+                    : null;
 
             if (title.isEmpty()) {
                 addTrackErrorLabel.setText("Il titolo è obbligatorio.");
@@ -213,13 +234,19 @@ public class AddTrackController {
 
             if (currentEditingTrack != null) {
                 // MODIFICA TRAMITE COMMAND
-                Command updateCmd = new UpdateTrackCommand(currentEditingTrack, title, author, album, genre, year, selectedFilePath, selectedTags);
+                Command updateCmd = new UpdateTrackCommand(currentEditingTrack, title, author, album, genre, year,
+                        selectedFilePath, selectedTags);
                 UndoManager.getInstance().executeCommand(updateCmd);
             } else {
                 // CREAZIONE TRAMITE COMMAND
                 Track track = new Track(title, author, album, extractedDuration, genre, year, selectedFilePath);
-                if (selectedTags != null) selectedTags.forEach(t -> { if (t != null) track.addTag(t); });
-                if (trackObserver != null) track.attach(trackObserver);
+                if (selectedTags != null)
+                    selectedTags.forEach(t -> {
+                        if (t != null)
+                            track.addTag(t);
+                    });
+                if (trackObserver != null)
+                    track.attach(trackObserver);
 
                 Command addCmd = new AddTrackCommand(Library.getInstance(), track);
                 UndoManager.getInstance().executeCommand(addCmd);
@@ -261,7 +288,8 @@ public class AddTrackController {
         if (file != null) {
             selectedFilePath = file.getAbsolutePath();
             filePathLabel.setText(file.getName());
-            if (addTrackErrorLabel != null) addTrackErrorLabel.setText("");
+            if (addTrackErrorLabel != null)
+                addTrackErrorLabel.setText("");
             setFieldsDisable(false);
             setLoading(true);
 
@@ -280,9 +308,12 @@ public class AddTrackController {
 
     /**
      * Analizza il file audio per estrarre metadati e durata.
-     * - jaudiotagger: estrae titolo, artista, album, anno, genere in modo sincrono e affidabile.
-     * - JavaFX MediaPlayer: utilizzato esclusivamente per calcolare la durata del brano.
-     * Entrambe le operazioni vengono eseguite in un thread separato per non bloccare l'UI.
+     * - jaudiotagger: estrae titolo, artista, album, anno, genere in modo sincrono
+     * e affidabile.
+     * - JavaFX MediaPlayer: utilizzato esclusivamente per calcolare la durata del
+     * brano.
+     * Entrambe le operazioni vengono eseguite in un thread separato per non
+     * bloccare l'UI.
      *
      * @param file Il file da analizzare.
      */
@@ -293,14 +324,15 @@ public class AddTrackController {
         addTrackTitleField.setText(lastDot > 0 ? fileName.substring(0, lastDot) : fileName);
 
         new Thread(() -> {
-            it.unisa.java_music_playlist_manager.model.Track extractedTrack = it.unisa.java_music_playlist_manager.model.TrackMetadataExtractor.extractMetadata(file);
+            it.unisa.java_music_playlist_manager.model.Track extractedTrack = it.unisa.java_music_playlist_manager.services.TrackMetadataExtractor
+                    .extractMetadata(file);
 
             // Cattura variabili final per il lambda del Platform.runLater
-            final String fTitle  = extractedTrack.getTitle();
+            final String fTitle = extractedTrack.getTitle();
             final String fArtist = extractedTrack.getAuthor();
-            final String fAlbum  = extractedTrack.getAlbum();
-            final String fGenre  = extractedTrack.getGenre();
-            final String fYear   = extractedTrack.getYear() != null ? String.valueOf(extractedTrack.getYear()) : null;
+            final String fAlbum = extractedTrack.getAlbum();
+            final String fGenre = extractedTrack.getGenre();
+            final String fYear = extractedTrack.getYear() != null ? String.valueOf(extractedTrack.getYear()) : null;
 
             // 2. Aggiorna i campi UI con i tag letti
             Platform.runLater(() -> {
@@ -319,13 +351,14 @@ public class AddTrackController {
                 if (fGenre != null && !fGenre.isEmpty()) {
                     // Cerca corrispondenza case-insensitive nella lista esistente
                     String matched = addTrackGenreComboBox.getItems().stream()
-                        .filter(g -> g.equalsIgnoreCase(fGenre))
-                        .findFirst()
-                        .orElse(null);
+                            .filter(g -> g.equalsIgnoreCase(fGenre))
+                            .findFirst()
+                            .orElse(null);
                     if (matched != null) {
                         addTrackGenreComboBox.getSelectionModel().select(matched);
                     } else {
-                        // Genere custom non in lista: aggiorna la lista osservabile in-place mantenendo l'ordinamento
+                        // Genere custom non in lista: aggiorna la lista osservabile in-place mantenendo
+                        // l'ordinamento
                         TreeSet<String> sorted = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
                         sorted.addAll(addTrackGenreComboBox.getItems());
                         sorted.add(fGenre);
@@ -338,7 +371,8 @@ public class AddTrackController {
                 }
             });
 
-            // 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) e validazione formato
+            // 3. Durata tramite JavaFX MediaPlayer (unico caso d'uso rimasto) e validazione
+            // formato
             Platform.runLater(() -> {
                 try {
                     Media media = new Media(file.toURI().toString());
@@ -352,20 +386,23 @@ public class AddTrackController {
                     });
                     tempPlayer.setOnError(() -> {
                         setLoading(false);
-                        invalidateUnsupportedAudioFile("Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
+                        invalidateUnsupportedAudioFile(
+                                "Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
                         tempPlayer.dispose();
                     });
                     startAnalysisTimeout(tempPlayer);
                 } catch (Exception e) {
                     setLoading(false);
-                    invalidateUnsupportedAudioFile("Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
+                    invalidateUnsupportedAudioFile(
+                            "Formato non supportato (es. WAVE compresso).\nSeleziona un file MP3, M4A o WAV PCM.");
                 }
             });
         }).start();
     }
 
     /**
-     * Resetta il file selezionato e mostra un errore bloccante se il formato audio non è supportato da JavaFX.
+     * Resetta il file selezionato e mostra un errore bloccante se il formato audio
+     * non è supportato da JavaFX.
      */
     private void invalidateUnsupportedAudioFile(String errorMsg) {
         selectedFilePath = null;
@@ -380,8 +417,6 @@ public class AddTrackController {
         });
     }
 
-
-
     private void startAnalysisTimeout(MediaPlayer player) {
         new Thread(() -> {
             try {
@@ -390,18 +425,26 @@ public class AddTrackController {
                     setLoading(false);
                     Platform.runLater(player::dispose);
                 }
-            } catch (InterruptedException ignored) {}
+            } catch (InterruptedException ignored) {
+            }
         }).start();
     }
 
     private void setFieldsDisable(boolean disable) {
-        if (addTrackTitleField != null) addTrackTitleField.setDisable(disable);
-        if (addTrackAuthorField != null) addTrackAuthorField.setDisable(disable);
-        if (addTrackAlbumField != null) addTrackAlbumField.setDisable(disable);
-        if (addTrackGenreComboBox != null) addTrackGenreComboBox.setDisable(disable);
-        if (addTrackYearField != null) addTrackYearField.setDisable(disable);
-        if (addTrackTagComboBox != null) addTrackTagComboBox.setDisable(disable);
-        if (saveTrackButton != null) saveTrackButton.setDisable(disable);
+        if (addTrackTitleField != null)
+            addTrackTitleField.setDisable(disable);
+        if (addTrackAuthorField != null)
+            addTrackAuthorField.setDisable(disable);
+        if (addTrackAlbumField != null)
+            addTrackAlbumField.setDisable(disable);
+        if (addTrackGenreComboBox != null)
+            addTrackGenreComboBox.setDisable(disable);
+        if (addTrackYearField != null)
+            addTrackYearField.setDisable(disable);
+        if (addTrackTagComboBox != null)
+            addTrackTagComboBox.setDisable(disable);
+        if (saveTrackButton != null)
+            saveTrackButton.setDisable(disable);
     }
 
     private void setLoading(boolean loading) {
@@ -410,7 +453,8 @@ public class AddTrackController {
                 loadingOverlay.setVisible(loading);
                 loadingOverlay.setManaged(loading);
             }
-            if (saveTrackButton != null) saveTrackButton.setDisable(loading);
+            if (saveTrackButton != null)
+                saveTrackButton.setDisable(loading);
         });
     }
 
@@ -421,6 +465,6 @@ public class AddTrackController {
     public void initialize() {
         if (addTrackTagComboBox != null) {
             addTrackTagComboBox.getItems().addAll(TagPredefined.values());
-        }   
+        }
     }
 }

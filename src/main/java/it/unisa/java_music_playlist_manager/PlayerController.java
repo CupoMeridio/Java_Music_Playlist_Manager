@@ -1,13 +1,16 @@
 package it.unisa.java_music_playlist_manager;
 
+import it.unisa.java_music_playlist_manager.controllers.PrimaryViewController;
 import it.unisa.java_music_playlist_manager.model.AudioState;
-import it.unisa.java_music_playlist_manager.model.Track;
-import it.unisa.java_music_playlist_manager.model.PlaybackManager;
-import it.unisa.java_music_playlist_manager.model.ShuffleStrategy;
-import it.unisa.java_music_playlist_manager.model.Observer;
 import it.unisa.java_music_playlist_manager.model.Library;
-import it.unisa.java_music_playlist_manager.model.StoppedState;
+import it.unisa.java_music_playlist_manager.model.Observer;
+import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import it.unisa.java_music_playlist_manager.model.Track;
+import it.unisa.java_music_playlist_manager.model.state.StoppedState;
+import it.unisa.java_music_playlist_manager.model.strategy.ShuffleStrategy;
+
 import it.unisa.java_music_playlist_manager.utils.TimeFormatUtils;
+
 import javafx.animation.RotateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -30,7 +33,8 @@ import org.kordamp.ikonli.javafx.FontIcon;
 
 /**
  * Controller per la gestione della barra di riproduzione (PlayerBarView.fxml).
- * Separato per isolare la responsabilità del player dalla gestione della vista principale.
+ * Separato per isolare la responsabilità del player dalla gestione della vista
+ * principale.
  *
  * PlayerController gestisce l'interfaccia della barra di riproduzione
  * inferiore. Si occupa di visualizzare i metadati del brano corrente,
@@ -39,14 +43,14 @@ import org.kordamp.ikonli.javafx.FontIcon;
  *
  * Ruolo nel progetto:
  * - Implementa {@link Observer} per aggiornare la barra quando il player
- *   cambia traccia.
+ * cambia traccia.
  * - Sincronizza lo stato visivo (Play/Pause, Slider, Timer) tramite la
- *   <i>facade API</i> di {@link PlaybackManager} (metodi playAudioDirect,
- *   seekAudio, setAudioVolume, getAudioState ...).
- *   In questo modo il controller NON dipende direttamente da
- *   JavaFX MediaPlayer — disaccoppiamento dal layer Model.
+ * <i>facade API</i> di {@link PlaybackManager} (metodi playAudioDirect,
+ * seekAudio, setAudioVolume, getAudioState ...).
+ * In questo modo il controller NON dipende direttamente da
+ * JavaFX MediaPlayer — disaccoppiamento dal layer Model.
  * - Comunica con {@link PrimaryViewController} tramite callback Runnable per
- *   mantenere l'UI coerente.
+ * mantenere l'UI coerente.
  */
 public class PlayerController implements Observer {
 
@@ -248,14 +252,16 @@ public class PlayerController implements Observer {
             final boolean[] isDragging = { false };
 
             progressSlider.setOnMousePressed(e -> {
-                if (!isTrackOrThumbClick(e)) return;
+                if (!isTrackOrThumbClick(e))
+                    return;
                 isDragging[0] = true;
                 PlaybackManager manager = PlaybackManager.getInstance();
                 wasPlaying[0] = (manager.getAudioState() == AudioState.PLAYING);
                 manager.pauseAudioDirect();
             });
             progressSlider.setOnMouseReleased(e -> {
-                if (!isDragging[0]) return;
+                if (!isDragging[0])
+                    return;
                 isDragging[0] = false;
                 PlaybackManager manager = PlaybackManager.getInstance();
                 manager.seekAudio(progressSlider.getValue());
@@ -267,25 +273,26 @@ public class PlayerController implements Observer {
         }
 
         if (shuffleButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(shuffleButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(shuffleButton);
         if (prevPlayableButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(prevPlayableButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(prevPlayableButton);
         if (prevButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(prevButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(prevButton);
         if (playPauseButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(playPauseButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(playPauseButton);
         if (nextButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(nextButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(nextButton);
         if (nextPlayableButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(nextPlayableButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(nextPlayableButton);
         if (repeatButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(repeatButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(repeatButton);
         if (volumeButton != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(volumeButton);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(volumeButton);
         if (coverContainer != null)
-            it.unisa.java_music_playlist_manager.ui.SnapMotion.attach(coverContainer);
+            it.unisa.java_music_playlist_manager.view.SnapMotion.attach(coverContainer);
 
-        // Registra i listener audio sul PlaybackManager per l'intero ciclo di vita del controller.
+        // Registra i listener audio sul PlaybackManager per l'intero ciclo di vita del
+        // controller.
         PlaybackManager manager = PlaybackManager.getInstance();
         manager.setAudioReadyListener(() -> javafx.application.Platform.runLater(() -> {
             if (volumeSlider != null) {
@@ -341,8 +348,10 @@ public class PlayerController implements Observer {
     }
 
     /**
-     * Aggiorna la maschera di ritaglio (clip) della copertina in base al tema attivo.
-     * Nel tema Phantom Thief ritaglia con precisione gli angoli diagonali (taglio manga).
+     * Aggiorna la maschera di ritaglio (clip) della copertina in base al tema
+     * attivo.
+     * Nel tema Phantom Thief ritaglia con precisione gli angoli diagonali (taglio
+     * manga).
      * Negli altri temi applica il bordo arrotondato standard.
      */
     private void updateThemeClip(String themeName) {
@@ -352,13 +361,12 @@ public class PlayerController implements Observer {
         if ("Phantom Thief".equalsIgnoreCase(themeName)) {
             // Maschera esagonale ad angoli tagliati diagonali matching lo stile Persona 5
             Polygon phantomClip = new Polygon(
-                10.0, 0.0,
-                COVER_CONTENT_SIZE, 0.0,
-                COVER_CONTENT_SIZE, COVER_CONTENT_SIZE - 10.0,
-                COVER_CONTENT_SIZE - 10.0, COVER_CONTENT_SIZE,
-                0.0, COVER_CONTENT_SIZE,
-                0.0, 10.0
-            );
+                    10.0, 0.0,
+                    COVER_CONTENT_SIZE, 0.0,
+                    COVER_CONTENT_SIZE, COVER_CONTENT_SIZE - 10.0,
+                    COVER_CONTENT_SIZE - 10.0, COVER_CONTENT_SIZE,
+                    0.0, COVER_CONTENT_SIZE,
+                    0.0, 10.0);
             albumCoverImageView.setClip(phantomClip);
         } else {
             // Standard: ritaglio moderno ad angoli arrotondati
@@ -493,11 +501,11 @@ public class PlayerController implements Observer {
         // Se lo shuffle è già attivo, lo spegniamo ripristinando la strategia
         // sequenziale
         if (manager.getCurrentStrategy() instanceof ShuffleStrategy) {
-            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.SequentialStrategy());
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.strategy.SequentialStrategy());
             setButtonActiveState(shuffleButton, false);
         } else {
             // Altrimenti attiviamo la strategia shuffle
-            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.ShuffleStrategy());
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.strategy.ShuffleStrategy());
             setButtonActiveState(shuffleButton, true);
 
             // se attivi lo shuffle si spegne il loop
@@ -562,18 +570,20 @@ public class PlayerController implements Observer {
     @FXML
     private void handleRepeatToggle() {
         PlaybackManager manager = PlaybackManager.getInstance();
-        if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.SequentialStrategy) {
-            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatStrategy());
+        if (manager
+                .getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.strategy.SequentialStrategy) {
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.strategy.RepeatStrategy());
             setButtonActiveState(repeatButton, true);
             // Si potrebbe usare un'altra pseudoclasse (es. :active-track) per il
             // repeat-track
             repeatButton.pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("repeat-track"), false);
-        } else if (manager.getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.RepeatStrategy) {
-            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.RepeatTrackStrategy());
+        } else if (manager
+                .getCurrentStrategy() instanceof it.unisa.java_music_playlist_manager.model.strategy.RepeatStrategy) {
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.strategy.RepeatTrackStrategy());
             setButtonActiveState(repeatButton, true);
             repeatButton.pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("repeat-track"), true);
         } else {
-            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.SequentialStrategy());
+            manager.setStrategy(new it.unisa.java_music_playlist_manager.model.strategy.SequentialStrategy());
             setButtonActiveState(repeatButton, false);
             repeatButton.pseudoClassStateChanged(javafx.css.PseudoClass.getPseudoClass("repeat-track"), false);
         }
@@ -636,9 +646,9 @@ public class PlayerController implements Observer {
         if (filePath == null)
             return;
 
-        it.unisa.java_music_playlist_manager.ui.CoverImageService.getInstance().loadCoverAsync(filePath)
+        it.unisa.java_music_playlist_manager.services.CoverImageService.getInstance().loadCoverAsync(filePath)
                 .thenAcceptAsync(image -> {
-                    Image finalCover = it.unisa.java_music_playlist_manager.ui.CoverImageService.getInstance()
+                    Image finalCover = it.unisa.java_music_playlist_manager.services.CoverImageService.getInstance()
                             .isDefaultCover(image) ? null : image;
                     if (albumCoverImageView != null)
                         albumCoverImageView.setImage(finalCover);

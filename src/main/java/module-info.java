@@ -17,11 +17,18 @@ module it.unisa.java_music_playlist_manager {
     requires jaudiotagger;
     
     opens it.unisa.java_music_playlist_manager to javafx.fxml;
-    opens it.unisa.java_music_playlist_manager.ui to javafx.fxml;
+    opens it.unisa.java_music_playlist_manager.controllers to javafx.fxml;
+    opens it.unisa.java_music_playlist_manager.view to javafx.fxml;
     opens it.unisa.java_music_playlist_manager.model to javafx.base, com.fasterxml.jackson.databind, org.junit.platform.commons;
     exports it.unisa.java_music_playlist_manager;
-    exports it.unisa.java_music_playlist_manager.ui;
+    exports it.unisa.java_music_playlist_manager.controllers;
+    exports it.unisa.java_music_playlist_manager.view;
+    exports it.unisa.java_music_playlist_manager.services;
     exports it.unisa.java_music_playlist_manager.model;
+    exports it.unisa.java_music_playlist_manager.model.command;
+    exports it.unisa.java_music_playlist_manager.model.generator;
+    exports it.unisa.java_music_playlist_manager.model.state;
+    exports it.unisa.java_music_playlist_manager.model.strategy;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.datatype.jsr310;
     

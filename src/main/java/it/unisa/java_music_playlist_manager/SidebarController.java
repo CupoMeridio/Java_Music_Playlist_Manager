@@ -1,7 +1,8 @@
 package it.unisa.java_music_playlist_manager;
 
+import it.unisa.java_music_playlist_manager.view.ViewType;
+
 import java.util.function.Consumer;
-import it.unisa.java_music_playlist_manager.model.ViewType;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContextMenu;

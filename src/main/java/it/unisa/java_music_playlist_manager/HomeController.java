@@ -1,8 +1,12 @@
 package it.unisa.java_music_playlist_manager;
 
-import it.unisa.java_music_playlist_manager.model.*;
-import it.unisa.java_music_playlist_manager.ui.ContextMenuManager;
+import it.unisa.java_music_playlist_manager.model.Library;
+import it.unisa.java_music_playlist_manager.model.Observer;
+import it.unisa.java_music_playlist_manager.model.PlaybackManager;
+import it.unisa.java_music_playlist_manager.model.Playlist;
+import it.unisa.java_music_playlist_manager.model.Track;
 import it.unisa.java_music_playlist_manager.utils.TimeFormatUtils;
+import it.unisa.java_music_playlist_manager.view.ContextMenuManager;
 
 import java.util.Comparator;
 import java.util.List;
