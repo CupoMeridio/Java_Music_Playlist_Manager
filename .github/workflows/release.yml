@@ -48,16 +48,13 @@ jobs:
           # 3. Comprimi la cartella dell'eseguibile in uno zip portabile
           Compress-Archive -Path "target/dist/Java-Music-Playlist-Manager" -DestinationPath "target/Java-Music-Playlist-Manager-Windows-Portable.zip"
 
-          # 4. Crea l'installer Windows (.msi) con scorciatoia su Desktop e Menu Start
+          # 4. Crea l'installer Windows (.msi) riutilizzando l'app-image già generata (più veloce e garantisce consistenza)
           jpackage --type msi `
-            --input "target/jpackage-input" `
+            --app-image "target/dist/Java-Music-Playlist-Manager" `
             --name "Java-Music-Playlist-Manager" `
-            --main-jar "Java-Music-Playlist-Manager.jar" `
-            --main-class it.unisa.java_music_playlist_manager.Launcher `
             --dest "target" `
             --win-shortcut `
-            --win-menu `
-            --java-options "--enable-native-access=javafx.graphics,javafx.media"
+            --win-menu
 
       - name: Forza l'aggiornamento del tag "latest" al commit corrente
         shell: bash
